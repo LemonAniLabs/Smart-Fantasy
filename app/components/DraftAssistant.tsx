@@ -110,7 +110,7 @@ export default function DraftAssistant() {
               <tbody className="text-white">
                 {filteredPlayers.slice(0, 100).map((player) => {
                   const topCats = Object.entries(player.categoryScores)
-                    .filter(([_, score]) => score >= 7)
+                    .filter(([, score]) => score >= 7)
                     .map(([cat]) => cat.toUpperCase())
                     .slice(0, 4)
                     .join(', ')

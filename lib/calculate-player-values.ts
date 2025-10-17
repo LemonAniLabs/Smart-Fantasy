@@ -210,7 +210,6 @@ export function calculatePlayerValues(players: PlayerStats[]): PlayerValue[] {
   // 計算建議價格（Salary Cap: $200 總預算）
   // 14 隊聯盟，每隊 16 人 = 224 個球員位置
   // 假設前 200 名球員會被選走
-  const totalBudget = 200 * 14  // $2800 total league budget
   const topPlayerCount = 200
 
   playerValues.forEach((player, index) => {

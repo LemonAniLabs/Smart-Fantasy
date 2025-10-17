@@ -97,7 +97,7 @@ async function importSeasonData() {
 
         resolve()
       },
-      error: (error) => {
+      error: (error: Error) => {
         console.error('❌ CSV 解析錯誤:', error)
         reject(error)
       }
