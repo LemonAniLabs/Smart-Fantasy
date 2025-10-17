@@ -1,0 +1,248 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// 球員基本資料
+model Player {
+  id            String   @id @default(cuid())
+  name          String
+  team          String?
+  position      String?  // PG, SG, SF, PF, C
+  yahooId       String?  @unique
+  injuryStatus  String?  // Healthy, GTD, Out, IL
+  lastUpdated   DateTime @default(now()) @updatedAt
+
+  // Relations
+  seasonStats   PlayerSeasonStats[]
+  dailyStats    PlayerDailyStats[]
+  projections   PlayerProjection[]
+  draftValues   DraftValue[]
+  news          PlayerNews[]
+
+  @@index([name])
+  @@index([team])
+  @@index([position])
+}
+
+// 球員每日統計（用於詳細分析）
+model PlayerDailyStats {
+  id           String   @id @default(cuid())
+  playerId     String
+  player       Player   @relation(fields: [playerId], references: [id], onDelete: Cascade)
+
+  gameDate     DateTime
+  season       String   // e.g., "2024-25"
+  opponent     String?
+  isHome       Boolean  @default(true)
+
+  // 11-Category Stats
+  fgm          Float    @default(0)  // Field Goals Made
+  fga          Float    @default(0)  // Field Goals Attempted
+  fgPct        Float    @default(0)  // Field Goal Percentage
+  ftm          Float    @default(0)  // Free Throws Made
+  fta          Float    @default(0)  // Free Throws Attempted
+  ftPct        Float    @default(0)  // Free Throw Percentage
+  tpm          Float    @default(0)  // 3-Point Made (3PTM)
+  pts          Float    @default(0)  // Points
+  oreb         Float    @default(0)  // Offensive Rebounds
+  reb          Float    @default(0)  // Total Rebounds
+  ast          Float    @default(0)  // Assists
+  stl          Float    @default(0)  // Steals
+  blk          Float    @default(0)  // Blocks
+  tov          Float    @default(0)  // Turnovers
+
+  // Calculated
+  astToRatio   Float    @default(0)  // A/T Ratio
+
+  // Additional Context
+  minutesPlayed Float   @default(0)
+  gameResult    String?  // W/L
+
+  @@unique([playerId, gameDate])
+  @@index([playerId, season])
+  @@index([gameDate])
+}
+
+// 球員賽季平均數據（用於快速查詢）
+model PlayerSeasonStats {
+  id           String   @id @default(cuid())
+  playerId     String
+  player       Player   @relation(fields: [playerId], references: [id], onDelete: Cascade)
+
+  season       String   // e.g., "2024-25"
+  gamesPlayed  Int      @default(0)
+
+  // Season Averages (11-Cat)
+  avgFgm       Float    @default(0)
+  avgFga       Float    @default(0)
+  avgFgPct     Float    @default(0)
+  avgFtPct     Float    @default(0)
+  avgTpm       Float    @default(0)
+  avgPts       Float    @default(0)
+  avgOreb      Float    @default(0)
+  avgReb       Float    @default(0)
+  avgAst       Float    @default(0)
+  avgStl       Float    @default(0)
+  avgBlk       Float    @default(0)
+  avgTov       Float    @default(0)
+  avgAstToRatio Float   @default(0)
+  avgMinutes   Float    @default(0)
+
+  // Totals
+  totalFgm     Float    @default(0)
+  totalFga     Float    @default(0)
+  totalFtm     Float    @default(0)
+  totalFta     Float    @default(0)
+  totalTpm     Float    @default(0)
+  totalPts     Float    @default(0)
+  totalOreb    Float    @default(0)
+  totalReb     Float    @default(0)
+  totalAst     Float    @default(0)
+  totalStl     Float    @default(0)
+  totalBlk     Float    @default(0)
+  totalTov     Float    @default(0)
+
+  @@unique([playerId, season])
+  @@index([season])
+}
+
+// AI 預測數據
+model PlayerProjection {
+  id              String   @id @default(cuid())
+  playerId        String
+  player          Player   @relation(fields: [playerId], references: [id], onDelete: Cascade)
+
+  projectionDate  DateTime @default(now())
+  season          String
+  modelType       String   // "xgboost", "lstm", "ensemble"
+
+  // Projected Stats (next 7 days / ROS)
+  projFgm         Float    @default(0)
+  projFgPct       Float    @default(0)
+  projFtPct       Float    @default(0)
+  projTpm         Float    @default(0)
+  projPts         Float    @default(0)
+  projOreb        Float    @default(0)
+  projReb         Float    @default(0)
+  projAst         Float    @default(0)
+  projStl         Float    @default(0)
+  projBlk         Float    @default(0)
+  projTov         Float    @default(0)
+  projAstToRatio  Float    @default(0)
+
+  // Confidence & Metadata
+  confidenceScore Float    @default(0)  // 0-1
+  variance        Float    @default(0)
+
+  @@index([playerId, season])
+  @@index([projectionDate])
+}
+
+// 選秀價值評估
+model DraftValue {
+  id                String   @id @default(cuid())
+  playerId          String
+  player            Player   @relation(fields: [playerId], references: [id], onDelete: Cascade)
+
+  season            String
+  draftType         String   // "salary_cap", "snake"
+
+  // Value Metrics
+  suggestedPrice    Float    @default(0)  // $1-200 for salary cap
+  minPrice          Float    @default(0)
+  maxPrice          Float    @default(0)
+  tier              Int      @default(0)  // 1-10
+  positionRank      Int      @default(0)
+  overallRank       Int      @default(0)
+
+  // Category Strengths (JSON)
+  categoryScores    Json?    // { "fgPct": 8.5, "pts": 9.2, ... }
+
+  // VORP & Advanced Metrics
+  vorp              Float    @default(0)  // Value Over Replacement Player
+  scarcityScore     Float    @default(0)  // Position scarcity in 14-team league
+  balanceScore      Float    @default(0)  // How balanced across 11 categories
+
+  updatedAt         DateTime @updatedAt
+
+  @@unique([playerId, season, draftType])
+  @@index([season, overallRank])
+}
+
+// 傷病與新聞
+model PlayerNews {
+  id              String   @id @default(cuid())
+  playerId        String
+  player          Player   @relation(fields: [playerId], references: [id], onDelete: Cascade)
+
+  newsDate        DateTime @default(now())
+  source          String   // "ESPN", "Yahoo", "Twitter", etc.
+  title           String
+  content         String   @db.Text
+  url             String?
+
+  // Impact Analysis
+  impactLevel     String   // "High", "Medium", "Low"
+  injuryType      String?  // "Ankle", "Knee", "Rest", etc.
+  expectedReturn  DateTime?
+
+  // Related Players (beneficiaries)
+  beneficiaries   Json?    // ["player_id_1", "player_id_2"]
+
+  @@index([playerId, newsDate])
+  @@index([newsDate])
+}
+
+// 自由市場推薦
+model WaiverRecommendation {
+  id                  String   @id @default(cuid())
+  playerId            String
+
+  week                Int
+  season              String
+  recommendationScore Float    @default(0)  // 0-100
+
+  // Analysis
+  categoryFill        Json?    // Which categories this player helps with
+  opportunityIndex    Float    @default(0)  // Injury/trade opportunity score
+  trendingScore       Float    @default(0)  // Recent performance trend
+
+  // Context
+  reason              String   @db.Text
+  createdAt           DateTime @default(now())
+
+  @@index([season, week, recommendationScore])
+}
+
+// 對戰分析
+model MatchupAnalysis {
+  id              String   @id @default(cuid())
+
+  week            Int
+  season          String
+  opponentTeamId  String
+
+  // Predictions
+  predictedWins   Int      @default(0)  // Out of 11 categories
+  winProbability  Float    @default(0)  // 0-1
+
+  // Category Breakdown
+  categoryAnalysis Json?   // Detailed analysis per category
+
+  // Recommendations
+  startPlayers     Json?   // ["player_id_1", ...]
+  benchPlayers     Json?
+  waiverTargets    Json?
+
+  createdAt        DateTime @default(now())
+
+  @@index([season, week])
+}

@@ -1,0 +1,243 @@
+'use client'
+
+import { useState, useEffect, useMemo } from 'react'
+import type { PlayerValue } from '@/lib/calculate-player-values'
+
+export default function DraftAssistant() {
+  const [players, setPlayers] = useState<PlayerValue[]>([])
+  const [loading, setLoading] = useState(true)
+  const [budget, setBudget] = useState(200)
+  const [rosterSpots, setRosterSpots] = useState(16)
+  const [draftedPlayers, setDraftedPlayers] = useState<Set<string>>(new Set())
+  const [searchTerm, setSearchTerm] = useState('')
+  const [positionFilter, setPositionFilter] = useState<string>('ALL')
+
+  useEffect(() => {
+    // 載入選秀排名數據
+    fetch('/data/draft-rankings-2024-25.json')
+      .then(res => res.json())
+      .then(data => {
+        setPlayers(data)
+        setLoading(false)
+      })
+      .catch(err => {
+        console.error('Failed to load rankings:', err)
+        setLoading(false)
+      })
+  }, [])
+
+  const handleDraft = (playerName: string, price: number) => {
+    setDraftedPlayers(prev => new Set([...prev, playerName]))
+    setBudget(prev => Math.max(0, prev - price))
+    setRosterSpots(prev => Math.max(0, prev - 1))
+  }
+
+  const handleUndraft = (playerName: string, price: number) => {
+    setDraftedPlayers(prev => {
+      const newSet = new Set(prev)
+      newSet.delete(playerName)
+      return newSet
+    })
+    setBudget(prev => Math.min(200, prev + price))
+    setRosterSpots(prev => Math.min(16, prev + 1))
+  }
+
+  const filteredPlayers = useMemo(() => {
+    return players.filter(p => {
+      const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           p.team?.toLowerCase().includes(searchTerm.toLowerCase())
+      const matchesPosition = positionFilter === 'ALL' ||
+                             (p.position && p.position.includes(positionFilter))
+      const notDrafted = !draftedPlayers.has(p.name)
+      return matchesSearch && matchesPosition && notDrafted
+    })
+  }, [players, searchTerm, positionFilter, draftedPlayers])
+
+  const myTeam = useMemo(() => {
+    return players.filter(p => draftedPlayers.has(p.name))
+  }, [players, draftedPlayers])
+
+  const avgPerSpot = Math.floor(budget / Math.max(1, rosterSpots))
+
+  if (loading) {
+    return <div className="text-white text-center">Loading draft data...</div>
+  }
+
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* Left: Draft Board */}
+      <div className="lg:col-span-2">
+        <div className="bg-white/10 backdrop-blur-md rounded-lg p-6">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-white">Available Players</h2>
+            <div className="flex gap-4 items-center">
+              <select
+                value={positionFilter}
+                onChange={(e) => setPositionFilter(e.target.value)}
+                className="bg-slate-800 text-white px-4 py-2 rounded-lg border border-purple-500"
+              >
+                <option value="ALL">All Positions</option>
+                <option value="PG">PG</option>
+                <option value="SG">SG</option>
+                <option value="SF">SF</option>
+                <option value="PF">PF</option>
+                <option value="C">C</option>
+              </select>
+              <input
+                type="text"
+                placeholder="Search players..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="bg-slate-800 text-white px-4 py-2 rounded-lg border border-purple-500 w-64"
+              />
+            </div>
+          </div>
+
+          <div className="overflow-x-auto max-h-[600px] overflow-y-auto">
+            <table className="w-full text-sm">
+              <thead className="sticky top-0 bg-slate-800 text-white">
+                <tr>
+                  <th className="text-left p-2">Rank</th>
+                  <th className="text-left p-2">Player</th>
+                  <th className="text-left p-2">Team</th>
+                  <th className="text-left p-2">Pos</th>
+                  <th className="text-right p-2">Price</th>
+                  <th className="text-right p-2">VORP</th>
+                  <th className="text-left p-2">Strengths</th>
+                  <th className="text-center p-2">Action</th>
+                </tr>
+              </thead>
+              <tbody className="text-white">
+                {filteredPlayers.slice(0, 100).map((player) => {
+                  const topCats = Object.entries(player.categoryScores)
+                    .filter(([_, score]) => score >= 7)
+                    .map(([cat]) => cat.toUpperCase())
+                    .slice(0, 4)
+                    .join(', ')
+
+                  const canAfford = player.suggestedPrice <= budget
+
+                  return (
+                    <tr
+                      key={player.name}
+                      className={`border-b border-slate-700 hover:bg-white/5 ${
+                        !canAfford ? 'opacity-40' : ''
+                      }`}
+                    >
+                      <td className="p-2 font-bold text-purple-300">#{player.overallRank}</td>
+                      <td className="p-2 font-semibold">{player.name}</td>
+                      <td className="p-2">{player.team}</td>
+                      <td className="p-2 text-xs">{player.position}</td>
+                      <td className="p-2 text-right">
+                        <span className="text-green-400 font-bold">${player.suggestedPrice}</span>
+                        <span className="text-xs text-gray-400 ml-1">
+                          (${player.minPrice}-${player.maxPrice})
+                        </span>
+                      </td>
+                      <td className="p-2 text-right text-xs">{player.vorp.toFixed(1)}</td>
+                      <td className="p-2 text-xs text-purple-200">{topCats || '-'}</td>
+                      <td className="p-2 text-center">
+                        <button
+                          onClick={() => handleDraft(player.name, player.suggestedPrice)}
+                          disabled={!canAfford || rosterSpots === 0}
+                          className="bg-purple-600 hover:bg-purple-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-3 py-1 rounded text-xs font-semibold"
+                        >
+                          Draft
+                        </button>
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      {/* Right: My Team & Budget */}
+      <div className="space-y-6">
+        {/* Budget Info */}
+        <div className="bg-white/10 backdrop-blur-md rounded-lg p-6">
+          <h3 className="text-xl font-bold text-white mb-4">Draft Status</h3>
+          <div className="space-y-3">
+            <div className="flex justify-between items-center">
+              <span className="text-purple-200">Remaining Budget:</span>
+              <span className="text-3xl font-bold text-green-400">${budget}</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-purple-200">Roster Spots:</span>
+              <span className="text-2xl font-bold text-blue-400">{rosterSpots} / 16</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-purple-200">Avg per Spot:</span>
+              <span className="text-xl font-bold text-yellow-400">${avgPerSpot}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* My Team */}
+        <div className="bg-white/10 backdrop-blur-md rounded-lg p-6">
+          <h3 className="text-xl font-bold text-white mb-4">My Team ({myTeam.length})</h3>
+          <div className="space-y-2 max-h-[400px] overflow-y-auto">
+            {myTeam.length === 0 ? (
+              <p className="text-gray-400 text-sm italic">No players drafted yet</p>
+            ) : (
+              myTeam.map((player) => (
+                <div
+                  key={player.name}
+                  className="bg-slate-800/50 p-3 rounded flex justify-between items-center"
+                >
+                  <div className="flex-1">
+                    <div className="font-semibold text-white">{player.name}</div>
+                    <div className="text-xs text-purple-200">
+                      {player.team} | {player.position}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-green-400 font-bold">${player.suggestedPrice}</span>
+                    <button
+                      onClick={() => handleUndraft(player.name, player.suggestedPrice)}
+                      className="bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded text-xs"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+
+        {/* Category Coverage */}
+        {myTeam.length > 0 && (
+          <div className="bg-white/10 backdrop-blur-md rounded-lg p-6">
+            <h3 className="text-xl font-bold text-white mb-4">Category Coverage</h3>
+            <div className="space-y-2 text-sm">
+              {['fgPct', 'ftPct', 'tpm', 'pts', 'oreb', 'reb', 'ast', 'stl', 'blk', 'astToRatio'].map(cat => {
+                const avgScore = myTeam.reduce((sum, p) => sum + p.categoryScores[cat as keyof typeof p.categoryScores], 0) / myTeam.length
+                const barWidth = (avgScore / 10) * 100
+
+                return (
+                  <div key={cat}>
+                    <div className="flex justify-between text-purple-200 mb-1">
+                      <span className="uppercase text-xs font-semibold">{cat}</span>
+                      <span>{avgScore.toFixed(1)}/10</span>
+                    </div>
+                    <div className="w-full bg-slate-700 rounded-full h-2">
+                      <div
+                        className={`h-2 rounded-full ${
+                          avgScore >= 7 ? 'bg-green-500' : avgScore >= 5 ? 'bg-yellow-500' : 'bg-red-500'
+                        }`}
+                        style={{ width: `${barWidth}%` }}
+                      />
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
