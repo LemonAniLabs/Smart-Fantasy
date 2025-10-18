@@ -9,6 +9,14 @@ type SortDirection = 'asc' | 'desc'
 export default function DraftAssistant() {
   const [players, setPlayers] = useState<PlayerValue[]>([])
   const [loading, setLoading] = useState(true)
+
+  // League Configuration
+  const [totalBudget, setTotalBudget] = useState(200)
+  const [teamCount, setTeamCount] = useState(14)
+  const [draftDate, setDraftDate] = useState('')
+  const [draftTime, setDraftTime] = useState('')
+
+  // Draft State
   const [budget, setBudget] = useState(200)
   const [rosterSpots, setRosterSpots] = useState(16)
   const [draftedPlayers, setDraftedPlayers] = useState<Set<string>>(new Set())
@@ -17,6 +25,7 @@ export default function DraftAssistant() {
   const [sortField, setSortField] = useState<SortField>('rank')
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc')
   const [ignoreBudget, setIgnoreBudget] = useState(false)
+  const [showConfig, setShowConfig] = useState(false)
 
   useEffect(() => {
     // Load draft rankings data
@@ -31,6 +40,46 @@ export default function DraftAssistant() {
         setLoading(false)
       })
   }, [])
+
+  // Draft notification effect
+  useEffect(() => {
+    if (!draftDate || !draftTime) return
+
+    const checkDraftTime = () => {
+      const now = new Date()
+      const draftDateTime = new Date(`${draftDate}T${draftTime}`)
+      const timeDiff = draftDateTime.getTime() - now.getTime()
+      const minutesDiff = Math.floor(timeDiff / 1000 / 60)
+
+      // Notify 30 minutes before
+      if (minutesDiff === 30) {
+        if ('Notification' in window && Notification.permission === 'granted') {
+          new Notification('Fantasy Basketball Draft', {
+            body: 'Your draft starts in 30 minutes!',
+            icon: '/basketball-icon.png'
+          })
+        }
+      }
+
+      // Notify at draft time
+      if (minutesDiff === 0) {
+        if ('Notification' in window && Notification.permission === 'granted') {
+          new Notification('Fantasy Basketball Draft', {
+            body: 'Your draft is starting now!',
+            icon: '/basketball-icon.png'
+          })
+        }
+      }
+    }
+
+    // Request notification permission
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission()
+    }
+
+    const interval = setInterval(checkDraftTime, 60000) // Check every minute
+    return () => clearInterval(interval)
+  }, [draftDate, draftTime])
 
   const handleDraft = (playerName: string, price: number) => {
     // Prevent duplicate selection
@@ -138,12 +187,87 @@ export default function DraftAssistant() {
   }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      {/* Left: Draft Board */}
-      <div className="lg:col-span-2">
-        <div className="bg-white/10 backdrop-blur-md rounded-lg p-6">
-          <div className="flex flex-col gap-4 mb-6">
-            <div className="flex items-center justify-between">
+    <div className="space-y-6">
+      {/* Configuration Panel */}
+      <div className="bg-white/10 backdrop-blur-md rounded-lg p-6">
+        <button
+          onClick={() => setShowConfig(!showConfig)}
+          className="flex items-center justify-between w-full text-white"
+        >
+          <h2 className="text-xl font-bold">League Configuration</h2>
+          <span className="text-2xl">{showConfig ? '▼' : '▶'}</span>
+        </button>
+
+        {showConfig && (
+          <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-purple-200 text-sm mb-2">Format</label>
+              <div className="bg-slate-800 text-white px-4 py-2 rounded-lg border border-purple-500">
+                11-Cat H2H
+              </div>
+            </div>
+            <div>
+              <label className="block text-purple-200 text-sm mb-2">Draft Type</label>
+              <div className="bg-slate-800 text-white px-4 py-2 rounded-lg border border-purple-500">
+                Salary Cap Draft
+              </div>
+            </div>
+            <div>
+              <label className="block text-purple-200 text-sm mb-2">Teams</label>
+              <input
+                type="number"
+                value={teamCount}
+                onChange={(e) => setTeamCount(parseInt(e.target.value))}
+                className="w-full bg-slate-800 text-white px-4 py-2 rounded-lg border border-purple-500"
+              />
+            </div>
+            <div>
+              <label className="block text-purple-200 text-sm mb-2">Total Budget</label>
+              <input
+                type="number"
+                value={totalBudget}
+                onChange={(e) => {
+                  const newBudget = parseInt(e.target.value)
+                  setTotalBudget(newBudget)
+                  setBudget(newBudget)
+                }}
+                className="w-full bg-slate-800 text-white px-4 py-2 rounded-lg border border-purple-500"
+              />
+            </div>
+            <div>
+              <label className="block text-purple-200 text-sm mb-2">Draft Date</label>
+              <input
+                type="date"
+                value={draftDate}
+                onChange={(e) => setDraftDate(e.target.value)}
+                className="w-full bg-slate-800 text-white px-4 py-2 rounded-lg border border-purple-500"
+              />
+            </div>
+            <div>
+              <label className="block text-purple-200 text-sm mb-2">Draft Time</label>
+              <input
+                type="time"
+                value={draftTime}
+                onChange={(e) => setDraftTime(e.target.value)}
+                className="w-full bg-slate-800 text-white px-4 py-2 rounded-lg border border-purple-500"
+              />
+            </div>
+            {draftDate && draftTime && (
+              <div className="md:col-span-2">
+                <div className="bg-purple-900/30 border border-purple-500 rounded-lg p-3 text-sm text-purple-200">
+                  🔔 Browser notifications enabled. You&apos;ll be notified 30 minutes before and at draft time.
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Left: Draft Board */}
+        <div className="lg:col-span-2">
+          <div className="bg-white/10 backdrop-blur-md rounded-lg p-6">
+            <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-white">Available Players ({filteredPlayers.length})</h2>
               <div className="flex gap-4 items-center">
                 <select
@@ -167,21 +291,6 @@ export default function DraftAssistant() {
                 />
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              <label className="flex items-center gap-2 text-white cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={ignoreBudget}
-                  onChange={(e) => setIgnoreBudget(e.target.checked)}
-                  className="w-4 h-4 cursor-pointer"
-                />
-                <span className="text-sm">Ignore Budget Limit</span>
-              </label>
-              <span className="text-xs text-gray-400">
-                - Select any player without budget restrictions
-              </span>
-            </div>
-          </div>
 
           <div className="overflow-x-auto max-h-[600px] overflow-y-auto">
             <table className="w-full text-sm">
@@ -279,7 +388,19 @@ export default function DraftAssistant() {
       <div className="space-y-6">
         {/* Budget Info */}
         <div className="bg-white/10 backdrop-blur-md rounded-lg p-6">
-          <h3 className="text-xl font-bold text-white mb-4">Draft Status</h3>
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-xl font-bold text-white">Draft Status</h3>
+            <label className="relative inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                checked={ignoreBudget}
+                onChange={(e) => setIgnoreBudget(e.target.checked)}
+                className="sr-only peer"
+              />
+              <div className="w-11 h-6 bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
+              <span className="ml-3 text-sm font-medium text-purple-200">Ignore Budget</span>
+            </label>
+          </div>
           <div className="space-y-3">
             <div className="flex justify-between items-center">
               <span className="text-purple-200">Remaining Budget:</span>
@@ -377,5 +498,6 @@ export default function DraftAssistant() {
         )}
       </div>
     </div>
+      </div>
   )
 }

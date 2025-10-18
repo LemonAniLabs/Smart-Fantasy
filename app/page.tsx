@@ -9,10 +9,10 @@ export default function Home() {
             Fantasy Basketball Draft Assistant
           </h1>
           <p className="text-xl text-purple-200">
-            11-Cat H2H | Salary Cap Draft | 2024-25 Season
+            11-Cat H2H | Salary Cap Draft | 2025-26 Season
           </p>
           <p className="text-sm text-purple-300 mt-2">
-            14 Teams | $200 Budget | Draft: Oct 17, 2024 21:30 CST
+            Customize your league settings below
           </p>
         </header>
 
