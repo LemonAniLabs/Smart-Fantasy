@@ -47,7 +47,7 @@ export default function DraftAssistant() {
       const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                            p.team?.toLowerCase().includes(searchTerm.toLowerCase())
       const matchesPosition = positionFilter === 'ALL' ||
-                             (p.position && p.position.includes(positionFilter))
+                             (p.position && p.position === positionFilter)
       const notDrafted = !draftedPlayers.has(p.name)
       return matchesSearch && matchesPosition && notDrafted
     })
@@ -77,11 +77,9 @@ export default function DraftAssistant() {
                 className="bg-slate-800 text-white px-4 py-2 rounded-lg border border-purple-500"
               >
                 <option value="ALL">All Positions</option>
-                <option value="PG">PG</option>
-                <option value="SG">SG</option>
-                <option value="SF">SF</option>
-                <option value="PF">PF</option>
-                <option value="C">C</option>
+                <option value="G">Guards (G)</option>
+                <option value="F">Forwards (F)</option>
+                <option value="C">Centers (C)</option>
               </select>
               <input
                 type="text"
