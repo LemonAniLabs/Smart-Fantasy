@@ -106,12 +106,17 @@ async function main() {
     players.push(...fallbackPlayers)
   }
 
-  // 2. 轉換為我們的格式
-  const playerStats: PlayerStats[] = []
+  // 2. Filter and convert to our format
+  const playerStatsMap = new Map<string, PlayerStats>()
 
   players.forEach(player => {
     if (!player.games || player.games < 20) {
-      return // 過濾出賽太少的球員
+      return // Filter players with too few games
+    }
+
+    // Skip multi-team entries (2TM, 3TM, etc.) and unknown teams
+    if (!player.team || /^\d+TM$/.test(player.team) || player.team === 'TOT' || player.team === 'UNK') {
+      return
     }
 
     const fgm = player.fieldGoals / player.games
@@ -133,12 +138,12 @@ async function main() {
 
     const astToRatio = tov > 0 ? ast / tov : ast
 
-    // 保留原始細分位置（PG, SG, SF, PF, C）
+    // Preserve detailed position (PG, SG, SF, PF, C)
     const position = player.position || 'F'
 
-    playerStats.push({
+    const playerStat: PlayerStats = {
       name: player.playerName,
-      team: player.team || 'UNK',
+      team: player.team,
       position: position,
       gamesPlayed: player.games,
       fgm,
@@ -156,24 +161,32 @@ async function main() {
       blk,
       tov,
       astToRatio,
-    })
+    }
+
+    // Handle duplicates: keep the entry with more games played (current team)
+    const existingPlayer = playerStatsMap.get(player.playerName)
+    if (!existingPlayer || player.games > existingPlayer.gamesPlayed) {
+      playerStatsMap.set(player.playerName, playerStat)
+    }
   })
 
-  console.log(`\n📊 處理完成: ${playerStats.length} 位合格球員（至少 20 場出賽）`)
+  const playerStats = Array.from(playerStatsMap.values())
 
-  // 3. 顯示 Top 10
+  console.log(`\n📊 Processed: ${playerStats.length} qualified players (at least 20 games, valid teams only)`)
+
+  // 3. Show Top 10
   const sorted = playerStats.sort((a, b) => b.pts - a.pts)
-  console.log('\n🏆 Top 10 得分球員:')
+  console.log('\n🏆 Top 10 Scorers:')
   sorted.slice(0, 10).forEach((p, i) => {
     console.log(`${i + 1}. ${p.name} (${p.team}) - ${p.pts.toFixed(1)} PPG, ${p.reb.toFixed(1)} RPG, ${p.ast.toFixed(1)} APG`)
   })
 
-  // 4. 儲存數據
+  // 4. Save data
   const outputPath = path.join(process.cwd(), 'data', 'player-stats-2024-25.json')
   fs.writeFileSync(outputPath, JSON.stringify(playerStats, null, 2))
-  console.log(`\n💾 數據已儲存至: ${outputPath}`)
+  console.log(`\n💾 Data saved to: ${outputPath}`)
 
-  console.log('\n✅ 完成！現在可以執行：npx tsx scripts/generate-draft-rankings-2024-25.ts')
+  console.log('\n✅ Done! Now run: npx tsx scripts/generate-draft-rankings-2024-25.ts')
 }
 
 main().catch(console.error)

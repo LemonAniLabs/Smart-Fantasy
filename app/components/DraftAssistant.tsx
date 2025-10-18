@@ -19,7 +19,7 @@ export default function DraftAssistant() {
   const [ignoreBudget, setIgnoreBudget] = useState(false)
 
   useEffect(() => {
-    // 載入選秀排名數據
+    // Load draft rankings data
     fetch('/data/draft-rankings-2024-25.json')
       .then(res => res.json())
       .then(data => {
@@ -33,7 +33,7 @@ export default function DraftAssistant() {
   }, [])
 
   const handleDraft = (playerName: string, price: number) => {
-    // 防止重複選擇
+    // Prevent duplicate selection
     if (draftedPlayers.has(playerName)) {
       console.warn('Player already drafted:', playerName)
       return
@@ -41,7 +41,7 @@ export default function DraftAssistant() {
 
     setDraftedPlayers(prev => new Set([...prev, playerName]))
 
-    // 只有在非忽略預算模式下才扣除預算
+    // Only deduct budget when not ignoring budget limit
     if (!ignoreBudget) {
       setBudget(prev => Math.max(0, prev - price))
     }
@@ -175,10 +175,10 @@ export default function DraftAssistant() {
                   onChange={(e) => setIgnoreBudget(e.target.checked)}
                   className="w-4 h-4 cursor-pointer"
                 />
-                <span className="text-sm">忽略預算限制 (Ignore Budget Limit)</span>
+                <span className="text-sm">Ignore Budget Limit</span>
               </label>
               <span className="text-xs text-gray-400">
-                - 啟用後可以選擇任何球員，不受預算限制
+                - Select any player without budget restrictions
               </span>
             </div>
           </div>
