@@ -8,12 +8,31 @@ AI-powered Yahoo Fantasy Basketball draft assistant, optimized for **11-Cat H2H 
 
 ## Features
 
+### Core Features
 - **Intelligent Ranking System**: Z-Score analysis based on 2024-25 season data (448 qualified players)
-- **11 Category Evaluation**: FGM, FG%, FT%, 3PM, PTS, OREB, REB, AST, STL, BLK, A/T Ratio
-- **Salary Cap Recommendations**: Price valuations for $200 budget across 14-team leagues
+- **Flexible League Formats**: Support for 9-Cat, 8-Cat, 11-Cat H2H, Points League, and Roto formats
+- **Multiple Draft Types**: Snake Draft, Auction Draft, and Salary Cap Draft modes
 - **Real-time Draft Simulation**: Track budget, roster spots, and category coverage
 - **Position-specific Rankings**: Detailed breakdowns for PG, SG, SF, PF, C
-- **Budget Override Option**: Ability to ignore budget constraints for mock drafts
+- **Dynamic Category Coverage**: Adjusts based on your league format
+
+### Yahoo Fantasy Integration (Hybrid Mode)
+
+**Mode 1: Basic Assistant (No Yahoo Account Required)**
+- Manual league configuration
+- Static player rankings
+- General draft strategy
+
+**Mode 2: Yahoo Public Data (Developer Credentials Only)**
+- Access latest player stats via Yahoo Fantasy API
+- No user login required
+- Real-time player data updates
+
+**Mode 3: Personal Integration (Coming Soon)**
+- Connect your Yahoo Fantasy account
+- Import your league settings automatically
+- Sync your team roster
+- Personalized draft strategy based on your actual league
 
 ## Quick Start
 
@@ -23,6 +42,25 @@ AI-powered Yahoo Fantasy Basketball draft assistant, optimized for **11-Cat H2H 
 npm install
 ```
 
+### Environment Setup
+
+1. Copy `.env.example` to `.env`:
+```bash
+cp .env.example .env
+```
+
+2. **For Yahoo API Integration** (Optional - Mode 2 & 3):
+   - Go to [Yahoo Developer Network](https://developer.yahoo.com/apps/create/)
+   - Create a new application
+   - Select "Fantasy Sports" with Read/Write access
+   - Set Redirect URI: `http://localhost:3000/api/auth/callback/yahoo`
+   - Copy Client ID and Client Secret to `.env`
+
+3. Generate NextAuth secret:
+```bash
+openssl rand -base64 32
+```
+
 ### Development
 
 ```bash
@@ -30,6 +68,12 @@ npm run dev
 ```
 
 Visit: **http://localhost:3000**
+
+### Test Yahoo API Connection
+
+```bash
+curl http://localhost:3000/api/yahoo/test
+```
 
 ### Data Updates
 

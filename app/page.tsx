@@ -1,4 +1,5 @@
 import DraftAssistant from './components/DraftAssistant'
+import YahooConnect from './components/YahooConnect'
 
 export default function Home() {
   return (
@@ -15,6 +16,10 @@ export default function Home() {
             Customize your league settings below
           </p>
         </header>
+
+        <div className="mb-6">
+          <YahooConnect />
+        </div>
 
         <DraftAssistant />
       </div>
