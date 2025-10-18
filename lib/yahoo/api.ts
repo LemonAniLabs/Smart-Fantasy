@@ -155,7 +155,7 @@ export async function getLeagueTeams(accessToken: string, leagueKey: string): Pr
         // Yahoo API returns team as array where:
         // team[0] is array of property objects OR a single object with all properties
         // team[1] contains nested data (managers, etc.)
-        let teamInfo: any = {}
+        let teamInfo: Partial<YahooTeam> & Record<string, unknown> = {}
 
         if (Array.isArray(teamItem[0])) {
           // team[0] is an array of individual property objects - merge them
@@ -166,12 +166,13 @@ export async function getLeagueTeams(accessToken: string, leagueKey: string): Pr
           }
         } else if (typeof teamItem[0] === 'object') {
           // team[0] is already a single object with all properties
-          teamInfo = teamItem[0]
+          teamInfo = teamItem[0] as Partial<YahooTeam> & Record<string, unknown>
         }
 
         // Convert numeric is_owned_by_current_login (0/1) to boolean
         if ('is_owned_by_current_login' in teamInfo) {
-          teamInfo.is_owned_by_current_login = teamInfo.is_owned_by_current_login === 1 || teamInfo.is_owned_by_current_login === true
+          const ownedValue = teamInfo.is_owned_by_current_login as unknown
+          teamInfo.is_owned_by_current_login = ownedValue === 1 || ownedValue === true
         }
 
         if (teamInfo.team_key) {
@@ -236,7 +237,7 @@ export async function getTeamRoster(accessToken: string, teamKey: string): Promi
         // Yahoo API returns player as array where:
         // player[0] is array of property objects OR a single object with all properties
         // player[1] contains nested data (stats, etc.)
-        let playerInfo: any = {}
+        let playerInfo: Partial<YahooPlayer> & Record<string, unknown> = {}
 
         if (Array.isArray(playerItem[0])) {
           // player[0] is an array of individual property objects - merge them
@@ -247,7 +248,7 @@ export async function getTeamRoster(accessToken: string, teamKey: string): Promi
           }
         } else if (typeof playerItem[0] === 'object') {
           // player[0] is already a single object with all properties
-          playerInfo = playerItem[0]
+          playerInfo = playerItem[0] as Partial<YahooPlayer> & Record<string, unknown>
         }
 
         if (playerInfo.player_key) {
