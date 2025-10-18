@@ -45,22 +45,71 @@ export interface YahooPlayer {
  */
 export async function getUserLeagues(accessToken: string, season?: string): Promise<YahooLeague[]> {
   try {
-    const seasonYear = season || new Date().getFullYear().toString()
-    // nba is the game code for basketball
-    const url = `${YAHOO_FANTASY_API_BASE}/users;use_login=1/games;game_codes=nba;seasons=${seasonYear}/leagues`
-    
+    // Current NBA season is 2024-25, which Yahoo represents as "2024"
+    const seasonYear = season || '2024'
+
+    // Add format=json to get JSON response instead of XML
+    const url = `${YAHOO_FANTASY_API_BASE}/users;use_login=1/games;game_codes=nba;seasons=${seasonYear}/leagues?format=json`
+
+    console.log('Fetching leagues from:', url)
+
     const response = await axios.get(url, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
+        Accept: 'application/json',
       },
     })
 
-    // Parse XML response (Yahoo returns XML by default)
-    // You may need to add xml2js package to parse this properly
-    return response.data.fantasy_content?.users?.[0]?.user?.[1]?.games?.[0]?.game?.[1]?.leagues || []
+    console.log('Yahoo API Response:', JSON.stringify(response.data, null, 2))
+
+    // Parse the nested Yahoo response structure
+    const users = response.data?.fantasy_content?.users
+    if (!users || users.length === 0) {
+      console.log('No users found in response')
+      return []
+    }
+
+    const user = users[0]?.user
+    if (!user || user.length < 2) {
+      console.log('Invalid user structure')
+      return []
+    }
+
+    const games = user[1]?.games
+    if (!games || games.length === 0) {
+      console.log('No games found for user')
+      return []
+    }
+
+    const game = games[0]?.game
+    if (!game || game.length < 2) {
+      console.log('Invalid game structure')
+      return []
+    }
+
+    const leagues = game[1]?.leagues
+    if (!leagues || leagues.length === 0) {
+      console.log('No leagues found in game')
+      return []
+    }
+
+    // Extract league data from the response
+    const leagueData: YahooLeague[] = []
+    for (let i = 0; i < leagues.length; i++) {
+      const league = leagues[i]?.league
+      if (league && Array.isArray(league) && league[0]) {
+        leagueData.push(league[0] as YahooLeague)
+      }
+    }
+
+    console.log('Parsed leagues:', leagueData)
+    return leagueData
   } catch (error) {
     console.error('Error fetching Yahoo leagues:', error)
+    if (axios.isAxiosError(error)) {
+      console.error('Response data:', error.response?.data)
+      console.error('Response status:', error.response?.status)
+    }
     throw error
   }
 }
