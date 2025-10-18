@@ -216,13 +216,21 @@ export async function getTeamRoster(accessToken: string, teamKey: string): Promi
       return []
     }
 
-    const roster = team[1]?.roster
-    if (!roster || !Array.isArray(roster) || roster.length === 0) {
+    const rosterObj = team[1]?.roster
+    if (!rosterObj || typeof rosterObj !== 'object') {
       console.log('No roster found')
       return []
     }
 
-    const playersObj = roster[0]?.players
+    // roster can be either an object with "0" key or directly have the data
+    // Example: {"0": {"players": {...}}} or {"players": {...}}
+    const rosterData = rosterObj['0'] || rosterObj[0] || rosterObj
+    if (!rosterData) {
+      console.log('No roster data found')
+      return []
+    }
+
+    const playersObj = rosterData.players
     if (!playersObj || typeof playersObj !== 'object') {
       console.log('No players found in roster')
       return []
@@ -249,6 +257,29 @@ export async function getTeamRoster(accessToken: string, teamKey: string): Promi
         } else if (typeof playerItem[0] === 'object') {
           // player[0] is already a single object with all properties
           playerInfo = playerItem[0] as Partial<YahooPlayer> & Record<string, unknown>
+        }
+
+        // Process eligible_positions from object array to string array
+        // Example: [{"position": "PG"}, {"position": "SG"}] => ["PG", "SG"]
+        if (playerInfo.eligible_positions && Array.isArray(playerInfo.eligible_positions)) {
+          playerInfo.eligible_positions = playerInfo.eligible_positions.map((pos: unknown) => {
+            if (typeof pos === 'object' && pos !== null && 'position' in pos) {
+              return (pos as { position: string }).position
+            }
+            return typeof pos === 'string' ? pos : ''
+          }).filter(Boolean)
+        }
+
+        // Process selected_position from playerItem[1]
+        // Example: [{"coverage_type": "date"}, {"position": "PG"}, {"is_flex": 0}]
+        if (playerItem[1]?.selected_position && Array.isArray(playerItem[1].selected_position)) {
+          const selectedPosArray = playerItem[1].selected_position
+          const posObj = selectedPosArray.find((item: unknown) =>
+            typeof item === 'object' && item !== null && 'position' in item
+          )
+          if (posObj && 'position' in posObj) {
+            playerInfo.selected_position = (posObj as { position: string }).position
+          }
         }
 
         if (playerInfo.player_key) {
