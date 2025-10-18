@@ -68,7 +68,7 @@ class YahooFantasyClient {
   /**
    * Make authenticated request to Yahoo Fantasy API
    */
-  private async request(endpoint: string): Promise<any> {
+  private async request(endpoint: string): Promise<unknown> {
     const token = await this.getAccessToken()
 
     try {
@@ -92,28 +92,28 @@ class YahooFantasyClient {
   /**
    * Get all available games (leagues across different seasons)
    */
-  async getGames(gameCode: string = 'nba'): Promise<any> {
+  async getGames(gameCode: string = 'nba'): Promise<unknown> {
     return this.request(`/games;game_codes=${gameCode}`)
   }
 
   /**
    * Get game info for specific season
    */
-  async getGameBySeason(season: string): Promise<any> {
+  async getGameBySeason(season: string): Promise<unknown> {
     return this.request(`/game/nba;seasons=${season}`)
   }
 
   /**
    * Get public league info by league key
    */
-  async getLeague(leagueKey: string): Promise<any> {
+  async getLeague(leagueKey: string): Promise<unknown> {
     return this.request(`/league/${leagueKey}`)
   }
 
   /**
    * Get league settings (categories, roster positions, etc.)
    */
-  async getLeagueSettings(leagueKey: string): Promise<any> {
+  async getLeagueSettings(leagueKey: string): Promise<unknown> {
     return this.request(`/league/${leagueKey}/settings`)
   }
 
@@ -125,7 +125,7 @@ class YahooFantasyClient {
     count?: number
     position?: string
     status?: string
-  } = {}): Promise<any> {
+  } = {}): Promise<unknown> {
     let endpoint = `/game/${gameKey}/players`
 
     const params: string[] = []
@@ -144,7 +144,7 @@ class YahooFantasyClient {
   /**
    * Get player stats for specific player
    */
-  async getPlayerStats(playerKey: string): Promise<any> {
+  async getPlayerStats(playerKey: string): Promise<unknown> {
     return this.request(`/player/${playerKey}/stats`)
   }
 
@@ -155,7 +155,7 @@ class YahooFantasyClient {
     const currentYear = new Date().getFullYear()
     const season = `${currentYear}`
 
-    const gameData = await this.getGameBySeason(season)
+    const gameData = await this.getGameBySeason(season) as { fantasy_content?: { game?: Array<{ game_key?: string }> } }
 
     return gameData.fantasy_content?.game?.[0]?.game_key || `nba.l.${currentYear}`
   }
