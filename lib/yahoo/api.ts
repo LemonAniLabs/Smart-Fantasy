@@ -87,18 +87,20 @@ export async function getUserLeagues(accessToken: string, season?: string): Prom
       return []
     }
 
-    const leagues = game[1]?.leagues
-    if (!leagues || leagues.length === 0) {
+    const leaguesObj = game[1]?.leagues
+    if (!leaguesObj || typeof leaguesObj !== 'object') {
       console.log('No leagues found in game')
       return []
     }
 
     // Extract league data from the response
+    // leagues is an object like: {"0": {"league": [...]}, "count": 1}
     const leagueData: YahooLeague[] = []
-    for (let i = 0; i < leagues.length; i++) {
-      const league = leagues[i]?.league
-      if (league && Array.isArray(league) && league[0]) {
-        leagueData.push(league[0] as YahooLeague)
+    for (const key in leaguesObj) {
+      if (key === 'count') continue // Skip the count property
+      const leagueItem = leaguesObj[key]?.league
+      if (leagueItem && Array.isArray(leagueItem) && leagueItem[0]) {
+        leagueData.push(leagueItem[0] as YahooLeague)
       }
     }
 
