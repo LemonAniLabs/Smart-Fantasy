@@ -253,7 +253,7 @@ export default function YahooConnect() {
                     </div>
                   ) : (
                     <div className="bg-yellow-900/30 border border-yellow-500 rounded-lg p-3 text-sm text-yellow-200">
-                      No roster data available. This might be because the roster hasn't been set yet.
+                      No roster data available. This might be because the roster has not been set yet.
                     </div>
                   )}
                 </div>
