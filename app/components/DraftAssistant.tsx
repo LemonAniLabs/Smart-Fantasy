@@ -3,6 +3,9 @@
 import { useState, useEffect, useMemo } from 'react'
 import type { PlayerValue } from '@/lib/calculate-player-values'
 
+type SortField = 'rank' | 'name' | 'team' | 'position' | 'price' | 'vorp'
+type SortDirection = 'asc' | 'desc'
+
 export default function DraftAssistant() {
   const [players, setPlayers] = useState<PlayerValue[]>([])
   const [loading, setLoading] = useState(true)
@@ -11,6 +14,9 @@ export default function DraftAssistant() {
   const [draftedPlayers, setDraftedPlayers] = useState<Set<string>>(new Set())
   const [searchTerm, setSearchTerm] = useState('')
   const [positionFilter, setPositionFilter] = useState<string>('ALL')
+  const [sortField, setSortField] = useState<SortField>('rank')
+  const [sortDirection, setSortDirection] = useState<SortDirection>('asc')
+  const [ignoreBudget, setIgnoreBudget] = useState(false)
 
   useEffect(() => {
     // 載入選秀排名數據
@@ -42,8 +48,17 @@ export default function DraftAssistant() {
     setRosterSpots(prev => Math.min(16, prev + 1))
   }
 
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')
+    } else {
+      setSortField(field)
+      setSortDirection('asc')
+    }
+  }
+
   const filteredPlayers = useMemo(() => {
-    return players.filter(p => {
+    let filtered = players.filter(p => {
       const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                            p.team?.toLowerCase().includes(searchTerm.toLowerCase())
       const matchesPosition = positionFilter === 'ALL' ||
@@ -51,7 +66,55 @@ export default function DraftAssistant() {
       const notDrafted = !draftedPlayers.has(p.name)
       return matchesSearch && matchesPosition && notDrafted
     })
-  }, [players, searchTerm, positionFilter, draftedPlayers])
+
+    // Sort
+    filtered.sort((a, b) => {
+      let aVal: string | number
+      let bVal: string | number
+
+      switch (sortField) {
+        case 'rank':
+          aVal = a.overallRank
+          bVal = b.overallRank
+          break
+        case 'name':
+          aVal = a.name
+          bVal = b.name
+          break
+        case 'team':
+          aVal = a.team
+          bVal = b.team
+          break
+        case 'position':
+          aVal = a.position
+          bVal = b.position
+          break
+        case 'price':
+          aVal = a.suggestedPrice
+          bVal = b.suggestedPrice
+          break
+        case 'vorp':
+          aVal = a.vorp
+          bVal = b.vorp
+          break
+        default:
+          aVal = a.overallRank
+          bVal = b.overallRank
+      }
+
+      if (typeof aVal === 'string' && typeof bVal === 'string') {
+        return sortDirection === 'asc'
+          ? aVal.localeCompare(bVal)
+          : bVal.localeCompare(aVal)
+      } else {
+        return sortDirection === 'asc'
+          ? (aVal as number) - (bVal as number)
+          : (bVal as number) - (aVal as number)
+      }
+    })
+
+    return filtered
+  }, [players, searchTerm, positionFilter, draftedPlayers, sortField, sortDirection])
 
   const myTeam = useMemo(() => {
     return players.filter(p => draftedPlayers.has(p.name))
@@ -68,28 +131,44 @@ export default function DraftAssistant() {
       {/* Left: Draft Board */}
       <div className="lg:col-span-2">
         <div className="bg-white/10 backdrop-blur-md rounded-lg p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-white">Available Players</h2>
-            <div className="flex gap-4 items-center">
-              <select
-                value={positionFilter}
-                onChange={(e) => setPositionFilter(e.target.value)}
-                className="bg-slate-800 text-white px-4 py-2 rounded-lg border border-purple-500"
-              >
-                <option value="ALL">All Positions</option>
-                <option value="PG">Point Guard (PG)</option>
-                <option value="SG">Shooting Guard (SG)</option>
-                <option value="SF">Small Forward (SF)</option>
-                <option value="PF">Power Forward (PF)</option>
-                <option value="C">Center (C)</option>
-              </select>
-              <input
-                type="text"
-                placeholder="Search players..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="bg-slate-800 text-white px-4 py-2 rounded-lg border border-purple-500 w-64"
-              />
+          <div className="flex flex-col gap-4 mb-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-bold text-white">Available Players ({filteredPlayers.length})</h2>
+              <div className="flex gap-4 items-center">
+                <select
+                  value={positionFilter}
+                  onChange={(e) => setPositionFilter(e.target.value)}
+                  className="bg-slate-800 text-white px-4 py-2 rounded-lg border border-purple-500"
+                >
+                  <option value="ALL">All Positions</option>
+                  <option value="PG">Point Guard (PG)</option>
+                  <option value="SG">Shooting Guard (SG)</option>
+                  <option value="SF">Small Forward (SF)</option>
+                  <option value="PF">Power Forward (PF)</option>
+                  <option value="C">Center (C)</option>
+                </select>
+                <input
+                  type="text"
+                  placeholder="Search players..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="bg-slate-800 text-white px-4 py-2 rounded-lg border border-purple-500 w-64"
+                />
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <label className="flex items-center gap-2 text-white cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={ignoreBudget}
+                  onChange={(e) => setIgnoreBudget(e.target.checked)}
+                  className="w-4 h-4 cursor-pointer"
+                />
+                <span className="text-sm">忽略預算限制 (Ignore Budget Limit)</span>
+              </label>
+              <span className="text-xs text-gray-400">
+                - 啟用後可以選擇任何球員，不受預算限制
+              </span>
             </div>
           </div>
 
@@ -97,25 +176,55 @@ export default function DraftAssistant() {
             <table className="w-full text-sm">
               <thead className="sticky top-0 bg-slate-800 text-white">
                 <tr>
-                  <th className="text-left p-2">Rank</th>
-                  <th className="text-left p-2">Player</th>
-                  <th className="text-left p-2">Team</th>
-                  <th className="text-left p-2">Pos</th>
-                  <th className="text-right p-2">Price</th>
-                  <th className="text-right p-2">VORP</th>
+                  <th
+                    className="text-left p-2 cursor-pointer hover:bg-slate-700"
+                    onClick={() => handleSort('rank')}
+                  >
+                    Rank {sortField === 'rank' && (sortDirection === 'asc' ? '▲' : '▼')}
+                  </th>
+                  <th
+                    className="text-left p-2 cursor-pointer hover:bg-slate-700"
+                    onClick={() => handleSort('name')}
+                  >
+                    Player {sortField === 'name' && (sortDirection === 'asc' ? '▲' : '▼')}
+                  </th>
+                  <th
+                    className="text-left p-2 cursor-pointer hover:bg-slate-700"
+                    onClick={() => handleSort('team')}
+                  >
+                    Team {sortField === 'team' && (sortDirection === 'asc' ? '▲' : '▼')}
+                  </th>
+                  <th
+                    className="text-left p-2 cursor-pointer hover:bg-slate-700"
+                    onClick={() => handleSort('position')}
+                  >
+                    Pos {sortField === 'position' && (sortDirection === 'asc' ? '▲' : '▼')}
+                  </th>
+                  <th
+                    className="text-right p-2 cursor-pointer hover:bg-slate-700"
+                    onClick={() => handleSort('price')}
+                  >
+                    Price {sortField === 'price' && (sortDirection === 'asc' ? '▲' : '▼')}
+                  </th>
+                  <th
+                    className="text-right p-2 cursor-pointer hover:bg-slate-700"
+                    onClick={() => handleSort('vorp')}
+                  >
+                    VORP {sortField === 'vorp' && (sortDirection === 'asc' ? '▲' : '▼')}
+                  </th>
                   <th className="text-left p-2">Strengths</th>
                   <th className="text-center p-2">Action</th>
                 </tr>
               </thead>
               <tbody className="text-white">
-                {filteredPlayers.slice(0, 100).map((player) => {
+                {filteredPlayers.map((player) => {
                   const topCats = Object.entries(player.categoryScores)
                     .filter(([, score]) => score >= 7)
                     .map(([cat]) => cat.toUpperCase())
                     .slice(0, 4)
                     .join(', ')
 
-                  const canAfford = player.suggestedPrice <= budget
+                  const canAfford = ignoreBudget || player.suggestedPrice <= budget
 
                   return (
                     <tr
