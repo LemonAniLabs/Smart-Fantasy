@@ -6,11 +6,79 @@ import type { PlayerValue } from '@/lib/calculate-player-values'
 type SortField = 'rank' | 'name' | 'team' | 'position' | 'price' | 'vorp'
 type SortDirection = 'asc' | 'desc'
 
+// Category configurations for different league formats
+const CATEGORY_CONFIGS = {
+  '11-cat-h2h': [
+    { key: 'fgm', label: 'FGM', fullName: 'Field Goals Made' },
+    { key: 'fgPct', label: 'FG%', fullName: 'Field Goal Percentage' },
+    { key: 'ftPct', label: 'FT%', fullName: 'Free Throw Percentage' },
+    { key: 'tpm', label: '3PM', fullName: '3-Pointers Made' },
+    { key: 'pts', label: 'PTS', fullName: 'Points Scored' },
+    { key: 'oreb', label: 'OREB', fullName: 'Offensive Rebounds' },
+    { key: 'reb', label: 'REB', fullName: 'Total Rebounds' },
+    { key: 'ast', label: 'AST', fullName: 'Assists' },
+    { key: 'stl', label: 'STL', fullName: 'Steals' },
+    { key: 'blk', label: 'BLK', fullName: 'Blocks' },
+    { key: 'astToRatio', label: 'A/T', fullName: 'Assist/Turnover Ratio' },
+  ],
+  '9-cat-h2h': [
+    { key: 'fgPct', label: 'FG%', fullName: 'Field Goal Percentage' },
+    { key: 'ftPct', label: 'FT%', fullName: 'Free Throw Percentage' },
+    { key: 'tpm', label: '3PM', fullName: '3-Pointers Made' },
+    { key: 'pts', label: 'PTS', fullName: 'Points Scored' },
+    { key: 'reb', label: 'REB', fullName: 'Total Rebounds' },
+    { key: 'ast', label: 'AST', fullName: 'Assists' },
+    { key: 'stl', label: 'STL', fullName: 'Steals' },
+    { key: 'blk', label: 'BLK', fullName: 'Blocks' },
+    { key: 'tov', label: 'TO', fullName: 'Turnovers (Lower is Better)', inverse: true },
+  ],
+  '8-cat-h2h': [
+    { key: 'fgPct', label: 'FG%', fullName: 'Field Goal Percentage' },
+    { key: 'ftPct', label: 'FT%', fullName: 'Free Throw Percentage' },
+    { key: 'tpm', label: '3PM', fullName: '3-Pointers Made' },
+    { key: 'pts', label: 'PTS', fullName: 'Points Scored' },
+    { key: 'reb', label: 'REB', fullName: 'Total Rebounds' },
+    { key: 'ast', label: 'AST', fullName: 'Assists' },
+    { key: 'stl', label: 'STL', fullName: 'Steals' },
+    { key: 'blk', label: 'BLK', fullName: 'Blocks' },
+  ],
+  'roto-9cat': [
+    { key: 'fgPct', label: 'FG%', fullName: 'Field Goal Percentage' },
+    { key: 'ftPct', label: 'FT%', fullName: 'Free Throw Percentage' },
+    { key: 'tpm', label: '3PM', fullName: '3-Pointers Made' },
+    { key: 'pts', label: 'PTS', fullName: 'Points Scored' },
+    { key: 'reb', label: 'REB', fullName: 'Total Rebounds' },
+    { key: 'ast', label: 'AST', fullName: 'Assists' },
+    { key: 'stl', label: 'STL', fullName: 'Steals' },
+    { key: 'blk', label: 'BLK', fullName: 'Blocks' },
+    { key: 'tov', label: 'TO', fullName: 'Turnovers (Lower is Better)', inverse: true },
+  ],
+  'roto-8cat': [
+    { key: 'fgPct', label: 'FG%', fullName: 'Field Goal Percentage' },
+    { key: 'ftPct', label: 'FT%', fullName: 'Free Throw Percentage' },
+    { key: 'tpm', label: '3PM', fullName: '3-Pointers Made' },
+    { key: 'pts', label: 'PTS', fullName: 'Points Scored' },
+    { key: 'reb', label: 'REB', fullName: 'Total Rebounds' },
+    { key: 'ast', label: 'AST', fullName: 'Assists' },
+    { key: 'stl', label: 'STL', fullName: 'Steals' },
+    { key: 'blk', label: 'BLK', fullName: 'Blocks' },
+  ],
+  'points': [
+    { key: 'pts', label: 'PTS', fullName: 'Points Scored' },
+    { key: 'reb', label: 'REB', fullName: 'Total Rebounds' },
+    { key: 'ast', label: 'AST', fullName: 'Assists' },
+    { key: 'stl', label: 'STL', fullName: 'Steals' },
+    { key: 'blk', label: 'BLK', fullName: 'Blocks' },
+  ]
+}
+
 export default function DraftAssistant() {
   const [players, setPlayers] = useState<PlayerValue[]>([])
   const [loading, setLoading] = useState(true)
 
   // League Configuration
+  const [leagueFormat, setLeagueFormat] = useState('11-cat-h2h')
+  const [draftType, setDraftType] = useState('salary-cap')
   const [totalBudget, setTotalBudget] = useState(200)
   const [teamCount, setTeamCount] = useState(14)
   const [draftDate, setDraftDate] = useState('')
@@ -182,6 +250,9 @@ export default function DraftAssistant() {
 
   const avgPerSpot = Math.floor(budget / Math.max(1, rosterSpots))
 
+  // Determine if budget/price features should be shown
+  const showBudgetFeatures = draftType === 'salary-cap' || draftType === 'auction'
+
   if (loading) {
     return <div className="text-white text-center">Loading draft data...</div>
   }
@@ -202,15 +273,30 @@ export default function DraftAssistant() {
           <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-purple-200 text-sm mb-2">Format</label>
-              <div className="bg-slate-800 text-white px-4 py-2 rounded-lg border border-purple-500">
-                11-Cat H2H
-              </div>
+              <select
+                value={leagueFormat}
+                onChange={(e) => setLeagueFormat(e.target.value)}
+                className="w-full bg-slate-800 text-white px-4 py-2 rounded-lg border border-purple-500"
+              >
+                <option value="9-cat-h2h">9-Cat H2H (FG%, FT%, 3PM, PTS, REB, AST, STL, BLK, TO)</option>
+                <option value="8-cat-h2h">8-Cat H2H (FG%, FT%, 3PM, PTS, REB, AST, STL, BLK)</option>
+                <option value="11-cat-h2h">11-Cat H2H (FGM, FG%, FT%, 3PM, PTS, OREB, REB, AST, STL, BLK, A/T)</option>
+                <option value="points">Points League (Custom Scoring)</option>
+                <option value="roto-9cat">Roto 9-Cat (Season-long Rankings)</option>
+                <option value="roto-8cat">Roto 8-Cat (Season-long Rankings)</option>
+              </select>
             </div>
             <div>
               <label className="block text-purple-200 text-sm mb-2">Draft Type</label>
-              <div className="bg-slate-800 text-white px-4 py-2 rounded-lg border border-purple-500">
-                Salary Cap Draft
-              </div>
+              <select
+                value={draftType}
+                onChange={(e) => setDraftType(e.target.value)}
+                className="w-full bg-slate-800 text-white px-4 py-2 rounded-lg border border-purple-500"
+              >
+                <option value="snake">Snake Draft (Serpentine Order)</option>
+                <option value="auction">Auction Draft (Bidding System)</option>
+                <option value="salary-cap">Salary Cap Draft (Yahoo Premium)</option>
+              </select>
             </div>
             <div>
               <label className="block text-purple-200 text-sm mb-2">Teams</label>
@@ -221,19 +307,21 @@ export default function DraftAssistant() {
                 className="w-full bg-slate-800 text-white px-4 py-2 rounded-lg border border-purple-500"
               />
             </div>
-            <div>
-              <label className="block text-purple-200 text-sm mb-2">Total Budget</label>
-              <input
-                type="number"
-                value={totalBudget}
-                onChange={(e) => {
-                  const newBudget = parseInt(e.target.value)
-                  setTotalBudget(newBudget)
-                  setBudget(newBudget)
-                }}
-                className="w-full bg-slate-800 text-white px-4 py-2 rounded-lg border border-purple-500"
-              />
-            </div>
+            {showBudgetFeatures && (
+              <div>
+                <label className="block text-purple-200 text-sm mb-2">Total Budget</label>
+                <input
+                  type="number"
+                  value={totalBudget}
+                  onChange={(e) => {
+                    const newBudget = parseInt(e.target.value)
+                    setTotalBudget(newBudget)
+                    setBudget(newBudget)
+                  }}
+                  className="w-full bg-slate-800 text-white px-4 py-2 rounded-lg border border-purple-500"
+                />
+              </div>
+            )}
             <div>
               <label className="block text-purple-200 text-sm mb-2">Draft Date</label>
               <input
@@ -259,6 +347,16 @@ export default function DraftAssistant() {
                 </div>
               </div>
             )}
+            <div className="md:col-span-2">
+              <div className="bg-blue-900/30 border border-blue-500 rounded-lg p-3 text-sm text-blue-200">
+                <div className="font-semibold mb-1">📊 Configuration Impact</div>
+                <div className="text-xs">
+                  Your league format affects category weights and player rankings. {leagueFormat === '9-cat-h2h' || leagueFormat === 'roto-9cat' ? 'Turnovers count as a negative category.' : leagueFormat === '11-cat-h2h' ? 'Includes FGM, OREB, and A/T ratio for deeper analysis.' : leagueFormat === 'points' ? 'Rankings optimized for total fantasy points scoring.' : 'Standard 8-category scoring.'}
+                  {' '}
+                  {draftType === 'salary-cap' ? 'Salary Cap pricing shown.' : draftType === 'auction' ? 'Auction values reflect competitive bidding.' : 'Snake draft rankings optimized for positional scarcity.'}
+                </div>
+              </div>
+            </div>
           </div>
         )}
       </div>
@@ -320,12 +418,14 @@ export default function DraftAssistant() {
                   >
                     Pos {sortField === 'position' && (sortDirection === 'asc' ? '▲' : '▼')}
                   </th>
-                  <th
-                    className="text-right p-2 cursor-pointer hover:bg-slate-700"
-                    onClick={() => handleSort('price')}
-                  >
-                    Price {sortField === 'price' && (sortDirection === 'asc' ? '▲' : '▼')}
-                  </th>
+                  {showBudgetFeatures && (
+                    <th
+                      className="text-right p-2 cursor-pointer hover:bg-slate-700"
+                      onClick={() => handleSort('price')}
+                    >
+                      Price {sortField === 'price' && (sortDirection === 'asc' ? '▲' : '▼')}
+                    </th>
+                  )}
                   <th
                     className="text-right p-2 cursor-pointer hover:bg-slate-700"
                     onClick={() => handleSort('vorp')}
@@ -358,12 +458,14 @@ export default function DraftAssistant() {
                       <td className="p-2 font-semibold">{player.name}</td>
                       <td className="p-2">{player.team}</td>
                       <td className="p-2 text-xs">{player.position}</td>
-                      <td className="p-2 text-right">
-                        <span className="text-green-400 font-bold">${player.suggestedPrice}</span>
-                        <span className="text-xs text-gray-400 ml-1">
-                          (${player.minPrice}-${player.maxPrice})
-                        </span>
-                      </td>
+                      {showBudgetFeatures && (
+                        <td className="p-2 text-right">
+                          <span className="text-green-400 font-bold">${player.suggestedPrice}</span>
+                          <span className="text-xs text-gray-400 ml-1">
+                            (${player.minPrice}-${player.maxPrice})
+                          </span>
+                        </td>
+                      )}
                       <td className="p-2 text-right text-xs">{player.vorp.toFixed(1)}</td>
                       <td className="p-2 text-xs text-purple-200">{topCats || '-'}</td>
                       <td className="p-2 text-center">
@@ -386,33 +488,43 @@ export default function DraftAssistant() {
 
       {/* Right: My Team & Budget */}
       <div className="space-y-6">
-        {/* Budget Info */}
+        {/* Budget Info / Draft Status */}
         <div className="bg-white/10 backdrop-blur-md rounded-lg p-6">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-xl font-bold text-white">Draft Status</h3>
-            <label className="relative inline-flex items-center cursor-pointer">
-              <input
-                type="checkbox"
-                checked={ignoreBudget}
-                onChange={(e) => setIgnoreBudget(e.target.checked)}
-                className="sr-only peer"
-              />
-              <div className="w-11 h-6 bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
-              <span className="ml-3 text-sm font-medium text-purple-200">Ignore Budget</span>
-            </label>
+            {showBudgetFeatures && (
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={ignoreBudget}
+                  onChange={(e) => setIgnoreBudget(e.target.checked)}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
+                <span className="ml-3 text-sm font-medium text-purple-200">Ignore Budget</span>
+              </label>
+            )}
           </div>
           <div className="space-y-3">
-            <div className="flex justify-between items-center">
-              <span className="text-purple-200">Remaining Budget:</span>
-              <span className="text-3xl font-bold text-green-400">${budget}</span>
-            </div>
+            {showBudgetFeatures && (
+              <>
+                <div className="flex justify-between items-center">
+                  <span className="text-purple-200">Remaining Budget:</span>
+                  <span className="text-3xl font-bold text-green-400">${budget}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-purple-200">Avg per Spot:</span>
+                  <span className="text-xl font-bold text-yellow-400">${avgPerSpot}</span>
+                </div>
+              </>
+            )}
             <div className="flex justify-between items-center">
               <span className="text-purple-200">Roster Spots:</span>
               <span className="text-2xl font-bold text-blue-400">{rosterSpots} / 16</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-purple-200">Avg per Spot:</span>
-              <span className="text-xl font-bold text-yellow-400">${avgPerSpot}</span>
+              <span className="text-purple-200">Players Drafted:</span>
+              <span className="text-2xl font-bold text-purple-400">{myTeam.length}</span>
             </div>
           </div>
         </div>
@@ -432,11 +544,13 @@ export default function DraftAssistant() {
                   <div className="flex-1">
                     <div className="font-semibold text-white">{player.name}</div>
                     <div className="text-xs text-purple-200">
-                      {player.team} | {player.position}
+                      {player.team} | {player.position} | Rank #{player.overallRank}
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-green-400 font-bold">${player.suggestedPrice}</span>
+                    {showBudgetFeatures && (
+                      <span className="text-green-400 font-bold">${player.suggestedPrice}</span>
+                    )}
                     <button
                       onClick={() => handleUndraft(player.name, player.suggestedPrice)}
                       className="bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded text-xs"
@@ -455,20 +569,27 @@ export default function DraftAssistant() {
           <div className="bg-white/10 backdrop-blur-md rounded-lg p-6">
             <h3 className="text-xl font-bold text-white mb-4">Category Coverage</h3>
             <div className="space-y-2 text-sm">
-              {[
-                { key: 'fgm', label: 'FGM', fullName: 'Field Goals Made' },
-                { key: 'fgPct', label: 'FG%', fullName: 'Field Goal Percentage' },
-                { key: 'ftPct', label: 'FT%', fullName: 'Free Throw Percentage' },
-                { key: 'tpm', label: '3PM', fullName: '3-Pointers Made' },
-                { key: 'pts', label: 'PTS', fullName: 'Points Scored' },
-                { key: 'oreb', label: 'OREB', fullName: 'Offensive Rebounds' },
-                { key: 'reb', label: 'REB', fullName: 'Total Rebounds' },
-                { key: 'ast', label: 'AST', fullName: 'Assists' },
-                { key: 'stl', label: 'STL', fullName: 'Steals' },
-                { key: 'blk', label: 'BLK', fullName: 'Blocks' },
-                { key: 'astToRatio', label: 'A/T', fullName: 'Assist/Turnover Ratio' },
-              ].map(cat => {
-                const avgScore = myTeam.reduce((sum, p) => sum + p.categoryScores[cat.key as keyof typeof p.categoryScores], 0) / myTeam.length
+              {(CATEGORY_CONFIGS[leagueFormat as keyof typeof CATEGORY_CONFIGS] || CATEGORY_CONFIGS['11-cat-h2h']).map(cat => {
+                // Get average score for this category across all drafted players
+                let avgScore = 0
+
+                // For categories that exist in categoryScores
+                if (cat.key in myTeam[0]?.categoryScores || false) {
+                  avgScore = myTeam.reduce((sum, p) => sum + (p.categoryScores[cat.key as keyof typeof p.categoryScores] || 0), 0) / myTeam.length
+                } else if (cat.key === 'tov') {
+                  // For turnovers (inverse scoring - lower is better)
+                  const avgTov = myTeam.reduce((sum, p) => sum + p.tov, 0) / myTeam.length
+                  const allTovs = players.map(p => p.tov)
+                  const maxTov = Math.max(...allTovs)
+                  const minTov = Math.min(...allTovs.filter(t => t > 0))
+                  // Inverse scale: lower turnovers = higher score
+                  avgScore = ((maxTov - avgTov) / (maxTov - minTov)) * 10
+                } else {
+                  // For raw stats not in categoryScores
+                  const statValue = myTeam.reduce((sum, p) => sum + (p[cat.key as keyof typeof p] as number || 0), 0) / myTeam.length
+                  avgScore = Math.min(10, (statValue / 20) * 10) // Rough scaling
+                }
+
                 const barWidth = (avgScore / 10) * 100
 
                 return (
