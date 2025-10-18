@@ -33,8 +33,19 @@ export default function DraftAssistant() {
   }, [])
 
   const handleDraft = (playerName: string, price: number) => {
+    // 防止重複選擇
+    if (draftedPlayers.has(playerName)) {
+      console.warn('Player already drafted:', playerName)
+      return
+    }
+
     setDraftedPlayers(prev => new Set([...prev, playerName]))
-    setBudget(prev => Math.max(0, prev - price))
+
+    // 只有在非忽略預算模式下才扣除預算
+    if (!ignoreBudget) {
+      setBudget(prev => Math.max(0, prev - price))
+    }
+
     setRosterSpots(prev => Math.max(0, prev - 1))
   }
 
@@ -58,7 +69,7 @@ export default function DraftAssistant() {
   }
 
   const filteredPlayers = useMemo(() => {
-    const filtered = players.filter(p => {
+    let filtered = players.filter(p => {
       const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                            p.team?.toLowerCase().includes(searchTerm.toLowerCase())
       const matchesPosition = positionFilter === 'ALL' ||
@@ -67,8 +78,8 @@ export default function DraftAssistant() {
       return matchesSearch && matchesPosition && notDrafted
     })
 
-    // Sort
-    filtered.sort((a, b) => {
+    // Sort - create a new sorted array
+    const sorted = [...filtered].sort((a, b) => {
       let aVal: string | number
       let bVal: string | number
 
@@ -113,7 +124,7 @@ export default function DraftAssistant() {
       }
     })
 
-    return filtered
+    return sorted
   }, [players, searchTerm, positionFilter, draftedPlayers, sortField, sortDirection])
 
   const myTeam = useMemo(() => {
@@ -225,6 +236,7 @@ export default function DraftAssistant() {
                     .join(', ')
 
                   const canAfford = ignoreBudget || player.suggestedPrice <= budget
+                  const alreadyDrafted = draftedPlayers.has(player.name)
 
                   return (
                     <tr
@@ -248,10 +260,10 @@ export default function DraftAssistant() {
                       <td className="p-2 text-center">
                         <button
                           onClick={() => handleDraft(player.name, player.suggestedPrice)}
-                          disabled={!canAfford || rosterSpots === 0}
+                          disabled={!canAfford || rosterSpots === 0 || alreadyDrafted}
                           className="bg-purple-600 hover:bg-purple-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-3 py-1 rounded text-xs font-semibold"
                         >
-                          Draft
+                          {alreadyDrafted ? 'Drafted' : 'Draft'}
                         </button>
                       </td>
                     </tr>
