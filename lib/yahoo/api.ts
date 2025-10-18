@@ -121,18 +121,48 @@ export async function getUserLeagues(accessToken: string, season?: string): Prom
  */
 export async function getLeagueTeams(accessToken: string, leagueKey: string): Promise<YahooTeam[]> {
   try {
-    const url = `${YAHOO_FANTASY_API_BASE}/league/${leagueKey}/teams`
-    
+    const url = `${YAHOO_FANTASY_API_BASE}/league/${leagueKey}/teams?format=json`
+
+    console.log('Fetching teams from:', url)
+
     const response = await axios.get(url, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
+        Accept: 'application/json',
       },
     })
 
-    return response.data.fantasy_content?.league?.[1]?.teams || []
+    console.log('Teams API Response:', JSON.stringify(response.data, null, 2))
+
+    const league = response.data?.fantasy_content?.league
+    if (!league || !Array.isArray(league) || league.length < 2) {
+      console.log('Invalid league structure')
+      return []
+    }
+
+    const teamsObj = league[1]?.teams
+    if (!teamsObj || typeof teamsObj !== 'object') {
+      console.log('No teams found in league')
+      return []
+    }
+
+    // teams is an object like: {"0": {"team": [...]}, "count": 14}
+    const teamData: YahooTeam[] = []
+    for (const key in teamsObj) {
+      if (key === 'count') continue
+      const teamItem = teamsObj[key]?.team
+      if (teamItem && Array.isArray(teamItem) && teamItem[0]) {
+        teamData.push(teamItem[0] as YahooTeam)
+      }
+    }
+
+    console.log('Parsed teams:', teamData)
+    return teamData
   } catch (error) {
     console.error('Error fetching league teams:', error)
+    if (axios.isAxiosError(error)) {
+      console.error('Response data:', error.response?.data)
+    }
     throw error
   }
 }
@@ -142,18 +172,54 @@ export async function getLeagueTeams(accessToken: string, leagueKey: string): Pr
  */
 export async function getTeamRoster(accessToken: string, teamKey: string): Promise<YahooPlayer[]> {
   try {
-    const url = `${YAHOO_FANTASY_API_BASE}/team/${teamKey}/roster`
-    
+    const url = `${YAHOO_FANTASY_API_BASE}/team/${teamKey}/roster?format=json`
+
+    console.log('Fetching roster from:', url)
+
     const response = await axios.get(url, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
+        Accept: 'application/json',
       },
     })
 
-    return response.data.fantasy_content?.team?.[1]?.roster?.[0]?.players || []
+    console.log('Roster API Response:', JSON.stringify(response.data, null, 2))
+
+    const team = response.data?.fantasy_content?.team
+    if (!team || !Array.isArray(team) || team.length < 2) {
+      console.log('Invalid team structure')
+      return []
+    }
+
+    const roster = team[1]?.roster
+    if (!roster || !Array.isArray(roster) || roster.length === 0) {
+      console.log('No roster found')
+      return []
+    }
+
+    const playersObj = roster[0]?.players
+    if (!playersObj || typeof playersObj !== 'object') {
+      console.log('No players found in roster')
+      return []
+    }
+
+    // players is an object like: {"0": {"player": [...]}, "count": 13}
+    const playerData: YahooPlayer[] = []
+    for (const key in playersObj) {
+      if (key === 'count') continue
+      const playerItem = playersObj[key]?.player
+      if (playerItem && Array.isArray(playerItem) && playerItem[0]) {
+        playerData.push(playerItem[0] as YahooPlayer)
+      }
+    }
+
+    console.log('Parsed players:', playerData)
+    return playerData
   } catch (error) {
     console.error('Error fetching team roster:', error)
+    if (axios.isAxiosError(error)) {
+      console.error('Response data:', error.response?.data)
+    }
     throw error
   }
 }
