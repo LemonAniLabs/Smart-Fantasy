@@ -151,8 +151,32 @@ export async function getLeagueTeams(accessToken: string, leagueKey: string): Pr
     for (const key in teamsObj) {
       if (key === 'count') continue
       const teamItem = teamsObj[key]?.team
-      if (teamItem && Array.isArray(teamItem) && teamItem[0]) {
-        teamData.push(teamItem[0] as YahooTeam)
+      if (teamItem && Array.isArray(teamItem)) {
+        // Yahoo API returns team as array where:
+        // team[0] is array of property objects OR a single object with all properties
+        // team[1] contains nested data (managers, etc.)
+        let teamInfo: any = {}
+
+        if (Array.isArray(teamItem[0])) {
+          // team[0] is an array of individual property objects - merge them
+          for (const prop of teamItem[0]) {
+            if (typeof prop === 'object' && prop !== null) {
+              teamInfo = { ...teamInfo, ...prop }
+            }
+          }
+        } else if (typeof teamItem[0] === 'object') {
+          // team[0] is already a single object with all properties
+          teamInfo = teamItem[0]
+        }
+
+        // Convert numeric is_owned_by_current_login (0/1) to boolean
+        if ('is_owned_by_current_login' in teamInfo) {
+          teamInfo.is_owned_by_current_login = teamInfo.is_owned_by_current_login === 1 || teamInfo.is_owned_by_current_login === true
+        }
+
+        if (teamInfo.team_key) {
+          teamData.push(teamInfo as YahooTeam)
+        }
       }
     }
 
@@ -208,8 +232,27 @@ export async function getTeamRoster(accessToken: string, teamKey: string): Promi
     for (const key in playersObj) {
       if (key === 'count') continue
       const playerItem = playersObj[key]?.player
-      if (playerItem && Array.isArray(playerItem) && playerItem[0]) {
-        playerData.push(playerItem[0] as YahooPlayer)
+      if (playerItem && Array.isArray(playerItem)) {
+        // Yahoo API returns player as array where:
+        // player[0] is array of property objects OR a single object with all properties
+        // player[1] contains nested data (stats, etc.)
+        let playerInfo: any = {}
+
+        if (Array.isArray(playerItem[0])) {
+          // player[0] is an array of individual property objects - merge them
+          for (const prop of playerItem[0]) {
+            if (typeof prop === 'object' && prop !== null) {
+              playerInfo = { ...playerInfo, ...prop }
+            }
+          }
+        } else if (typeof playerItem[0] === 'object') {
+          // player[0] is already a single object with all properties
+          playerInfo = playerItem[0]
+        }
+
+        if (playerInfo.player_key) {
+          playerData.push(playerInfo as YahooPlayer)
+        }
       }
     }
 
