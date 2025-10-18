@@ -6,16 +6,19 @@ const authOptions: NextAuthOptions = {
       id: "yahoo",
       name: "Yahoo",
       type: "oauth",
+      wellKnown: "https://api.login.yahoo.com/.well-known/openid-configuration",
       authorization: {
-        url: "https://api.login.yahoo.com/oauth2/request_auth",
         params: {
-          scope: "openid profile email fspt-r fspt-w",
+          scope: "openid profile email fspt-r",
         },
       },
-      token: "https://api.login.yahoo.com/oauth2/get_token",
-      userinfo: "https://api.login.yahoo.com/openid/v1/userinfo",
       clientId: process.env.YAHOO_CLIENT_ID,
       clientSecret: process.env.YAHOO_CLIENT_SECRET,
+      client: {
+        authorization_signed_response_alg: "ES256",
+        id_token_signed_response_alg: "ES256",
+      },
+      issuer: "https://api.login.yahoo.com",
       profile(profile) {
         return {
           id: profile.sub,
