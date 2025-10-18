@@ -102,8 +102,14 @@ export default function YahooConnect() {
       }
       const rosterData = await rosterResponse.json()
       console.log('Roster data:', rosterData)
+      console.log('Roster array:', rosterData.roster)
+      console.log('Roster length:', rosterData.roster?.length)
 
       setRoster(rosterData.roster || [])
+
+      if (!rosterData.roster || rosterData.roster.length === 0) {
+        console.warn('No roster data received!')
+      }
     } catch (err: unknown) {
       setError((err as Error).message)
       console.error('Error fetching team data:', err)
@@ -216,30 +222,38 @@ export default function YahooConnect() {
 
               {myTeam && !loadingTeam && (
                 <div className="space-y-4">
-                  <div className="bg-slate-800/50 p-3 rounded">
-                    <div className="font-semibold text-white">{myTeam.name}</div>
-                    <div className="text-xs text-purple-200">Team ID: {myTeam.team_id}</div>
+                  <div className="bg-slate-800/50 p-4 rounded">
+                    <div className="font-semibold text-white text-lg">{myTeam.name}</div>
+                    <div className="text-xs text-purple-200 mt-1">Team Key: {myTeam.team_key}</div>
                   </div>
 
-                  {roster.length > 0 && (
-                    <div>
-                      <h4 className="font-semibold text-white mb-2">Roster ({roster.length} players)</h4>
-                      <div className="space-y-1 max-h-96 overflow-y-auto">
+                  {roster.length > 0 ? (
+                    <div className="bg-slate-800/50 p-4 rounded">
+                      <h4 className="font-semibold text-white mb-3 text-lg">
+                        Roster ({roster.length} players)
+                      </h4>
+                      <div className="space-y-2 max-h-96 overflow-y-auto">
                         {roster.map((player, index) => (
                           <div
-                            key={index}
-                            className="bg-slate-800/30 p-2 rounded flex justify-between items-center text-sm"
+                            key={player.player_key || index}
+                            className="bg-slate-700/50 p-3 rounded hover:bg-slate-700/70 transition-colors"
                           >
-                            <div>
-                              <div className="text-white">{player.name.full}</div>
-                              <div className="text-xs text-purple-200">
-                                {player.eligible_positions?.join(', ')}
-                                {player.selected_position && ` • ${player.selected_position.position}`}
-                              </div>
+                            <div className="font-medium text-white">{player.name?.full || 'Unknown Player'}</div>
+                            <div className="text-xs text-purple-200 mt-1">
+                              {player.eligible_positions?.join(', ') || 'No positions'}
+                              {player.selected_position && typeof player.selected_position === 'object' && 'position' in player.selected_position
+                                ? ` • Current: ${player.selected_position.position}`
+                                : player.selected_position && typeof player.selected_position === 'string'
+                                ? ` • Current: ${player.selected_position}`
+                                : ''}
                             </div>
                           </div>
                         ))}
                       </div>
+                    </div>
+                  ) : (
+                    <div className="bg-yellow-900/30 border border-yellow-500 rounded-lg p-3 text-sm text-yellow-200">
+                      No roster data available. This might be because the roster hasn't been set yet.
                     </div>
                   )}
                 </div>
