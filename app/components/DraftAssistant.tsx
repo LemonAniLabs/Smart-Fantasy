@@ -58,7 +58,7 @@ export default function DraftAssistant() {
   }
 
   const filteredPlayers = useMemo(() => {
-    let filtered = players.filter(p => {
+    const filtered = players.filter(p => {
       const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                            p.team?.toLowerCase().includes(searchTerm.toLowerCase())
       const matchesPosition = positionFilter === 'ALL' ||
