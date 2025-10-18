@@ -82,9 +82,12 @@ export default function YahooConnect() {
       }
       const teamsData = await teamsResponse.json()
       console.log('Teams data:', teamsData)
+      console.log('Teams array:', teamsData.teams)
+      console.log('First team structure:', teamsData.teams?.[0])
 
       // Find the user's team
       const userTeam = teamsData.teams?.find((team: Team) => team.is_owned_by_current_login)
+      console.log('Found user team:', userTeam)
       if (!userTeam) {
         throw new Error('Could not find your team in this league')
       }
