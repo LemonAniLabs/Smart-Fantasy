@@ -304,18 +304,70 @@ export async function getTeamRoster(accessToken: string, teamKey: string): Promi
  */
 export async function getLeagueSettings(accessToken: string, leagueKey: string) {
   try {
-    const url = `${YAHOO_FANTASY_API_BASE}/league/${leagueKey}/settings`
-    
+    const url = `${YAHOO_FANTASY_API_BASE}/league/${leagueKey}/settings?format=json`
+
+    console.log('Fetching league settings from:', url)
+
     const response = await axios.get(url, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
+        Accept: 'application/json',
       },
     })
+
+    console.log('League settings response:', JSON.stringify(response.data, null, 2))
 
     return response.data.fantasy_content?.league?.[1]?.settings || {}
   } catch (error) {
     console.error('Error fetching league settings:', error)
+    throw error
+  }
+}
+
+/**
+ * Fetch current week's matchup for a team
+ */
+export async function getCurrentMatchup(accessToken: string, teamKey: string) {
+  try {
+    // Get current week matchup
+    const url = `${YAHOO_FANTASY_API_BASE}/team/${teamKey}/matchups;current?format=json`
+
+    console.log('Fetching matchup from:', url)
+
+    const response = await axios.get(url, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        Accept: 'application/json',
+      },
+    })
+
+    console.log('Matchup response:', JSON.stringify(response.data, null, 2))
+
+    const team = response.data?.fantasy_content?.team
+    if (!team || !Array.isArray(team) || team.length < 2) {
+      console.log('Invalid team structure')
+      return null
+    }
+
+    const matchupsObj = team[1]?.matchups
+    if (!matchupsObj || typeof matchupsObj !== 'object') {
+      console.log('No matchups found')
+      return null
+    }
+
+    // Get first matchup (current week)
+    const matchupData = matchupsObj['0']?.matchup || matchupsObj[0]?.matchup
+    if (!matchupData) {
+      console.log('No matchup data found')
+      return null
+    }
+
+    return matchupData
+  } catch (error) {
+    console.error('Error fetching matchup:', error)
+    if (axios.isAxiosError(error)) {
+      console.error('Response data:', error.response?.data)
+    }
     throw error
   }
 }

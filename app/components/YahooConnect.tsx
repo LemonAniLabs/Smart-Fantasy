@@ -16,6 +16,14 @@ interface Team {
   team_id: string
   name: string
   is_owned_by_current_login: boolean
+  team_standings?: {
+    rank?: number
+    outcome_totals?: {
+      wins?: number
+      losses?: number
+      ties?: number
+    }
+  }
 }
 
 interface Player {
@@ -36,12 +44,17 @@ export default function YahooConnect() {
   const [leagues, setLeagues] = useState<League[]>([])
   const [selectedLeague, setSelectedLeague] = useState<League | null>(null)
   const [myTeam, setMyTeam] = useState<Team | null>(null)
+  const [allTeams, setAllTeams] = useState<Team[]>([])
+  const [viewingTeam, setViewingTeam] = useState<Team | null>(null)
   const [roster, setRoster] = useState<Player[]>([])
+  const [opponentTeam, setOpponentTeam] = useState<Team | null>(null)
   const [loading, setLoading] = useState(false)
   const [loadingTeam, setLoadingTeam] = useState(false)
+  const [loadingMatchup, setLoadingMatchup] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [showDebug, setShowDebug] = useState(false)
   const [debugData, setDebugData] = useState<string>('')
+  const [view, setView] = useState<'myteam' | 'allteams' | 'matchup'>('myteam')
 
   useEffect(() => {
     if (session?.accessToken) {
@@ -84,8 +97,8 @@ export default function YahooConnect() {
       }
       const teamsData = await teamsResponse.json()
       console.log('Teams data:', teamsData)
-      console.log('Teams array:', teamsData.teams)
-      console.log('First team structure:', teamsData.teams?.[0])
+
+      setAllTeams(teamsData.teams || [])
 
       // Find the user's team
       const userTeam = teamsData.teams?.find((team: Team) => team.is_owned_by_current_login)
@@ -95,31 +108,13 @@ export default function YahooConnect() {
       }
 
       setMyTeam(userTeam)
+      setViewingTeam(userTeam)
 
-      // Fetch the team's roster
-      const rosterResponse = await fetch(`/api/yahoo/roster?teamKey=${userTeam.team_key}`)
-      if (!rosterResponse.ok) {
-        const errorData = await rosterResponse.json()
-        throw new Error(errorData.error || 'Failed to fetch roster')
-      }
-      const rosterData = await rosterResponse.json()
-      console.log('Roster data:', rosterData)
-      console.log('Roster array:', rosterData.roster)
-      console.log('Roster length:', rosterData.roster?.length)
+      // Fetch my team's roster
+      await fetchTeamRoster(userTeam.team_key)
 
-      setRoster(rosterData.roster || [])
-
-      if (!rosterData.roster || rosterData.roster.length === 0) {
-        console.warn('No roster data received!')
-        // Store debug data for display
-        setDebugData(JSON.stringify({
-          teamsData,
-          rosterData,
-          userTeam,
-        }, null, 2))
-      } else {
-        setDebugData('')
-      }
+      // Fetch current week's matchup
+      fetchMatchup(userTeam.team_key)
     } catch (err: unknown) {
       setError((err as Error).message)
       console.error('Error fetching team data:', err)
@@ -128,6 +123,79 @@ export default function YahooConnect() {
     } finally {
       setLoadingTeam(false)
     }
+  }
+
+  const fetchTeamRoster = async (teamKey: string) => {
+    try {
+      const rosterResponse = await fetch(`/api/yahoo/roster?teamKey=${teamKey}`)
+      if (!rosterResponse.ok) {
+        const errorData = await rosterResponse.json()
+        throw new Error(errorData.error || 'Failed to fetch roster')
+      }
+      const rosterData = await rosterResponse.json()
+      console.log('Roster data:', rosterData)
+
+      setRoster(rosterData.roster || [])
+
+      if (!rosterData.roster || rosterData.roster.length === 0) {
+        console.warn('No roster data received!')
+      }
+    } catch (err) {
+      console.error('Error fetching roster:', err)
+      setRoster([])
+    }
+  }
+
+  const fetchMatchup = async (teamKey: string) => {
+    setLoadingMatchup(true)
+    try {
+      const matchupResponse = await fetch(`/api/yahoo/matchup?teamKey=${teamKey}`)
+      if (!matchupResponse.ok) {
+        console.warn('Failed to fetch matchup')
+        return
+      }
+      const matchupData = await matchupResponse.json()
+      console.log('Matchup data:', matchupData)
+
+      // Find opponent team from matchup data
+      // matchup structure: {"0": {"teams": {...}}}
+      if (matchupData.matchup) {
+        const matchupObj = matchupData.matchup
+        const teamsData = matchupObj['0']?.teams || matchupObj.teams
+        if (teamsData) {
+          // Find opponent (the team that is not mine)
+          for (const key in teamsData) {
+            if (key === 'count') continue
+            const teamItem = teamsData[key]?.team
+            if (teamItem && Array.isArray(teamItem) && teamItem[0]) {
+              const teamInfo: Partial<Team> = {}
+              if (Array.isArray(teamItem[0])) {
+                for (const prop of teamItem[0]) {
+                  if (typeof prop === 'object' && prop !== null) {
+                    Object.assign(teamInfo, prop)
+                  }
+                }
+              }
+              // Check if this is NOT my team
+              if (teamInfo.team_key && teamInfo.team_key !== teamKey) {
+                setOpponentTeam(teamInfo as Team)
+                break
+              }
+            }
+          }
+        }
+      }
+    } catch (err) {
+      console.error('Error fetching matchup:', err)
+    } finally {
+      setLoadingMatchup(false)
+    }
+  }
+
+  const handleViewTeam = async (team: Team) => {
+    setViewingTeam(team)
+    setView('myteam')
+    await fetchTeamRoster(team.team_key)
   }
 
   const fetchDebugData = async () => {
@@ -228,26 +296,70 @@ export default function YahooConnect() {
                 onClick={() => {
                   setSelectedLeague(null)
                   setMyTeam(null)
+                  setAllTeams([])
                   setRoster([])
+                  setOpponentTeam(null)
                 }}
                 className="text-purple-300 hover:text-purple-100 text-sm mb-3 flex items-center gap-1"
               >
                 ← Back to Leagues
               </button>
 
-              <h3 className="text-lg font-semibold text-white mb-2">
+              <h3 className="text-lg font-semibold text-white mb-4">
                 {selectedLeague.name}
               </h3>
 
-              {loadingTeam && (
-                <p className="text-purple-200">Loading your team...</p>
+              {/* Sub Navigation */}
+              {myTeam && (
+                <div className="flex gap-2 mb-4">
+                  <button
+                    onClick={() => setView('myteam')}
+                    className={`px-4 py-2 rounded text-sm font-semibold transition-colors ${
+                      view === 'myteam'
+                        ? 'bg-purple-600 text-white'
+                        : 'bg-slate-700 text-purple-200 hover:bg-slate-600'
+                    }`}
+                  >
+                    我的球隊
+                  </button>
+                  <button
+                    onClick={() => setView('matchup')}
+                    className={`px-4 py-2 rounded text-sm font-semibold transition-colors ${
+                      view === 'matchup'
+                        ? 'bg-purple-600 text-white'
+                        : 'bg-slate-700 text-purple-200 hover:bg-slate-600'
+                    }`}
+                  >
+                    本周對手 {opponentTeam && '🔥'}
+                  </button>
+                  <button
+                    onClick={() => setView('allteams')}
+                    className={`px-4 py-2 rounded text-sm font-semibold transition-colors ${
+                      view === 'allteams'
+                        ? 'bg-purple-600 text-white'
+                        : 'bg-slate-700 text-purple-200 hover:bg-slate-600'
+                    }`}
+                  >
+                    所有隊伍
+                  </button>
+                </div>
               )}
 
-              {myTeam && !loadingTeam && (
+              {loadingTeam && (
+                <p className="text-purple-200">Loading...</p>
+              )}
+
+              {/* My Team / Viewing Team View */}
+              {view === 'myteam' && viewingTeam && !loadingTeam && (
                 <div className="space-y-4">
                   <div className="bg-slate-800/50 p-4 rounded">
-                    <div className="font-semibold text-white text-lg">{myTeam.name}</div>
-                    <div className="text-xs text-purple-200 mt-1">Team Key: {myTeam.team_key}</div>
+                    <div className="font-semibold text-white text-lg">
+                      {viewingTeam.name}
+                      {viewingTeam.is_owned_by_current_login && (
+                        <span className="ml-2 text-xs bg-green-600 px-2 py-1 rounded">你的球隊</span>
+                      )}
+                    </div>
+                    <div className="text-xs text-purple-200 mt-1">Team Key: {viewingTeam.team_key}</div>
                   </div>
 
                   {roster.length > 0 ? (
@@ -303,6 +415,110 @@ export default function YahooConnect() {
                           </pre>
                         </div>
                       )}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* All Teams View */}
+              {view === 'allteams' && allTeams.length > 0 && (
+                <div className="space-y-3">
+                  <h4 className="font-semibold text-white text-lg mb-3">
+                    所有隊伍 ({allTeams.length} teams)
+                  </h4>
+                  <div className="space-y-2">
+                    {allTeams.map((team, index) => (
+                      <div
+                        key={team.team_key || index}
+                        className="bg-slate-800/50 p-3 rounded hover:bg-slate-700/50 transition-colors"
+                      >
+                        <div className="flex justify-between items-center">
+                          <div>
+                            <div className="font-medium text-white">
+                              {team.name}
+                              {team.is_owned_by_current_login && (
+                                <span className="ml-2 text-xs bg-green-600 px-2 py-1 rounded">你的球隊</span>
+                              )}
+                            </div>
+                            <div className="text-xs text-purple-200 mt-1">
+                              Team ID: {team.team_id}
+                            </div>
+                          </div>
+                          <button
+                            onClick={() => handleViewTeam(team)}
+                            className="bg-purple-600 hover:bg-purple-700 text-white text-xs px-3 py-1 rounded font-semibold"
+                          >
+                            查看 Roster
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Matchup View */}
+              {view === 'matchup' && (
+                <div className="space-y-4">
+                  {loadingMatchup && (
+                    <p className="text-purple-200">Loading matchup...</p>
+                  )}
+
+                  {!loadingMatchup && opponentTeam && (
+                    <div>
+                      <h4 className="font-semibold text-white text-lg mb-3">
+                        本周對戰 🔥
+                      </h4>
+
+                      <div className="flex flex-col md:flex-row items-center gap-4">
+                        {/* My Team */}
+                        <div className="flex-1 w-full bg-green-900/20 border-2 border-green-600 rounded-lg p-4">
+                          <div className="text-center mb-2">
+                            <div className="text-xs text-green-400 font-semibold">你的球隊</div>
+                            <div className="text-lg font-bold text-white mt-1">{myTeam?.name}</div>
+                          </div>
+                          <button
+                            onClick={() => {
+                              if (myTeam) handleViewTeam(myTeam)
+                            }}
+                            className="w-full bg-green-600 hover:bg-green-700 text-white text-sm py-2 rounded font-semibold mt-2"
+                          >
+                            查看我的 Roster
+                          </button>
+                        </div>
+
+                        {/* VS */}
+                        <div className="flex items-center justify-center px-4">
+                          <div className="text-4xl font-bold text-purple-400">VS</div>
+                        </div>
+
+                        {/* Opponent Team */}
+                        <div className="flex-1 w-full bg-red-900/20 border-2 border-red-600 rounded-lg p-4">
+                          <div className="text-center mb-2">
+                            <div className="text-xs text-red-400 font-semibold">對手球隊</div>
+                            <div className="text-lg font-bold text-white mt-1">{opponentTeam.name}</div>
+                          </div>
+                          <button
+                            onClick={() => handleViewTeam(opponentTeam)}
+                            className="w-full bg-red-600 hover:bg-red-700 text-white text-sm py-2 rounded font-semibold mt-2"
+                          >
+                            查看對手 Roster
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="mt-4 bg-slate-800/50 p-4 rounded">
+                        <h5 className="font-semibold text-white text-sm mb-2">戰略提示</h5>
+                        <p className="text-purple-200 text-sm">
+                          點擊「查看對手 Roster」來分析對手的球員陣容，找出他們的優勢和弱點，制定你的戰略！
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {!loadingMatchup && !opponentTeam && (
+                    <div className="bg-yellow-900/30 border border-yellow-500 rounded-lg p-3 text-sm text-yellow-200">
+                      無法獲取本周對手資訊。可能還沒有安排對戰或賽季尚未開始。
                     </div>
                   )}
                 </div>
