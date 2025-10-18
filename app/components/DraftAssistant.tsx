@@ -77,9 +77,11 @@ export default function DraftAssistant() {
                 className="bg-slate-800 text-white px-4 py-2 rounded-lg border border-purple-500"
               >
                 <option value="ALL">All Positions</option>
-                <option value="G">Guards (G)</option>
-                <option value="F">Forwards (F)</option>
-                <option value="C">Centers (C)</option>
+                <option value="PG">Point Guard (PG)</option>
+                <option value="SG">Shooting Guard (SG)</option>
+                <option value="SF">Small Forward (SF)</option>
+                <option value="PF">Power Forward (PF)</option>
+                <option value="C">Center (C)</option>
               </select>
               <input
                 type="text"
@@ -211,14 +213,31 @@ export default function DraftAssistant() {
           <div className="bg-white/10 backdrop-blur-md rounded-lg p-6">
             <h3 className="text-xl font-bold text-white mb-4">Category Coverage</h3>
             <div className="space-y-2 text-sm">
-              {['fgPct', 'ftPct', 'tpm', 'pts', 'oreb', 'reb', 'ast', 'stl', 'blk', 'astToRatio'].map(cat => {
-                const avgScore = myTeam.reduce((sum, p) => sum + p.categoryScores[cat as keyof typeof p.categoryScores], 0) / myTeam.length
+              {[
+                { key: 'fgm', label: 'FGM', fullName: 'Field Goals Made' },
+                { key: 'fgPct', label: 'FG%', fullName: 'Field Goal Percentage' },
+                { key: 'ftPct', label: 'FT%', fullName: 'Free Throw Percentage' },
+                { key: 'tpm', label: '3PM', fullName: '3-Pointers Made' },
+                { key: 'pts', label: 'PTS', fullName: 'Points Scored' },
+                { key: 'oreb', label: 'OREB', fullName: 'Offensive Rebounds' },
+                { key: 'reb', label: 'REB', fullName: 'Total Rebounds' },
+                { key: 'ast', label: 'AST', fullName: 'Assists' },
+                { key: 'stl', label: 'STL', fullName: 'Steals' },
+                { key: 'blk', label: 'BLK', fullName: 'Blocks' },
+                { key: 'astToRatio', label: 'A/T', fullName: 'Assist/Turnover Ratio' },
+              ].map(cat => {
+                const avgScore = myTeam.reduce((sum, p) => sum + p.categoryScores[cat.key as keyof typeof p.categoryScores], 0) / myTeam.length
                 const barWidth = (avgScore / 10) * 100
 
                 return (
-                  <div key={cat}>
+                  <div key={cat.key}>
                     <div className="flex justify-between text-purple-200 mb-1">
-                      <span className="uppercase text-xs font-semibold">{cat}</span>
+                      <span
+                        className="uppercase text-xs font-semibold cursor-help"
+                        title={cat.fullName}
+                      >
+                        {cat.label}
+                      </span>
                       <span>{avgScore.toFixed(1)}/10</span>
                     </div>
                     <div className="w-full bg-slate-700 rounded-full h-2">

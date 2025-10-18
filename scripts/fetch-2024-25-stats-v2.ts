@@ -133,17 +133,8 @@ async function main() {
 
     const astToRatio = tov > 0 ? ast / tov : ast
 
-    // 映射位置格式
-    let position = 'F' // 預設
-    if (player.position) {
-      if (player.position.includes('G') || player.position.includes('Guard')) {
-        position = 'G'
-      } else if (player.position.includes('C') || player.position.includes('Center')) {
-        position = 'C'
-      } else {
-        position = 'F'
-      }
-    }
+    // 保留原始細分位置（PG, SG, SF, PF, C）
+    const position = player.position || 'F'
 
     playerStats.push({
       name: player.playerName,

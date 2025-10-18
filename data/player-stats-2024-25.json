@@ -2,7 +2,7 @@
   {
     "name": "Shai Gilgeous-Alexander",
     "team": "OKC",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 76,
     "fgm": 11.31578947368421,
     "fga": 21.789473684210527,
@@ -23,7 +23,7 @@
   {
     "name": "Giannis Antetokounmpo",
     "team": "MIL",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 67,
     "fgm": 11.835820895522389,
     "fga": 19.686567164179106,
@@ -44,7 +44,7 @@
   {
     "name": "Shai Gilgeous-Alexander",
     "team": "OKC",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 23,
     "fgm": 10.130434782608695,
     "fga": 21.91304347826087,
@@ -86,7 +86,7 @@
   {
     "name": "Luka Dončić",
     "team": "LAL",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 28,
     "fgm": 8.75,
     "fga": 19.964285714285715,
@@ -107,7 +107,7 @@
   {
     "name": "Luka Dončić",
     "team": "2TM",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 50,
     "fgm": 9.22,
     "fga": 20.5,
@@ -128,7 +128,7 @@
   {
     "name": "Luka Dončić",
     "team": "DAL",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 22,
     "fgm": 9.818181818181818,
     "fga": 21.181818181818183,
@@ -149,7 +149,7 @@
   {
     "name": "Anthony Edwards",
     "team": "MIN",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 79,
     "fgm": 9.126582278481013,
     "fga": 20.40506329113924,
@@ -170,7 +170,7 @@
   {
     "name": "Jayson Tatum",
     "team": "BOS",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 72,
     "fgm": 9.194444444444445,
     "fga": 20.34722222222222,
@@ -191,7 +191,7 @@
   {
     "name": "Kevin Durant",
     "team": "PHO",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 62,
     "fgm": 9.548387096774194,
     "fga": 18.129032258064516,
@@ -212,7 +212,7 @@
   {
     "name": "Tyrese Maxey",
     "team": "PHI",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 52,
     "fgm": 9.173076923076923,
     "fga": 20.98076923076923,
@@ -233,7 +233,7 @@
   {
     "name": "Cade Cunningham",
     "team": "DET",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 70,
     "fgm": 9.771428571428572,
     "fga": 20.814285714285713,
@@ -254,7 +254,7 @@
   {
     "name": "Jalen Brunson",
     "team": "NYK",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 65,
     "fgm": 9,
     "fga": 18.46153846153846,
@@ -275,7 +275,7 @@
   {
     "name": "Paolo Banchero",
     "team": "ORL",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 46,
     "fgm": 8.956521739130435,
     "fga": 19.804347826086957,
@@ -317,7 +317,7 @@
   {
     "name": "Devin Booker",
     "team": "PHO",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 75,
     "fgm": 8.72,
     "fga": 18.933333333333334,
@@ -338,7 +338,7 @@
   {
     "name": "LaMelo Ball",
     "team": "CHO",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 47,
     "fgm": 8.638297872340425,
     "fga": 21.340425531914892,
@@ -359,7 +359,7 @@
   {
     "name": "De'Aaron Fox",
     "team": "SAC",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 45,
     "fgm": 9.2,
     "fga": 19.622222222222224,
@@ -380,7 +380,7 @@
   {
     "name": "Damian Lillard",
     "team": "MIL",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 58,
     "fgm": 7.655172413793103,
     "fga": 17.103448275862068,
@@ -422,7 +422,7 @@
   {
     "name": "Kyrie Irving",
     "team": "DAL",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 50,
     "fgm": 8.94,
     "fga": 18.9,
@@ -443,7 +443,7 @@
   {
     "name": "Zion Williamson",
     "team": "NOP",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 30,
     "fgm": 9.6,
     "fga": 16.933333333333334,
@@ -464,7 +464,7 @@
   {
     "name": "Stephen Curry",
     "team": "GSW",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 70,
     "fgm": 8.057142857142857,
     "fga": 17.97142857142857,
@@ -506,7 +506,7 @@
   {
     "name": "LeBron James",
     "team": "LAL",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 70,
     "fgm": 9.3,
     "fga": 18.142857142857142,
@@ -548,7 +548,7 @@
   {
     "name": "Trae Young",
     "team": "ATL",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 76,
     "fgm": 7.447368421052632,
     "fga": 18.105263157894736,
@@ -569,7 +569,7 @@
   {
     "name": "Franz Wagner",
     "team": "ORL",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 60,
     "fgm": 8.95,
     "fga": 19.35,
@@ -590,7 +590,7 @@
   {
     "name": "Zach LaVine",
     "team": "CHI",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 42,
     "fgm": 8.642857142857142,
     "fga": 16.904761904761905,
@@ -611,7 +611,7 @@
   {
     "name": "Cam Thomas",
     "team": "BRK",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 25,
     "fgm": 7.96,
     "fga": 18.16,
@@ -632,7 +632,7 @@
   {
     "name": "Donovan Mitchell",
     "team": "CLE",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 71,
     "fgm": 8.23943661971831,
     "fga": 18.591549295774648,
@@ -653,7 +653,7 @@
   {
     "name": "Tyler Herro",
     "team": "MIA",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 77,
     "fgm": 8.454545454545455,
     "fga": 17.896103896103895,
@@ -674,7 +674,7 @@
   {
     "name": "De'Aaron Fox",
     "team": "2TM",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 62,
     "fgm": 8.693548387096774,
     "fga": 18.758064516129032,
@@ -695,7 +695,7 @@
   {
     "name": "Zach LaVine",
     "team": "2TM",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 74,
     "fgm": 8.445945945945946,
     "fga": 16.527027027027028,
@@ -716,7 +716,7 @@
   {
     "name": "Ja Morant",
     "team": "MEM",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 50,
     "fgm": 8.08,
     "fga": 17.78,
@@ -737,7 +737,7 @@
   {
     "name": "James Harden",
     "team": "LAC",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 79,
     "fgm": 6.7215189873417724,
     "fga": 16.39240506329114,
@@ -758,7 +758,7 @@
   {
     "name": "Zach LaVine",
     "team": "SAC",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 32,
     "fgm": 8.1875,
     "fga": 16.03125,
@@ -779,7 +779,7 @@
   {
     "name": "DeMar DeRozan",
     "team": "SAC",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 77,
     "fgm": 8.103896103896103,
     "fga": 16.98701298701299,
@@ -800,7 +800,7 @@
   {
     "name": "Jaylen Brown",
     "team": "BOS",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 63,
     "fgm": 8.222222222222221,
     "fga": 17.746031746031747,
@@ -842,7 +842,7 @@
   {
     "name": "Quentin Grimes",
     "team": "PHI",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 28,
     "fgm": 7.678571428571429,
     "fga": 16.357142857142858,
@@ -863,7 +863,7 @@
   {
     "name": "Norman Powell",
     "team": "LAC",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 60,
     "fgm": 7.616666666666666,
     "fga": 15.75,
@@ -884,7 +884,7 @@
   {
     "name": "Jalen Williams",
     "team": "OKC",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 69,
     "fgm": 8.18840579710145,
     "fga": 16.92753623188406,
@@ -905,7 +905,7 @@
   {
     "name": "Kawhi Leonard",
     "team": "LAC",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 37,
     "fgm": 8.378378378378379,
     "fga": 16.83783783783784,
@@ -926,7 +926,7 @@
   {
     "name": "Jamal Murray",
     "team": "DEN",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 67,
     "fgm": 7.925373134328358,
     "fga": 16.73134328358209,
@@ -947,7 +947,7 @@
   {
     "name": "Jalen Williams",
     "team": "OKC",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 23,
     "fgm": 7.739130434782608,
     "fga": 17.217391304347824,
@@ -968,7 +968,7 @@
   {
     "name": "Trey Murphy III",
     "team": "NOP",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 53,
     "fgm": 7.188679245283019,
     "fga": 15.830188679245284,
@@ -989,7 +989,7 @@
   {
     "name": "CJ McCollum",
     "team": "NOP",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 56,
     "fgm": 7.928571428571429,
     "fga": 17.857142857142858,
@@ -1010,7 +1010,7 @@
   {
     "name": "RJ Barrett",
     "team": "TOR",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 58,
     "fgm": 7.931034482758621,
     "fga": 16.93103448275862,
@@ -1031,7 +1031,7 @@
   {
     "name": "Brandon Miller",
     "team": "CHO",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 27,
     "fgm": 7.333333333333333,
     "fga": 18.185185185185187,
@@ -1052,7 +1052,7 @@
   {
     "name": "Jalen Green",
     "team": "HOU",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 82,
     "fgm": 7.414634146341464,
     "fga": 17.524390243902438,
@@ -1073,7 +1073,7 @@
   {
     "name": "Darius Garland",
     "team": "CLE",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 75,
     "fgm": 7.386666666666667,
     "fga": 15.653333333333334,
@@ -1094,7 +1094,7 @@
   {
     "name": "Pascal Siakam",
     "team": "IND",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 23,
     "fgm": 7.608695652173913,
     "fga": 14.826086956521738,
@@ -1115,7 +1115,7 @@
   {
     "name": "Jordan Poole",
     "team": "WAS",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 68,
     "fgm": 6.720588235294118,
     "fga": 15.544117647058824,
@@ -1136,7 +1136,7 @@
   {
     "name": "Coby White",
     "team": "CHI",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 74,
     "fgm": 6.864864864864865,
     "fga": 15.14864864864865,
@@ -1157,7 +1157,7 @@
   {
     "name": "Miles Bridges",
     "team": "CHO",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 64,
     "fgm": 7.328125,
     "fga": 17.015625,
@@ -1178,7 +1178,7 @@
   {
     "name": "Pascal Siakam",
     "team": "IND",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 78,
     "fgm": 7.858974358974359,
     "fga": 15.153846153846153,
@@ -1199,7 +1199,7 @@
   {
     "name": "Austin Reaves",
     "team": "LAL",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 73,
     "fgm": 6.534246575342466,
     "fga": 14.205479452054794,
@@ -1241,7 +1241,7 @@
   {
     "name": "Scottie Barnes",
     "team": "TOR",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 65,
     "fgm": 7.292307692307692,
     "fga": 16.353846153846153,
@@ -1262,7 +1262,7 @@
   {
     "name": "Anfernee Simons",
     "team": "POR",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 70,
     "fgm": 6.8428571428571425,
     "fga": 16.071428571428573,
@@ -1283,7 +1283,7 @@
   {
     "name": "Desmond Bane",
     "team": "MEM",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 69,
     "fgm": 7.144927536231884,
     "fga": 14.753623188405797,
@@ -1346,7 +1346,7 @@
   {
     "name": "Lauri Markkanen",
     "team": "UTA",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 47,
     "fgm": 6.297872340425532,
     "fga": 14.893617021276595,
@@ -1367,7 +1367,7 @@
   {
     "name": "De'Andre Hunter",
     "team": "ATL",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 37,
     "fgm": 6.135135135135135,
     "fga": 13.297297297297296,
@@ -1388,7 +1388,7 @@
   {
     "name": "John Collins",
     "team": "UTA",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 40,
     "fgm": 7,
     "fga": 13.275,
@@ -1409,7 +1409,7 @@
   {
     "name": "Jalen Johnson",
     "team": "ATL",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 36,
     "fgm": 7.527777777777778,
     "fga": 15.055555555555555,
@@ -1430,7 +1430,7 @@
   {
     "name": "Cameron Johnson",
     "team": "BRK",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 57,
     "fgm": 6.228070175438597,
     "fga": 13.105263157894736,
@@ -1451,7 +1451,7 @@
   {
     "name": "Julius Randle",
     "team": "MIN",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 69,
     "fgm": 6.594202898550725,
     "fga": 13.608695652173912,
@@ -1472,7 +1472,7 @@
   {
     "name": "Tyrese Haliburton",
     "team": "IND",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 73,
     "fgm": 6.52054794520548,
     "fga": 13.780821917808218,
@@ -1493,7 +1493,7 @@
   {
     "name": "Shaedon Sharpe",
     "team": "POR",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 72,
     "fgm": 6.930555555555555,
     "fga": 15.333333333333334,
@@ -1514,7 +1514,7 @@
   {
     "name": "Evan Mobley",
     "team": "CLE",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 71,
     "fgm": 7.112676056338028,
     "fga": 12.76056338028169,
@@ -1556,7 +1556,7 @@
   {
     "name": "Dennis Schröder",
     "team": "BRK",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 23,
     "fgm": 6.391304347826087,
     "fga": 14.130434782608695,
@@ -1577,7 +1577,7 @@
   {
     "name": "Collin Sexton",
     "team": "UTA",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 63,
     "fgm": 6.603174603174603,
     "fga": 13.761904761904763,
@@ -1598,7 +1598,7 @@
   {
     "name": "Michael Porter Jr.",
     "team": "DEN",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 77,
     "fgm": 6.857142857142857,
     "fga": 13.61038961038961,
@@ -1640,7 +1640,7 @@
   {
     "name": "OG Anunoby",
     "team": "NYK",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 74,
     "fgm": 6.608108108108108,
     "fga": 13.878378378378379,
@@ -1661,7 +1661,7 @@
   {
     "name": "Andrew Wiggins",
     "team": "2TM",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 60,
     "fgm": 6.266666666666667,
     "fga": 13.983333333333333,
@@ -1682,7 +1682,7 @@
   {
     "name": "Jimmy Butler",
     "team": "GSW",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 30,
     "fgm": 5.3,
     "fga": 11.133333333333333,
@@ -1703,7 +1703,7 @@
   {
     "name": "Mikal Bridges",
     "team": "NYK",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 82,
     "fgm": 7.219512195121951,
     "fga": 14.426829268292684,
@@ -1724,7 +1724,7 @@
   {
     "name": "Jaden Ivey",
     "team": "DET",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 30,
     "fgm": 6.333333333333333,
     "fga": 13.766666666666667,
@@ -1745,7 +1745,7 @@
   {
     "name": "Andrew Wiggins",
     "team": "GSW",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 43,
     "fgm": 6.069767441860465,
     "fga": 13.674418604651162,
@@ -1766,7 +1766,7 @@
   {
     "name": "Jimmy Butler",
     "team": "2TM",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 55,
     "fgm": 5.472727272727273,
     "fga": 10.854545454545455,
@@ -1787,7 +1787,7 @@
   {
     "name": "Dejounte Murray",
     "team": "NOP",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 31,
     "fgm": 6.258064516129032,
     "fga": 15.935483870967742,
@@ -1808,7 +1808,7 @@
   {
     "name": "Tyrese Haliburton",
     "team": "IND",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 23,
     "fgm": 6.3478260869565215,
     "fga": 13.695652173913043,
@@ -1829,7 +1829,7 @@
   {
     "name": "Malik Monk",
     "team": "SAC",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 65,
     "fgm": 6.338461538461538,
     "fga": 14.446153846153846,
@@ -1850,7 +1850,7 @@
   {
     "name": "Immanuel Quickley",
     "team": "TOR",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 33,
     "fgm": 5.575757575757576,
     "fga": 13.272727272727273,
@@ -1871,7 +1871,7 @@
   {
     "name": "Jimmy Butler",
     "team": "MIA",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 25,
     "fgm": 5.68,
     "fga": 10.52,
@@ -1892,7 +1892,7 @@
   {
     "name": "Bradley Beal",
     "team": "PHO",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 53,
     "fgm": 6.509433962264151,
     "fga": 13.09433962264151,
@@ -1913,7 +1913,7 @@
   {
     "name": "De'Andre Hunter",
     "team": "2TM",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 64,
     "fgm": 5.59375,
     "fga": 11.90625,
@@ -1934,7 +1934,7 @@
   {
     "name": "Deni Avdija",
     "team": "POR",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 72,
     "fgm": 5.583333333333333,
     "fga": 11.722222222222221,
@@ -1955,7 +1955,7 @@
   {
     "name": "Keyonte George",
     "team": "UTA",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 67,
     "fgm": 5.358208955223881,
     "fga": 13.716417910447761,
@@ -1997,7 +1997,7 @@
   {
     "name": "Derrick White",
     "team": "BOS",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 76,
     "fgm": 5.578947368421052,
     "fga": 12.618421052631579,
@@ -2018,7 +2018,7 @@
   {
     "name": "Malik Beasley",
     "team": "DET",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 82,
     "fgm": 5.621951219512195,
     "fga": 13.060975609756097,
@@ -2039,7 +2039,7 @@
   {
     "name": "Devin Vassell",
     "team": "SAS",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 64,
     "fgm": 6.15625,
     "fga": 13.890625,
@@ -2060,7 +2060,7 @@
   {
     "name": "Paul George",
     "team": "PHI",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 41,
     "fgm": 5.975609756097561,
     "fga": 13.902439024390244,
@@ -2081,7 +2081,7 @@
   {
     "name": "Jordan Clarkson",
     "team": "UTA",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 37,
     "fgm": 5.4324324324324325,
     "fga": 13.324324324324325,
@@ -2102,7 +2102,7 @@
   {
     "name": "Jalen Suggs",
     "team": "ORL",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 35,
     "fgm": 5.628571428571429,
     "fga": 13.742857142857142,
@@ -2123,7 +2123,7 @@
   {
     "name": "Bennedict Mathurin",
     "team": "IND",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 72,
     "fgm": 5.430555555555555,
     "fga": 11.847222222222221,
@@ -2165,7 +2165,7 @@
   {
     "name": "Christian Braun",
     "team": "DEN",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 79,
     "fgm": 6.025316455696203,
     "fga": 10.39240506329114,
@@ -2186,7 +2186,7 @@
   {
     "name": "Jared McCain",
     "team": "PHI",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 23,
     "fgm": 5.478260869565218,
     "fga": 11.91304347826087,
@@ -2207,7 +2207,7 @@
   {
     "name": "Jonathan Kuminga",
     "team": "GSW",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 47,
     "fgm": 5.48936170212766,
     "fga": 12.085106382978724,
@@ -2249,7 +2249,7 @@
   {
     "name": "Kyle Kuzma",
     "team": "WAS",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 32,
     "fgm": 5.96875,
     "fga": 14.21875,
@@ -2291,7 +2291,7 @@
   {
     "name": "Kelly Oubre Jr.",
     "team": "PHI",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 60,
     "fgm": 5.8,
     "fga": 12.35,
@@ -2333,7 +2333,7 @@
   {
     "name": "Caris LeVert",
     "team": "ATL",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 26,
     "fgm": 5.576923076923077,
     "fga": 11.576923076923077,
@@ -2354,7 +2354,7 @@
   {
     "name": "Kyle Kuzma",
     "team": "2TM",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 65,
     "fgm": 5.6923076923076925,
     "fga": 13.046153846153846,
@@ -2375,7 +2375,7 @@
   {
     "name": "Stephon Castle",
     "team": "SAS",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 81,
     "fgm": 5.222222222222222,
     "fga": 12.197530864197532,
@@ -2396,7 +2396,7 @@
   {
     "name": "P.J. Washington",
     "team": "DAL",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 57,
     "fgm": 5.280701754385965,
     "fga": 11.666666666666666,
@@ -2417,7 +2417,7 @@
   {
     "name": "Aaron Gordon",
     "team": "DEN",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 51,
     "fgm": 5.176470588235294,
     "fga": 9.745098039215685,
@@ -2438,7 +2438,7 @@
   {
     "name": "Josh Giddey",
     "team": "CHI",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 70,
     "fgm": 5.3,
     "fga": 11.4,
@@ -2459,7 +2459,7 @@
   {
     "name": "Quentin Grimes",
     "team": "2TM",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 75,
     "fgm": 5.12,
     "fga": 10.973333333333333,
@@ -2480,7 +2480,7 @@
   {
     "name": "Kyle Kuzma",
     "team": "MIL",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 33,
     "fgm": 5.424242424242424,
     "fga": 11.909090909090908,
@@ -2522,7 +2522,7 @@
   {
     "name": "Jerami Grant",
     "team": "POR",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 47,
     "fgm": 4.553191489361702,
     "fga": 12.212765957446809,
@@ -2564,7 +2564,7 @@
   {
     "name": "Gradey Dick",
     "team": "TOR",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 54,
     "fgm": 4.907407407407407,
     "fga": 11.981481481481481,
@@ -2585,7 +2585,7 @@
   {
     "name": "Payton Pritchard",
     "team": "BOS",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 80,
     "fgm": 5.1125,
     "fga": 10.825,
@@ -2606,7 +2606,7 @@
   {
     "name": "De'Andre Hunter",
     "team": "CLE",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 27,
     "fgm": 4.851851851851852,
     "fga": 10,
@@ -2648,7 +2648,7 @@
   {
     "name": "Dyson Daniels",
     "team": "ATL",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 76,
     "fgm": 5.9868421052631575,
     "fga": 12.144736842105264,
@@ -2669,7 +2669,7 @@
   {
     "name": "Fred VanVleet",
     "team": "HOU",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 60,
     "fgm": 4.783333333333333,
     "fga": 12.65,
@@ -2690,7 +2690,7 @@
   {
     "name": "Amen Thompson",
     "team": "HOU",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 69,
     "fgm": 5.6231884057971016,
     "fga": 10.101449275362318,
@@ -2711,7 +2711,7 @@
   {
     "name": "Dillon Brooks",
     "team": "HOU",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 75,
     "fgm": 5.12,
     "fga": 11.933333333333334,
@@ -2732,7 +2732,7 @@
   {
     "name": "Klay Thompson",
     "team": "DAL",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 72,
     "fgm": 5.013888888888889,
     "fga": 12.180555555555555,
@@ -2753,7 +2753,7 @@
   {
     "name": "Bobby Portis",
     "team": "MIL",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 49,
     "fgm": 5.653061224489796,
     "fga": 12.142857142857142,
@@ -2795,7 +2795,7 @@
   {
     "name": "Tobias Harris",
     "team": "DET",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 73,
     "fgm": 5.260273972602739,
     "fga": 11.027397260273972,
@@ -2816,7 +2816,7 @@
   {
     "name": "Josh Hart",
     "team": "NYK",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 77,
     "fgm": 5.246753246753247,
     "fga": 10,
@@ -2879,7 +2879,7 @@
   {
     "name": "Russell Westbrook",
     "team": "DEN",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 75,
     "fgm": 4.973333333333334,
     "fga": 11.08,
@@ -2900,7 +2900,7 @@
   {
     "name": "Naji Marshall",
     "team": "DAL",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 69,
     "fgm": 5.246376811594203,
     "fga": 10.318840579710145,
@@ -2921,7 +2921,7 @@
   {
     "name": "Kevin Huerter",
     "team": "CHI",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 26,
     "fgm": 4.961538461538462,
     "fga": 11.307692307692308,
@@ -2942,7 +2942,7 @@
   {
     "name": "Rui Hachimura",
     "team": "LAL",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 59,
     "fgm": 4.966101694915254,
     "fga": 9.76271186440678,
@@ -2963,7 +2963,7 @@
   {
     "name": "Dennis Schröder",
     "team": "3TM",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 75,
     "fgm": 4.48,
     "fga": 11.026666666666667,
@@ -3047,7 +3047,7 @@
   {
     "name": "D'Angelo Russell",
     "team": "BRK",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 29,
     "fgm": 4.137931034482759,
     "fga": 11.275862068965518,
@@ -3068,7 +3068,7 @@
   {
     "name": "Keldon Johnson",
     "team": "SAS",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 77,
     "fgm": 4.818181818181818,
     "fga": 10,
@@ -3089,7 +3089,7 @@
   {
     "name": "Malcolm Brogdon",
     "team": "WAS",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 24,
     "fgm": 4.333333333333333,
     "fga": 10,
@@ -3110,7 +3110,7 @@
   {
     "name": "Scoot Henderson",
     "team": "POR",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 66,
     "fgm": 4.348484848484849,
     "fga": 10.378787878787879,
@@ -3131,7 +3131,7 @@
   {
     "name": "Aaron Nesmith",
     "team": "IND",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 23,
     "fgm": 4.3478260869565215,
     "fga": 9.217391304347826,
@@ -3152,7 +3152,7 @@
   {
     "name": "D'Angelo Russell",
     "team": "2TM",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 58,
     "fgm": 4.293103448275862,
     "fga": 11,
@@ -3173,7 +3173,7 @@
   {
     "name": "Khris Middleton",
     "team": "MIL",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 23,
     "fgm": 4.695652173913044,
     "fga": 9.173913043478262,
@@ -3194,7 +3194,7 @@
   {
     "name": "Zaccharie Risacher",
     "team": "ATL",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 75,
     "fgm": 4.76,
     "fga": 10.386666666666667,
@@ -3215,7 +3215,7 @@
   {
     "name": "Ty Jerome",
     "team": "CLE",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 70,
     "fgm": 4.557142857142857,
     "fga": 8.82857142857143,
@@ -3236,7 +3236,7 @@
   {
     "name": "Andrew Nembhard",
     "team": "IND",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 23,
     "fgm": 4.565217391304348,
     "fga": 9.695652173913043,
@@ -3257,7 +3257,7 @@
   {
     "name": "Santi Aldama",
     "team": "MEM",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 65,
     "fgm": 4.815384615384615,
     "fga": 9.96923076923077,
@@ -3278,7 +3278,7 @@
   {
     "name": "Keegan Murray",
     "team": "SAC",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 76,
     "fgm": 4.7894736842105265,
     "fga": 10.789473684210526,
@@ -3299,7 +3299,7 @@
   {
     "name": "D'Angelo Russell",
     "team": "LAL",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 29,
     "fgm": 4.448275862068965,
     "fga": 10.724137931034482,
@@ -3320,7 +3320,7 @@
   {
     "name": "Lonnie Walker IV",
     "team": "PHI",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 20,
     "fgm": 4.45,
     "fga": 10.6,
@@ -3341,7 +3341,7 @@
   {
     "name": "Harrison Barnes",
     "team": "SAS",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 82,
     "fgm": 4.2317073170731705,
     "fga": 8.329268292682928,
@@ -3362,7 +3362,7 @@
   {
     "name": "Bilal Coulibaly",
     "team": "WAS",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 59,
     "fgm": 4.4576271186440675,
     "fga": 10.576271186440678,
@@ -3383,7 +3383,7 @@
   {
     "name": "Ayo Dosunmu",
     "team": "CHI",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 46,
     "fgm": 4.804347826086956,
     "fga": 9.76086956521739,
@@ -3425,7 +3425,7 @@
   {
     "name": "Jabari Smith Jr.",
     "team": "HOU",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 57,
     "fgm": 4.350877192982456,
     "fga": 9.929824561403509,
@@ -3446,7 +3446,7 @@
   {
     "name": "Jaden McDaniels",
     "team": "MIN",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 82,
     "fgm": 4.853658536585366,
     "fga": 10.170731707317072,
@@ -3467,7 +3467,7 @@
   {
     "name": "Caris LeVert",
     "team": "2TM",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 64,
     "fgm": 4.375,
     "fga": 9.359375,
@@ -3488,7 +3488,7 @@
   {
     "name": "Georges Niang",
     "team": "ATL",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 28,
     "fgm": 4.285714285714286,
     "fga": 9.714285714285714,
@@ -3509,7 +3509,7 @@
   {
     "name": "Tari Eason",
     "team": "HOU",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 57,
     "fgm": 4.771929824561403,
     "fga": 9.807017543859649,
@@ -3551,7 +3551,7 @@
   {
     "name": "Aaron Wiggins",
     "team": "OKC",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 76,
     "fgm": 4.671052631578948,
     "fga": 9.578947368421053,
@@ -3572,7 +3572,7 @@
   {
     "name": "Aaron Nesmith",
     "team": "IND",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 45,
     "fgm": 4.266666666666667,
     "fga": 8.422222222222222,
@@ -3593,7 +3593,7 @@
   {
     "name": "Khris Middleton",
     "team": "2TM",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 37,
     "fgm": 4.324324324324325,
     "fga": 9.108108108108109,
@@ -3635,7 +3635,7 @@
   {
     "name": "Kevin Porter Jr.",
     "team": "MIL",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 30,
     "fgm": 4.033333333333333,
     "fga": 8.166666666666666,
@@ -3656,7 +3656,7 @@
   {
     "name": "Brandin Podziemski",
     "team": "GSW",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 64,
     "fgm": 4.375,
     "fga": 9.828125,
@@ -3677,7 +3677,7 @@
   {
     "name": "Donte DiVincenzo",
     "team": "MIN",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 62,
     "fgm": 4.032258064516129,
     "fga": 9.564516129032258,
@@ -3698,7 +3698,7 @@
   {
     "name": "Corey Kispert",
     "team": "WAS",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 61,
     "fgm": 4.180327868852459,
     "fga": 9.262295081967213,
@@ -3740,7 +3740,7 @@
   {
     "name": "Jared Butler",
     "team": "PHI",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 28,
     "fgm": 4.214285714285714,
     "fga": 9.892857142857142,
@@ -3761,7 +3761,7 @@
   {
     "name": "Bogdan Bogdanović",
     "team": "LAC",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 30,
     "fgm": 4.233333333333333,
     "fga": 8.933333333333334,
@@ -3782,7 +3782,7 @@
   {
     "name": "Jeremy Sochan",
     "team": "SAS",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 54,
     "fgm": 4.648148148148148,
     "fga": 8.685185185185185,
@@ -3803,7 +3803,7 @@
   {
     "name": "Toumani Camara",
     "team": "POR",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 78,
     "fgm": 4.205128205128205,
     "fga": 9.179487179487179,
@@ -3824,7 +3824,7 @@
   {
     "name": "Max Christie",
     "team": "DAL",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 32,
     "fgm": 3.875,
     "fga": 9.4375,
@@ -3866,7 +3866,7 @@
   {
     "name": "Gary Trent Jr.",
     "team": "MIL",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 74,
     "fgm": 3.824324324324324,
     "fga": 8.878378378378379,
@@ -3887,7 +3887,7 @@
   {
     "name": "Buddy Hield",
     "team": "GSW",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 82,
     "fgm": 4,
     "fga": 9.585365853658537,
@@ -3908,7 +3908,7 @@
   {
     "name": "Jrue Holiday",
     "team": "BOS",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 62,
     "fgm": 4.096774193548387,
     "fga": 9.241935483870968,
@@ -3950,7 +3950,7 @@
   {
     "name": "Bennedict Mathurin",
     "team": "IND",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 22,
     "fgm": 3.090909090909091,
     "fga": 6.7272727272727275,
@@ -3971,7 +3971,7 @@
   {
     "name": "Duncan Robinson",
     "team": "MIA",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 74,
     "fgm": 3.918918918918919,
     "fga": 8.95945945945946,
@@ -3992,7 +3992,7 @@
   {
     "name": "Spencer Dinwiddie",
     "team": "DAL",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 79,
     "fgm": 3.5949367088607596,
     "fga": 8.632911392405063,
@@ -4034,7 +4034,7 @@
   {
     "name": "Tim Hardaway Jr.",
     "team": "DET",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 77,
     "fgm": 3.5844155844155843,
     "fga": 8.831168831168831,
@@ -4055,7 +4055,7 @@
   {
     "name": "Brice Sensabaugh",
     "team": "UTA",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 71,
     "fgm": 3.8732394366197185,
     "fga": 8.43661971830986,
@@ -4076,7 +4076,7 @@
   {
     "name": "Bogdan Bogdanović",
     "team": "2TM",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 54,
     "fgm": 3.888888888888889,
     "fga": 9.11111111111111,
@@ -4097,7 +4097,7 @@
   {
     "name": "Jordan Hawkins",
     "team": "NOP",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 56,
     "fgm": 3.6964285714285716,
     "fga": 9.928571428571429,
@@ -4118,7 +4118,7 @@
   {
     "name": "Dennis Schröder",
     "team": "DET",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 28,
     "fgm": 3.392857142857143,
     "fga": 8.964285714285714,
@@ -4139,7 +4139,7 @@
   {
     "name": "Nikola Jović",
     "team": "MIA",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 46,
     "fgm": 3.739130434782609,
     "fga": 8.195652173913043,
@@ -4160,7 +4160,7 @@
   {
     "name": "Brandon Boston Jr.",
     "team": "NOP",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 42,
     "fgm": 3.9523809523809526,
     "fga": 9.071428571428571,
@@ -4202,7 +4202,7 @@
   {
     "name": "Grayson Allen",
     "team": "PHO",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 64,
     "fgm": 3.421875,
     "fga": 7.640625,
@@ -4223,7 +4223,7 @@
   {
     "name": "Keon Johnson",
     "team": "BRK",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 79,
     "fgm": 3.8354430379746836,
     "fga": 9.860759493670885,
@@ -4244,7 +4244,7 @@
   {
     "name": "Terry Rozier",
     "team": "MIA",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 64,
     "fgm": 3.875,
     "fga": 9.921875,
@@ -4265,7 +4265,7 @@
   {
     "name": "Dennis Schröder",
     "team": "GSW",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 24,
     "fgm": 3.9166666666666665,
     "fga": 10.458333333333334,
@@ -4286,7 +4286,7 @@
   {
     "name": "Obi Toppin",
     "team": "IND",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 79,
     "fgm": 4.012658227848101,
     "fga": 7.582278481012659,
@@ -4307,7 +4307,7 @@
   {
     "name": "Ochai Agbaji",
     "team": "TOR",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 64,
     "fgm": 4.15625,
     "fga": 8.34375,
@@ -4328,7 +4328,7 @@
   {
     "name": "Jaylen Wells",
     "team": "MEM",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 79,
     "fgm": 3.632911392405063,
     "fga": 8.556962025316455,
@@ -4370,7 +4370,7 @@
   {
     "name": "Dorian Finney-Smith",
     "team": "BRK",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 20,
     "fgm": 3.65,
     "fga": 7.95,
@@ -4412,7 +4412,7 @@
   {
     "name": "Jose Alvarado",
     "team": "NOP",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 56,
     "fgm": 3.642857142857143,
     "fga": 9.303571428571429,
@@ -4433,7 +4433,7 @@
   {
     "name": "Davion Mitchell",
     "team": "MIA",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 30,
     "fgm": 3.9,
     "fga": 7.733333333333333,
@@ -4454,7 +4454,7 @@
   {
     "name": "Kevin Porter Jr.",
     "team": "2TM",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 75,
     "fgm": 3.9066666666666667,
     "fga": 8.693333333333333,
@@ -4475,7 +4475,7 @@
   {
     "name": "Herbert Jones",
     "team": "NOP",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 20,
     "fgm": 3.75,
     "fga": 8.6,
@@ -4496,7 +4496,7 @@
   {
     "name": "Tyus Jones",
     "team": "PHO",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 81,
     "fgm": 3.7777777777777777,
     "fga": 8.432098765432098,
@@ -4517,7 +4517,7 @@
   {
     "name": "Trendon Watford",
     "team": "BRK",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 44,
     "fgm": 3.727272727272727,
     "fga": 7.954545454545454,
@@ -4538,7 +4538,7 @@
   {
     "name": "Isaiah Joe",
     "team": "OKC",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 74,
     "fgm": 3.5,
     "fga": 7.945945945945946,
@@ -4559,7 +4559,7 @@
   {
     "name": "Quentin Grimes",
     "team": "DAL",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 47,
     "fgm": 3.595744680851064,
     "fga": 7.76595744680851,
@@ -4580,7 +4580,7 @@
   {
     "name": "Caris LeVert",
     "team": "CLE",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 38,
     "fgm": 3.5526315789473686,
     "fga": 7.842105263157895,
@@ -4601,7 +4601,7 @@
   {
     "name": "Derrick Jones Jr.",
     "team": "LAC",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 77,
     "fgm": 4.025974025974026,
     "fga": 7.64935064935065,
@@ -4622,7 +4622,7 @@
   {
     "name": "Luguentz Dort",
     "team": "OKC",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 71,
     "fgm": 3.6338028169014085,
     "fga": 8.352112676056338,
@@ -4643,7 +4643,7 @@
   {
     "name": "Justin Edwards",
     "team": "PHI",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 44,
     "fgm": 3.909090909090909,
     "fga": 8.590909090909092,
@@ -4664,7 +4664,7 @@
   {
     "name": "Ausar Thompson",
     "team": "DET",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 59,
     "fgm": 4.169491525423729,
     "fga": 7.796610169491525,
@@ -4685,7 +4685,7 @@
   {
     "name": "Andrew Nembhard",
     "team": "IND",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 65,
     "fgm": 3.8,
     "fga": 8.292307692307693,
@@ -4706,7 +4706,7 @@
   {
     "name": "Chris Boucher",
     "team": "TOR",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 50,
     "fgm": 3.64,
     "fga": 7.4,
@@ -4727,7 +4727,7 @@
   {
     "name": "Ziaire Williams",
     "team": "BRK",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 63,
     "fgm": 3.3968253968253967,
     "fga": 8.253968253968255,
@@ -4748,7 +4748,7 @@
   {
     "name": "Bogdan Bogdanović",
     "team": "ATL",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 24,
     "fgm": 3.4583333333333335,
     "fga": 9.333333333333334,
@@ -4769,7 +4769,7 @@
   {
     "name": "Julian Champagnie",
     "team": "SAS",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 82,
     "fgm": 3.3658536585365852,
     "fga": 8.109756097560975,
@@ -4790,7 +4790,7 @@
   {
     "name": "Georges Niang",
     "team": "2TM",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 79,
     "fgm": 3.6202531645569622,
     "fga": 7.848101265822785,
@@ -4811,7 +4811,7 @@
   {
     "name": "Kevin Huerter",
     "team": "2TM",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 69,
     "fgm": 3.7246376811594204,
     "fga": 8.753623188405797,
@@ -4832,7 +4832,7 @@
   {
     "name": "Scotty Pippen Jr.",
     "team": "MEM",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 79,
     "fgm": 3.607594936708861,
     "fga": 7.518987341772152,
@@ -4853,7 +4853,7 @@
   {
     "name": "Nick Smith Jr.",
     "team": "CHO",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 60,
     "fgm": 3.7,
     "fga": 9.466666666666667,
@@ -4874,7 +4874,7 @@
   {
     "name": "Bub Carrington",
     "team": "WAS",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 82,
     "fgm": 3.658536585365854,
     "fga": 9.121951219512194,
@@ -4895,7 +4895,7 @@
   {
     "name": "Terance Mann",
     "team": "ATL",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 30,
     "fgm": 3.933333333333333,
     "fga": 7.266666666666667,
@@ -4916,7 +4916,7 @@
   {
     "name": "Moses Moody",
     "team": "GSW",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 74,
     "fgm": 3.324324324324324,
     "fga": 7.675675675675675,
@@ -4937,7 +4937,7 @@
   {
     "name": "Amir Coffey",
     "team": "LAC",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 72,
     "fgm": 3.3333333333333335,
     "fga": 7.083333333333333,
@@ -4958,7 +4958,7 @@
   {
     "name": "Max Christie",
     "team": "2TM",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 78,
     "fgm": 3.230769230769231,
     "fga": 7.564102564102564,
@@ -5000,7 +5000,7 @@
   {
     "name": "Miles McBride",
     "team": "NYK",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 64,
     "fgm": 3.46875,
     "fga": 8.546875,
@@ -5021,7 +5021,7 @@
   {
     "name": "Tosan Evbuomwan",
     "team": "BRK",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 28,
     "fgm": 3.357142857142857,
     "fga": 7.857142857142857,
@@ -5063,7 +5063,7 @@
   {
     "name": "Jalen Wilson",
     "team": "BRK",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 79,
     "fgm": 3.1139240506329116,
     "fga": 7.848101265822785,
@@ -5084,7 +5084,7 @@
   {
     "name": "T.J. McConnell",
     "team": "IND",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 23,
     "fgm": 4.086956521739131,
     "fga": 7.608695652173913,
@@ -5105,7 +5105,7 @@
   {
     "name": "Anthony Black",
     "team": "ORL",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 78,
     "fgm": 3.358974358974359,
     "fga": 7.948717948717949,
@@ -5147,7 +5147,7 @@
   {
     "name": "Nickeil Alexander-Walker",
     "team": "MIN",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 82,
     "fgm": 3.292682926829268,
     "fga": 7.512195121951219,
@@ -5168,7 +5168,7 @@
   {
     "name": "Max Strus",
     "team": "CLE",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 50,
     "fgm": 3.3,
     "fga": 7.46,
@@ -5189,7 +5189,7 @@
   {
     "name": "Cole Anthony",
     "team": "ORL",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 67,
     "fgm": 3.4328358208955225,
     "fga": 8.104477611940299,
@@ -5210,7 +5210,7 @@
   {
     "name": "Obi Toppin",
     "team": "IND",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 23,
     "fgm": 3.608695652173913,
     "fga": 7.434782608695652,
@@ -5231,7 +5231,7 @@
   {
     "name": "Cam Whitmore",
     "team": "HOU",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 51,
     "fgm": 3.5098039215686274,
     "fga": 7.901960784313726,
@@ -5252,7 +5252,7 @@
   {
     "name": "Kevin Porter Jr.",
     "team": "LAC",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 45,
     "fgm": 3.8222222222222224,
     "fga": 9.044444444444444,
@@ -5336,7 +5336,7 @@
   {
     "name": "Alex Caruso",
     "team": "OKC",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 23,
     "fgm": 3.130434782608696,
     "fga": 6.956521739130435,
@@ -5378,7 +5378,7 @@
   {
     "name": "Noah Clowney",
     "team": "BRK",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 46,
     "fgm": 2.891304347826087,
     "fga": 8.08695652173913,
@@ -5399,7 +5399,7 @@
   {
     "name": "T.J. McConnell",
     "team": "IND",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 79,
     "fgm": 4.10126582278481,
     "fga": 7.89873417721519,
@@ -5441,7 +5441,7 @@
   {
     "name": "AJ Johnson",
     "team": "WAS",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 22,
     "fgm": 3.3636363636363638,
     "fga": 8.818181818181818,
@@ -5483,7 +5483,7 @@
   {
     "name": "A.J. Lawson",
     "team": "TOR",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 26,
     "fgm": 3.076923076923077,
     "fga": 7.3076923076923075,
@@ -5504,7 +5504,7 @@
   {
     "name": "Royce O'Neale",
     "team": "PHO",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 75,
     "fgm": 3.2133333333333334,
     "fga": 7.6,
@@ -5525,7 +5525,7 @@
   {
     "name": "Caleb Martin",
     "team": "PHI",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 31,
     "fgm": 3.2580645161290325,
     "fga": 7.483870967741935,
@@ -5546,7 +5546,7 @@
   {
     "name": "Dalton Knecht",
     "team": "LAL",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 78,
     "fgm": 3.2948717948717947,
     "fga": 7.141025641025641,
@@ -5567,7 +5567,7 @@
   {
     "name": "Julian Strawther",
     "team": "DEN",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 65,
     "fgm": 3.230769230769231,
     "fga": 7.476923076923077,
@@ -5588,7 +5588,7 @@
   {
     "name": "Jared Butler",
     "team": "2TM",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 60,
     "fgm": 3.3833333333333333,
     "fga": 7.55,
@@ -5609,7 +5609,7 @@
   {
     "name": "Draymond Green",
     "team": "GSW",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 68,
     "fgm": 3.176470588235294,
     "fga": 7.485294117647059,
@@ -5630,7 +5630,7 @@
   {
     "name": "Patrick Williams",
     "team": "CHI",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 63,
     "fgm": 3.253968253968254,
     "fga": 8.19047619047619,
@@ -5651,7 +5651,7 @@
   {
     "name": "Marcus Smart",
     "team": "2TM",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 34,
     "fgm": 2.9705882352941178,
     "fga": 7.5588235294117645,
@@ -5693,7 +5693,7 @@
   {
     "name": "Johnny Juzang",
     "team": "UTA",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 64,
     "fgm": 3.1875,
     "fga": 7.421875,
@@ -5777,7 +5777,7 @@
   {
     "name": "Luke Kennard",
     "team": "MEM",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 65,
     "fgm": 3.169230769230769,
     "fga": 6.630769230769231,
@@ -5798,7 +5798,7 @@
   {
     "name": "Chris Paul",
     "team": "SAS",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 82,
     "fgm": 3.0365853658536586,
     "fga": 7.109756097560975,
@@ -5819,7 +5819,7 @@
   {
     "name": "Svi Mykhailiuk",
     "team": "UTA",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 38,
     "fgm": 3.1052631578947367,
     "fga": 7.947368421052632,
@@ -5840,7 +5840,7 @@
   {
     "name": "Justin Champagnie",
     "team": "WAS",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 62,
     "fgm": 3.3870967741935485,
     "fga": 6.629032258064516,
@@ -5861,7 +5861,7 @@
   {
     "name": "Kentavious Caldwell-Pope",
     "team": "ORL",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 77,
     "fgm": 3.103896103896104,
     "fga": 7.064935064935065,
@@ -5903,7 +5903,7 @@
   {
     "name": "Georges Niang",
     "team": "CLE",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 51,
     "fgm": 3.2549019607843137,
     "fga": 6.823529411764706,
@@ -5966,7 +5966,7 @@
   {
     "name": "Tyrese Martin",
     "team": "BRK",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 60,
     "fgm": 3.15,
     "fga": 7.75,
@@ -5987,7 +5987,7 @@
   {
     "name": "Dorian Finney-Smith",
     "team": "2TM",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 63,
     "fgm": 3.0952380952380953,
     "fga": 6.904761904761905,
@@ -6008,7 +6008,7 @@
   {
     "name": "Jaden Hardy",
     "team": "DAL",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 57,
     "fgm": 3.1578947368421053,
     "fga": 7.2631578947368425,
@@ -6029,7 +6029,7 @@
   {
     "name": "Dante Exum",
     "team": "DAL",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 20,
     "fgm": 3.2,
     "fga": 6.7,
@@ -6050,7 +6050,7 @@
   {
     "name": "Kyshawn George",
     "team": "WAS",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 68,
     "fgm": 2.985294117647059,
     "fga": 8.029411764705882,
@@ -6071,7 +6071,7 @@
   {
     "name": "Isaiah Collier",
     "team": "UTA",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 71,
     "fgm": 3.295774647887324,
     "fga": 7.816901408450704,
@@ -6092,7 +6092,7 @@
   {
     "name": "Jaime Jaquez Jr.",
     "team": "MIA",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 66,
     "fgm": 3.227272727272727,
     "fga": 7,
@@ -6113,7 +6113,7 @@
   {
     "name": "Ja'Kobe Walter",
     "team": "TOR",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 52,
     "fgm": 3.0576923076923075,
     "fga": 7.5576923076923075,
@@ -6134,7 +6134,7 @@
   {
     "name": "Matas Buzelis",
     "team": "CHI",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 80,
     "fgm": 3.15,
     "fga": 6.9375,
@@ -6176,7 +6176,7 @@
   {
     "name": "Zach Collins",
     "team": "CHI",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 28,
     "fgm": 3.2857142857142856,
     "fga": 6.071428571428571,
@@ -6197,7 +6197,7 @@
   {
     "name": "Sam Hauser",
     "team": "BOS",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 71,
     "fgm": 3.0140845070422535,
     "fga": 6.676056338028169,
@@ -6218,7 +6218,7 @@
   {
     "name": "Max Christie",
     "team": "LAL",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 46,
     "fgm": 2.782608695652174,
     "fga": 6.260869565217392,
@@ -6239,7 +6239,7 @@
   {
     "name": "Larry Nance Jr.",
     "team": "ATL",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 24,
     "fgm": 3.3333333333333335,
     "fga": 6.458333333333333,
@@ -6260,7 +6260,7 @@
   {
     "name": "Cason Wallace",
     "team": "OKC",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 68,
     "fgm": 3.411764705882353,
     "fga": 7.1911764705882355,
@@ -6281,7 +6281,7 @@
   {
     "name": "Brandon Clarke",
     "team": "MEM",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 64,
     "fgm": 3.6875,
     "fga": 5.9375,
@@ -6302,7 +6302,7 @@
   {
     "name": "Dalano Banton",
     "team": "POR",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 67,
     "fgm": 2.955223880597015,
     "fga": 7.567164179104478,
@@ -6323,7 +6323,7 @@
   {
     "name": "Brandon Williams",
     "team": "DAL",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 33,
     "fgm": 2.9696969696969697,
     "fga": 5.696969696969697,
@@ -6344,7 +6344,7 @@
   {
     "name": "Keon Ellis",
     "team": "SAC",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 80,
     "fgm": 2.8375,
     "fga": 5.8,
@@ -6365,7 +6365,7 @@
   {
     "name": "Bruce Brown",
     "team": "2TM",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 41,
     "fgm": 3.1707317073170733,
     "fga": 7.536585365853658,
@@ -6386,7 +6386,7 @@
   {
     "name": "Bruce Brown",
     "team": "NOP",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 23,
     "fgm": 3.1739130434782608,
     "fga": 7.739130434782608,
@@ -6407,7 +6407,7 @@
   {
     "name": "Taurean Prince",
     "team": "MIL",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 80,
     "fgm": 2.9375,
     "fga": 6.425,
@@ -6428,7 +6428,7 @@
   {
     "name": "Mike Conley",
     "team": "MIN",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 71,
     "fgm": 2.6338028169014085,
     "fga": 6.591549295774648,
@@ -6491,7 +6491,7 @@
   {
     "name": "Peyton Watson",
     "team": "DEN",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 68,
     "fgm": 3,
     "fga": 6.294117647058823,
@@ -6512,7 +6512,7 @@
   {
     "name": "Quinten Post",
     "team": "GSW",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 42,
     "fgm": 2.9285714285714284,
     "fga": 6.523809523809524,
@@ -6554,7 +6554,7 @@
   {
     "name": "Davion Mitchell",
     "team": "2TM",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 74,
     "fgm": 3.0135135135135136,
     "fga": 6.4324324324324325,
@@ -6596,7 +6596,7 @@
   {
     "name": "Dorian Finney-Smith",
     "team": "LAL",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 43,
     "fgm": 2.8372093023255816,
     "fga": 6.4186046511627906,
@@ -6617,7 +6617,7 @@
   {
     "name": "Luguentz Dort",
     "team": "OKC",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 23,
     "fgm": 2.608695652173913,
     "fga": 7.130434782608695,
@@ -6638,7 +6638,7 @@
   {
     "name": "Caleb Martin",
     "team": "2TM",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 45,
     "fgm": 2.8666666666666667,
     "fga": 6.7555555555555555,
@@ -6659,7 +6659,7 @@
   {
     "name": "Kevin Huerter",
     "team": "SAC",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 43,
     "fgm": 2.9767441860465116,
     "fga": 7.209302325581396,
@@ -6680,7 +6680,7 @@
   {
     "name": "Cody Martin",
     "team": "CHO",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 39,
     "fgm": 2.9743589743589745,
     "fga": 6.871794871794871,
@@ -6701,7 +6701,7 @@
   {
     "name": "KJ Simpson",
     "team": "CHO",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 36,
     "fgm": 2.888888888888889,
     "fga": 8.36111111111111,
@@ -6722,7 +6722,7 @@
   {
     "name": "Karlo Matković",
     "team": "NOP",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 42,
     "fgm": 3.2142857142857144,
     "fga": 5.595238095238095,
@@ -6743,7 +6743,7 @@
   {
     "name": "Terance Mann",
     "team": "2TM",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 67,
     "fgm": 3.0597014925373136,
     "fga": 6.164179104477612,
@@ -6764,7 +6764,7 @@
   {
     "name": "Lonzo Ball",
     "team": "CHI",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 35,
     "fgm": 2.5428571428571427,
     "fga": 6.942857142857143,
@@ -6785,7 +6785,7 @@
   {
     "name": "AJ Johnson",
     "team": "2TM",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 29,
     "fgm": 2.8275862068965516,
     "fga": 7.344827586206897,
@@ -6806,7 +6806,7 @@
   {
     "name": "Garrison Mathews",
     "team": "ATL",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 47,
     "fgm": 2.1702127659574466,
     "fga": 5.468085106382978,
@@ -6827,7 +6827,7 @@
   {
     "name": "Vasilije Micić",
     "team": "CHO",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 36,
     "fgm": 2.638888888888889,
     "fga": 7.583333333333333,
@@ -6848,7 +6848,7 @@
   {
     "name": "Josh Green",
     "team": "CHO",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 68,
     "fgm": 2.6470588235294117,
     "fga": 6.1911764705882355,
@@ -6869,7 +6869,7 @@
   {
     "name": "Richaun Holmes",
     "team": "WAS",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 31,
     "fgm": 2.903225806451613,
     "fga": 4.483870967741935,
@@ -6890,7 +6890,7 @@
   {
     "name": "A.J. Green",
     "team": "MIL",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 73,
     "fgm": 2.493150684931507,
     "fga": 5.808219178082192,
@@ -6911,7 +6911,7 @@
   {
     "name": "Shake Milton",
     "team": "BRK",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 27,
     "fgm": 2.7037037037037037,
     "fga": 5.814814814814815,
@@ -6953,7 +6953,7 @@
   {
     "name": "Jake LaRavia",
     "team": "MEM",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 47,
     "fgm": 2.5106382978723403,
     "fga": 5.127659574468085,
@@ -6974,7 +6974,7 @@
   {
     "name": "Ricky Council IV",
     "team": "PHI",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 73,
     "fgm": 2.4246575342465753,
     "fga": 6.342465753424658,
@@ -6995,7 +6995,7 @@
   {
     "name": "Alec Burks",
     "team": "MIA",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 49,
     "fgm": 2.3469387755102042,
     "fga": 5.530612244897959,
@@ -7016,7 +7016,7 @@
   {
     "name": "Vit Krejci",
     "team": "ATL",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 57,
     "fgm": 2.543859649122807,
     "fga": 5.12280701754386,
@@ -7037,7 +7037,7 @@
   {
     "name": "GG Jackson II",
     "team": "MEM",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 29,
     "fgm": 2.5517241379310347,
     "fga": 6.862068965517241,
@@ -7058,7 +7058,7 @@
   {
     "name": "Tristan Da Silva",
     "team": "ORL",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 74,
     "fgm": 2.689189189189189,
     "fga": 6.527027027027027,
@@ -7079,7 +7079,7 @@
   {
     "name": "Bones Hyland",
     "team": "LAC",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 20,
     "fgm": 2.25,
     "fga": 5.75,
@@ -7100,7 +7100,7 @@
   {
     "name": "Tre Jones",
     "team": "2TM",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 46,
     "fgm": 2.782608695652174,
     "fga": 5.173913043478261,
@@ -7142,7 +7142,7 @@
   {
     "name": "Sam Merrill",
     "team": "CLE",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 71,
     "fgm": 2.4225352112676055,
     "fga": 5.971830985915493,
@@ -7184,7 +7184,7 @@
   {
     "name": "Jamal Shead",
     "team": "TOR",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 75,
     "fgm": 2.72,
     "fga": 6.72,
@@ -7205,7 +7205,7 @@
   {
     "name": "Jamison Battle",
     "team": "TOR",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 59,
     "fgm": 2.5254237288135593,
     "fga": 5.88135593220339,
@@ -7226,7 +7226,7 @@
   {
     "name": "Josh Okogie",
     "team": "2TM",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 40,
     "fgm": 2.35,
     "fga": 5.3,
@@ -7247,7 +7247,7 @@
   {
     "name": "Alex Caruso",
     "team": "OKC",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 54,
     "fgm": 2.5925925925925926,
     "fga": 5.814814814814815,
@@ -7268,7 +7268,7 @@
   {
     "name": "Jeff Dowtin Jr.",
     "team": "PHI",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 41,
     "fgm": 2.731707317073171,
     "fga": 5.609756097560975,
@@ -7289,7 +7289,7 @@
   {
     "name": "Cameron Payne",
     "team": "NYK",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 72,
     "fgm": 2.486111111111111,
     "fga": 6.194444444444445,
@@ -7310,7 +7310,7 @@
   {
     "name": "Jake LaRavia",
     "team": "2TM",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 66,
     "fgm": 2.4242424242424243,
     "fga": 5.106060606060606,
@@ -7331,7 +7331,7 @@
   {
     "name": "Antonio Reeves",
     "team": "NOP",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 44,
     "fgm": 2.5681818181818183,
     "fga": 5.636363636363637,
@@ -7373,7 +7373,7 @@
   {
     "name": "Ryan Dunn",
     "team": "PHO",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 74,
     "fgm": 2.77027027027027,
     "fga": 6.445945945945946,
@@ -7415,7 +7415,7 @@
   {
     "name": "Jared Butler",
     "team": "WAS",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 32,
     "fgm": 2.65625,
     "fga": 5.5,
@@ -7478,7 +7478,7 @@
   {
     "name": "Eric Gordon",
     "team": "PHI",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 39,
     "fgm": 2.230769230769231,
     "fga": 5.230769230769231,
@@ -7499,7 +7499,7 @@
   {
     "name": "Bol Bol",
     "team": "PHO",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 36,
     "fgm": 2.6666666666666665,
     "fga": 5.083333333333333,
@@ -7520,7 +7520,7 @@
   {
     "name": "Cody Martin",
     "team": "2TM",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 53,
     "fgm": 2.5660377358490565,
     "fga": 6.132075471698113,
@@ -7541,7 +7541,7 @@
   {
     "name": "Kyle Anderson",
     "team": "MIA",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 25,
     "fgm": 2.64,
     "fga": 5.36,
@@ -7562,7 +7562,7 @@
   {
     "name": "DaQuan Jeffries",
     "team": "CHO",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 47,
     "fgm": 2.5106382978723403,
     "fga": 6.191489361702128,
@@ -7604,7 +7604,7 @@
   {
     "name": "Vince Williams Jr.",
     "team": "MEM",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 27,
     "fgm": 2.4814814814814814,
     "fga": 6.185185185185185,
@@ -7625,7 +7625,7 @@
   {
     "name": "Marcus Sasser",
     "team": "DET",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 57,
     "fgm": 2.4035087719298245,
     "fga": 5.192982456140351,
@@ -7667,7 +7667,7 @@
   {
     "name": "Vasilije Micić",
     "team": "2TM",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 41,
     "fgm": 2.317073170731707,
     "fga": 6.658536585365853,
@@ -7688,7 +7688,7 @@
   {
     "name": "Trey Lyles",
     "team": "SAC",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 69,
     "fgm": 2.2753623188405796,
     "fga": 5.420289855072464,
@@ -7709,7 +7709,7 @@
   {
     "name": "Talen Horton-Tucker",
     "team": "CHI",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 58,
     "fgm": 2.293103448275862,
     "fga": 5.017241379310345,
@@ -7730,7 +7730,7 @@
   {
     "name": "Seth Curry",
     "team": "CHO",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 68,
     "fgm": 2.411764705882353,
     "fga": 5.044117647058823,
@@ -7793,7 +7793,7 @@
   {
     "name": "Ajay Mitchell",
     "team": "OKC",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 36,
     "fgm": 2.5277777777777777,
     "fga": 5.111111111111111,
@@ -7814,7 +7814,7 @@
   {
     "name": "Haywood Highsmith",
     "team": "MIA",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 74,
     "fgm": 2.418918918918919,
     "fga": 5.283783783783784,
@@ -7835,7 +7835,7 @@
   {
     "name": "Gary Payton II",
     "team": "GSW",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 62,
     "fgm": 2.7580645161290325,
     "fga": 4.806451612903226,
@@ -7856,7 +7856,7 @@
   {
     "name": "Ron Holland",
     "team": "DET",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 81,
     "fgm": 2.432098765432099,
     "fga": 5.135802469135802,
@@ -7877,7 +7877,7 @@
   {
     "name": "KJ Martin",
     "team": "PHI",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 24,
     "fgm": 2.5416666666666665,
     "fga": 4.125,
@@ -7898,7 +7898,7 @@
   {
     "name": "Kris Dunn",
     "team": "LAC",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 74,
     "fgm": 2.5945945945945947,
     "fga": 5.905405405405405,
@@ -7919,7 +7919,7 @@
   {
     "name": "Gabe Vincent",
     "team": "LAL",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 72,
     "fgm": 2.3333333333333335,
     "fga": 5.833333333333333,
@@ -7940,7 +7940,7 @@
   {
     "name": "KJ Martin",
     "team": "2TM",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 43,
     "fgm": 2.5813953488372094,
     "fga": 4.674418604651163,
@@ -7961,7 +7961,7 @@
   {
     "name": "Zach Collins",
     "team": "2TM",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 64,
     "fgm": 2.390625,
     "fga": 4.71875,
@@ -7982,7 +7982,7 @@
   {
     "name": "Davion Mitchell",
     "team": "TOR",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 44,
     "fgm": 2.409090909090909,
     "fga": 5.545454545454546,
@@ -8003,7 +8003,7 @@
   {
     "name": "Jeremiah Robinson-Earl",
     "team": "NOP",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 66,
     "fgm": 2.393939393939394,
     "fga": 5.257575757575758,
@@ -8024,7 +8024,7 @@
   {
     "name": "Kenrich Williams",
     "team": "OKC",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 69,
     "fgm": 2.4782608695652173,
     "fga": 5.130434782608695,
@@ -8045,7 +8045,7 @@
   {
     "name": "Sandro Mamukelashvili",
     "team": "SAS",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 61,
     "fgm": 2.3114754098360657,
     "fga": 4.60655737704918,
@@ -8066,7 +8066,7 @@
   {
     "name": "Ryan Rollins",
     "team": "MIL",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 56,
     "fgm": 2.357142857142857,
     "fga": 4.839285714285714,
@@ -8087,7 +8087,7 @@
   {
     "name": "Bones Hyland",
     "team": "2TM",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 24,
     "fgm": 1.9583333333333333,
     "fga": 4.916666666666667,
@@ -8108,7 +8108,7 @@
   {
     "name": "Ben Simmons",
     "team": "BRK",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 33,
     "fgm": 2.8181818181818183,
     "fga": 5.151515151515151,
@@ -8129,7 +8129,7 @@
   {
     "name": "Jonathan Mogbo",
     "team": "TOR",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 63,
     "fgm": 2.4761904761904763,
     "fga": 5.650793650793651,
@@ -8150,7 +8150,7 @@
   {
     "name": "Jarace Walker",
     "team": "IND",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 75,
     "fgm": 2.2666666666666666,
     "fga": 4.8,
@@ -8171,7 +8171,7 @@
   {
     "name": "Isaac Okoro",
     "team": "CLE",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 55,
     "fgm": 2.2545454545454544,
     "fga": 4.8545454545454545,
@@ -8234,7 +8234,7 @@
   {
     "name": "Terance Mann",
     "team": "LAC",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 37,
     "fgm": 2.3513513513513513,
     "fga": 5.27027027027027,
@@ -8255,7 +8255,7 @@
   {
     "name": "Josh Okogie",
     "team": "PHO",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 25,
     "fgm": 2.24,
     "fga": 4.56,
@@ -8276,7 +8276,7 @@
   {
     "name": "Aaron Wiggins",
     "team": "OKC",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 22,
     "fgm": 2.1363636363636362,
     "fga": 5.409090909090909,
@@ -8297,7 +8297,7 @@
   {
     "name": "Isaiah Wong",
     "team": "CHO",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 20,
     "fgm": 2.05,
     "fga": 5.25,
@@ -8318,7 +8318,7 @@
   {
     "name": "Mouhamed Gueye",
     "team": "ATL",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 33,
     "fgm": 2.1818181818181817,
     "fga": 5.181818181818182,
@@ -8339,7 +8339,7 @@
   {
     "name": "Simone Fontecchio",
     "team": "DET",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 75,
     "fgm": 2,
     "fga": 4.973333333333334,
@@ -8360,7 +8360,7 @@
   {
     "name": "Jaylin Williams",
     "team": "OKC",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 47,
     "fgm": 2.0638297872340425,
     "fga": 4.702127659574468,
@@ -8381,7 +8381,7 @@
   {
     "name": "Tidjane Salaün",
     "team": "CHO",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 60,
     "fgm": 1.9,
     "fga": 5.75,
@@ -8402,7 +8402,7 @@
   {
     "name": "Collin Gillespie",
     "team": "PHO",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 33,
     "fgm": 2.0606060606060606,
     "fga": 4.787878787878788,
@@ -8423,7 +8423,7 @@
   {
     "name": "Kyle Anderson",
     "team": "2TM",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 61,
     "fgm": 2.3278688524590163,
     "fga": 4.967213114754099,
@@ -8507,7 +8507,7 @@
   {
     "name": "Quenton Jackson",
     "team": "IND",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 28,
     "fgm": 2.0714285714285716,
     "fga": 4.357142857142857,
@@ -8528,7 +8528,7 @@
   {
     "name": "Javonte Green",
     "team": "NOP",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 50,
     "fgm": 2,
     "fga": 4.48,
@@ -8549,7 +8549,7 @@
   {
     "name": "Landry Shamet",
     "team": "NYK",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 50,
     "fgm": 2.12,
     "fga": 4.6,
@@ -8570,7 +8570,7 @@
   {
     "name": "Dariq Whitehead",
     "team": "BRK",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 20,
     "fgm": 1.95,
     "fga": 4.8,
@@ -8612,7 +8612,7 @@
   {
     "name": "Cason Wallace",
     "team": "OKC",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 23,
     "fgm": 2.217391304347826,
     "fga": 5.173913043478261,
@@ -8633,7 +8633,7 @@
   {
     "name": "Jordan Goodwin",
     "team": "LAL",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 29,
     "fgm": 2.1724137931034484,
     "fga": 4.9655172413793105,
@@ -8654,7 +8654,7 @@
   {
     "name": "Shake Milton",
     "team": "2TM",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 57,
     "fgm": 2.017543859649123,
     "fga": 4.456140350877193,
@@ -8675,7 +8675,7 @@
   {
     "name": "Lindy Waters III",
     "team": "GSW",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 38,
     "fgm": 2,
     "fga": 5.394736842105263,
@@ -8696,7 +8696,7 @@
   {
     "name": "Aaron Holiday",
     "team": "HOU",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 62,
     "fgm": 1.8870967741935485,
     "fga": 4.32258064516129,
@@ -8717,7 +8717,7 @@
   {
     "name": "Dean Wade",
     "team": "CLE",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 59,
     "fgm": 1.8983050847457628,
     "fga": 4.593220338983051,
@@ -8738,7 +8738,7 @@
   {
     "name": "Keaton Wallace",
     "team": "ATL",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 31,
     "fgm": 2.096774193548387,
     "fga": 5.225806451612903,
@@ -8759,7 +8759,7 @@
   {
     "name": "Jeff Green",
     "team": "HOU",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 32,
     "fgm": 1.90625,
     "fga": 3.78125,
@@ -8780,7 +8780,7 @@
   {
     "name": "Jonathan Isaac",
     "team": "ORL",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 71,
     "fgm": 1.8873239436619718,
     "fga": 4.563380281690141,
@@ -8801,7 +8801,7 @@
   {
     "name": "Maxwell Lewis",
     "team": "BRK",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 21,
     "fgm": 2.0476190476190474,
     "fga": 4.857142857142857,
@@ -8822,7 +8822,7 @@
   {
     "name": "Kevin Love",
     "team": "MIA",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 23,
     "fgm": 1.7826086956521738,
     "fga": 5,
@@ -8843,7 +8843,7 @@
   {
     "name": "Jamal Cain",
     "team": "NOP",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 37,
     "fgm": 1.837837837837838,
     "fga": 4.27027027027027,
@@ -8864,7 +8864,7 @@
   {
     "name": "Ben Sheppard",
     "team": "IND",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 63,
     "fgm": 1.9047619047619047,
     "fga": 4.555555555555555,
@@ -8885,7 +8885,7 @@
   {
     "name": "Pat Connaughton",
     "team": "MIL",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 41,
     "fgm": 2.024390243902439,
     "fga": 4.317073170731708,
@@ -8906,7 +8906,7 @@
   {
     "name": "Kyle Anderson",
     "team": "GSW",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 36,
     "fgm": 2.111111111111111,
     "fga": 4.694444444444445,
@@ -8927,7 +8927,7 @@
   {
     "name": "Jabari Walker",
     "team": "POR",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 60,
     "fgm": 1.9666666666666666,
     "fga": 3.816666666666667,
@@ -8948,7 +8948,7 @@
   {
     "name": "Monte Morris",
     "team": "PHO",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 45,
     "fgm": 1.8444444444444446,
     "fga": 4.333333333333333,
@@ -8990,7 +8990,7 @@
   {
     "name": "Javonte Green",
     "team": "2TM",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 68,
     "fgm": 1.8088235294117647,
     "fga": 4.220588235294118,
@@ -9011,7 +9011,7 @@
   {
     "name": "Isaiah Joe",
     "team": "OKC",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 21,
     "fgm": 1.7142857142857142,
     "fga": 3.4761904761904763,
@@ -9032,7 +9032,7 @@
   {
     "name": "Ben Simmons",
     "team": "2TM",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 51,
     "fgm": 2.2745098039215685,
     "fga": 4.372549019607843,
@@ -9074,7 +9074,7 @@
   {
     "name": "Malaki Branham",
     "team": "SAS",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 47,
     "fgm": 1.851063829787234,
     "fga": 4.042553191489362,
@@ -9116,7 +9116,7 @@
   {
     "name": "Lindy Waters III",
     "team": "2TM",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 52,
     "fgm": 1.7692307692307692,
     "fga": 4.788461538461538,
@@ -9137,7 +9137,7 @@
   {
     "name": "Trevelin Queen",
     "team": "ORL",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 31,
     "fgm": 1.8064516129032258,
     "fga": 4.741935483870968,
@@ -9221,7 +9221,7 @@
   {
     "name": "David Roddy",
     "team": "3TM",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 33,
     "fgm": 1.7272727272727273,
     "fga": 3.787878787878788,
@@ -9242,7 +9242,7 @@
   {
     "name": "Julian Phillips",
     "team": "CHI",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 79,
     "fgm": 1.620253164556962,
     "fga": 3.632911392405063,
@@ -9263,7 +9263,7 @@
   {
     "name": "Cody Williams",
     "team": "UTA",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 50,
     "fgm": 1.66,
     "fga": 5.14,
@@ -9326,7 +9326,7 @@
   {
     "name": "Pelle Larsson",
     "team": "MIA",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 55,
     "fgm": 1.6181818181818182,
     "fga": 3.690909090909091,
@@ -9368,7 +9368,7 @@
   {
     "name": "David Roddy",
     "team": "ATL",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 27,
     "fgm": 1.6296296296296295,
     "fga": 3.4444444444444446,
@@ -9410,7 +9410,7 @@
   {
     "name": "Rob Dillingham",
     "team": "MIN",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 49,
     "fgm": 1.8979591836734695,
     "fga": 4.3061224489795915,
@@ -9431,7 +9431,7 @@
   {
     "name": "Dalen Terry",
     "team": "CHI",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 73,
     "fgm": 1.643835616438356,
     "fga": 3.671232876712329,
@@ -9452,7 +9452,7 @@
   {
     "name": "Jett Howard",
     "team": "ORL",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 60,
     "fgm": 1.6333333333333333,
     "fga": 4.366666666666666,
@@ -9473,7 +9473,7 @@
   {
     "name": "Reed Sheppard",
     "team": "HOU",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 52,
     "fgm": 1.6153846153846154,
     "fga": 4.596153846153846,
@@ -9494,7 +9494,7 @@
   {
     "name": "Tre Jones",
     "team": "SAS",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 28,
     "fgm": 1.6071428571428572,
     "fga": 3.3214285714285716,
@@ -9515,7 +9515,7 @@
   {
     "name": "Reggie Jackson",
     "team": "PHI",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 31,
     "fgm": 1.6774193548387097,
     "fga": 4.290322580645161,
@@ -9536,7 +9536,7 @@
   {
     "name": "Marvin Bagley III",
     "team": "2TM",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 31,
     "fgm": 1.7741935483870968,
     "fga": 3.4193548387096775,
@@ -9578,7 +9578,7 @@
   {
     "name": "Terrence Shannon Jr.",
     "team": "MIN",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 32,
     "fgm": 1.71875,
     "fga": 3.5625,
@@ -9662,7 +9662,7 @@
   {
     "name": "Jevon Carter",
     "team": "CHI",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 36,
     "fgm": 1.5277777777777777,
     "fga": 4.055555555555555,
@@ -9683,7 +9683,7 @@
   {
     "name": "Cam Spencer",
     "team": "MEM",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 25,
     "fgm": 1.36,
     "fga": 3.28,
@@ -9704,7 +9704,7 @@
   {
     "name": "Dominick Barlow",
     "team": "ATL",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 35,
     "fgm": 1.7142857142857142,
     "fga": 3.2285714285714286,
@@ -9746,7 +9746,7 @@
   {
     "name": "Kessler Edwards",
     "team": "DAL",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 40,
     "fgm": 1.675,
     "fga": 3.375,
@@ -9767,7 +9767,7 @@
   {
     "name": "Oso Ighodaro",
     "team": "PHO",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 61,
     "fgm": 1.8524590163934427,
     "fga": 3.0655737704918034,
@@ -9788,7 +9788,7 @@
   {
     "name": "Wendell Moore Jr.",
     "team": "2TM",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 36,
     "fgm": 1.6388888888888888,
     "fga": 3.5,
@@ -9809,7 +9809,7 @@
   {
     "name": "Kris Murray",
     "team": "POR",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 69,
     "fgm": 1.6956521739130435,
     "fga": 4.043478260869565,
@@ -9830,7 +9830,7 @@
   {
     "name": "Torrey Craig",
     "team": "2TM",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 26,
     "fgm": 1.4615384615384615,
     "fga": 3.4615384615384617,
@@ -9851,7 +9851,7 @@
   {
     "name": "Maxwell Lewis",
     "team": "2TM",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 28,
     "fgm": 1.6071428571428572,
     "fga": 3.857142857142857,
@@ -9872,7 +9872,7 @@
   {
     "name": "Caleb Houstan",
     "team": "ORL",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 58,
     "fgm": 1.3793103448275863,
     "fga": 3.2758620689655173,
@@ -9893,7 +9893,7 @@
   {
     "name": "Jordan Miller",
     "team": "LAC",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 37,
     "fgm": 1.5675675675675675,
     "fga": 3.6216216216216215,
@@ -9935,7 +9935,7 @@
   {
     "name": "Jarred Vanderbilt",
     "team": "LAL",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 36,
     "fgm": 1.6388888888888888,
     "fga": 3.361111111111111,
@@ -9956,7 +9956,7 @@
   {
     "name": "Jalen Pickett",
     "team": "DEN",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 49,
     "fgm": 1.5714285714285714,
     "fga": 3.673469387755102,
@@ -9977,7 +9977,7 @@
   {
     "name": "Jaylen Clark",
     "team": "MIN",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 40,
     "fgm": 1.4,
     "fga": 3,
@@ -9998,7 +9998,7 @@
   {
     "name": "Gui Santos",
     "team": "GSW",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 56,
     "fgm": 1.4642857142857142,
     "fga": 3.1964285714285716,
@@ -10019,7 +10019,7 @@
   {
     "name": "Colby Jones",
     "team": "2TM",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 39,
     "fgm": 1.5128205128205128,
     "fga": 3.3076923076923075,
@@ -10040,7 +10040,7 @@
   {
     "name": "Nicolas Batum",
     "team": "LAC",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 78,
     "fgm": 1.3333333333333333,
     "fga": 3.051282051282051,
@@ -10061,7 +10061,7 @@
   {
     "name": "Kyle Lowry",
     "team": "PHI",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 35,
     "fgm": 1.1714285714285715,
     "fga": 3.342857142857143,
@@ -10103,7 +10103,7 @@
   {
     "name": "Shake Milton",
     "team": "LAL",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 30,
     "fgm": 1.4,
     "fga": 3.2333333333333334,
@@ -10124,7 +10124,7 @@
   {
     "name": "Olivier-Maxence Prosper",
     "team": "DAL",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 52,
     "fgm": 1.3461538461538463,
     "fga": 3.3461538461538463,
@@ -10166,7 +10166,7 @@
   {
     "name": "Devin Carter",
     "team": "SAC",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 36,
     "fgm": 1.3055555555555556,
     "fga": 3.5277777777777777,
@@ -10187,7 +10187,7 @@
   {
     "name": "Patty Mills",
     "team": "2TM",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 29,
     "fgm": 1.2413793103448276,
     "fga": 3.310344827586207,
@@ -10229,7 +10229,7 @@
   {
     "name": "Blake Wesley",
     "team": "SAS",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 58,
     "fgm": 1.396551724137931,
     "fga": 3.206896551724138,
@@ -10271,7 +10271,7 @@
   {
     "name": "Craig Porter Jr.",
     "team": "CLE",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 51,
     "fgm": 1.411764705882353,
     "fga": 2.7450980392156863,
@@ -10292,7 +10292,7 @@
   {
     "name": "Baylor Scheierman",
     "team": "BOS",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 31,
     "fgm": 1.2580645161290323,
     "fga": 3.5483870967741935,
@@ -10313,7 +10313,7 @@
   {
     "name": "Jae'Sean Tate",
     "team": "HOU",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 52,
     "fgm": 1.3461538461538463,
     "fga": 2.8461538461538463,
@@ -10334,7 +10334,7 @@
   {
     "name": "Jaylon Tyson",
     "team": "CLE",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 47,
     "fgm": 1.3617021276595744,
     "fga": 3.1702127659574466,
@@ -10355,7 +10355,7 @@
   {
     "name": "JT Thor",
     "team": "2TM",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 20,
     "fgm": 1.25,
     "fga": 2.95,
@@ -10376,7 +10376,7 @@
   {
     "name": "Elfrid Payton",
     "team": "2TM",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 24,
     "fgm": 1.6666666666666667,
     "fga": 5.083333333333333,
@@ -10397,7 +10397,7 @@
   {
     "name": "Cory Joseph",
     "team": "ORL",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 50,
     "fgm": 1.24,
     "fga": 3.08,
@@ -10439,7 +10439,7 @@
   {
     "name": "Doug McDermott",
     "team": "SAC",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 42,
     "fgm": 1.1904761904761905,
     "fga": 2.7857142857142856,
@@ -10460,7 +10460,7 @@
   {
     "name": "Andre Jackson Jr.",
     "team": "MIL",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 67,
     "fgm": 1.4029850746268657,
     "fga": 2.9402985074626864,
@@ -10481,7 +10481,7 @@
   {
     "name": "Isaac Jones",
     "team": "SAC",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 40,
     "fgm": 1.35,
     "fga": 2.075,
@@ -10502,7 +10502,7 @@
   {
     "name": "Damion Lee",
     "team": "PHO",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 25,
     "fgm": 1.08,
     "fga": 2.96,
@@ -10523,7 +10523,7 @@
   {
     "name": "Jeenathan Williams",
     "team": "HOU",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 20,
     "fgm": 1.35,
     "fga": 3.1,
@@ -10544,7 +10544,7 @@
   {
     "name": "Zeke Nnaji",
     "team": "DEN",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 57,
     "fgm": 1.2280701754385965,
     "fga": 2.473684210526316,
@@ -10565,7 +10565,7 @@
   {
     "name": "Ben Sheppard",
     "team": "IND",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 21,
     "fgm": 1.1428571428571428,
     "fga": 2.4285714285714284,
@@ -10586,7 +10586,7 @@
   {
     "name": "Cam Reddish",
     "team": "LAL",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 33,
     "fgm": 1.1515151515151516,
     "fga": 2.8484848484848486,
@@ -10607,7 +10607,7 @@
   {
     "name": "Wendell Moore Jr.",
     "team": "DET",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 20,
     "fgm": 1.15,
     "fga": 2.5,
@@ -10628,7 +10628,7 @@
   {
     "name": "Delon Wright",
     "team": "2TM",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 40,
     "fgm": 1.125,
     "fga": 3.275,
@@ -10649,7 +10649,7 @@
   {
     "name": "Maxi Kleber",
     "team": "DAL",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 34,
     "fgm": 1.088235294117647,
     "fga": 2.823529411764706,
@@ -10670,7 +10670,7 @@
   {
     "name": "Gary Harris",
     "team": "ORL",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 48,
     "fgm": 1.0625,
     "fga": 2.7708333333333335,
@@ -10691,7 +10691,7 @@
   {
     "name": "Rayan Rupert",
     "team": "POR",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 52,
     "fgm": 1.1153846153846154,
     "fga": 2.730769230769231,
@@ -10712,7 +10712,7 @@
   {
     "name": "Tyler Smith",
     "team": "MIL",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 23,
     "fgm": 1.0434782608695652,
     "fga": 2.1739130434782608,
@@ -10733,7 +10733,7 @@
   {
     "name": "Markelle Fultz",
     "team": "SAC",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 21,
     "fgm": 1.3333333333333333,
     "fga": 3.1904761904761907,
@@ -10796,7 +10796,7 @@
   {
     "name": "Reece Beekman",
     "team": "BRK",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 34,
     "fgm": 1,
     "fga": 3.1176470588235294,
@@ -10817,7 +10817,7 @@
   {
     "name": "Hunter Tyson",
     "team": "DEN",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 51,
     "fgm": 0.8823529411764706,
     "fga": 2.3529411764705883,
@@ -10880,7 +10880,7 @@
   {
     "name": "Josh Minott",
     "team": "MIN",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 46,
     "fgm": 0.9565217391304348,
     "fga": 1.9565217391304348,
@@ -10901,7 +10901,7 @@
   {
     "name": "Reece Beekman",
     "team": "2TM",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 36,
     "fgm": 0.9722222222222222,
     "fga": 2.9722222222222223,
@@ -10922,7 +10922,7 @@
   {
     "name": "Jaden Springer",
     "team": "2TM",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 43,
     "fgm": 0.813953488372093,
     "fga": 2.0930232558139537,
@@ -10943,7 +10943,7 @@
   {
     "name": "Anthony Gill",
     "team": "WAS",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 51,
     "fgm": 0.8431372549019608,
     "fga": 1.7254901960784315,
@@ -10964,7 +10964,7 @@
   {
     "name": "Pat Spencer",
     "team": "GSW",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 39,
     "fgm": 1.0512820512820513,
     "fga": 2.58974358974359,
@@ -10985,7 +10985,7 @@
   {
     "name": "Dillon Jones",
     "team": "OKC",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 54,
     "fgm": 0.9444444444444444,
     "fga": 2.462962962962963,
@@ -11027,7 +11027,7 @@
   {
     "name": "Delon Wright",
     "team": "MIL",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 26,
     "fgm": 0.8461538461538461,
     "fga": 3.1538461538461537,
@@ -11048,7 +11048,7 @@
   {
     "name": "John Konchar",
     "team": "MEM",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 46,
     "fgm": 0.8913043478260869,
     "fga": 1.9782608695652173,
@@ -11090,7 +11090,7 @@
   {
     "name": "Johnny Davis",
     "team": "WAS",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 34,
     "fgm": 0.9411764705882353,
     "fga": 2.2941176470588234,
@@ -11111,7 +11111,7 @@
   {
     "name": "Bronny James",
     "team": "LAL",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 27,
     "fgm": 0.7777777777777778,
     "fga": 2.4814814814814814,
@@ -11132,7 +11132,7 @@
   {
     "name": "MarJon Beauchamp",
     "team": "3TM",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 35,
     "fgm": 0.7714285714285715,
     "fga": 1.8571428571428572,
@@ -11153,7 +11153,7 @@
   {
     "name": "Patrick Baldwin Jr.",
     "team": "2TM",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 24,
     "fgm": 0.7916666666666666,
     "fga": 1.4583333333333333,
@@ -11195,7 +11195,7 @@
   {
     "name": "Drew Peterson",
     "team": "BOS",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 25,
     "fgm": 0.68,
     "fga": 1.64,
@@ -11216,7 +11216,7 @@
   {
     "name": "Patrick Baldwin Jr.",
     "team": "WAS",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 22,
     "fgm": 0.7727272727272727,
     "fga": 1.5,
@@ -11237,7 +11237,7 @@
   {
     "name": "Jordan McLaughlin",
     "team": "2TM",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 46,
     "fgm": 0.6739130434782609,
     "fga": 1.565217391304348,
@@ -11258,7 +11258,7 @@
   {
     "name": "Enrique Freeman",
     "team": "IND",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 22,
     "fgm": 0.7272727272727273,
     "fga": 1.6818181818181819,
@@ -11300,7 +11300,7 @@
   {
     "name": "Johnny Furphy",
     "team": "IND",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 50,
     "fgm": 0.7,
     "fga": 1.84,
@@ -11321,7 +11321,7 @@
   {
     "name": "MarJon Beauchamp",
     "team": "MIL",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 26,
     "fgm": 0.6923076923076923,
     "fga": 1.8076923076923077,
@@ -11342,7 +11342,7 @@
   {
     "name": "Tyler Kolek",
     "team": "NYK",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 41,
     "fgm": 0.6585365853658537,
     "fga": 2,
@@ -11363,7 +11363,7 @@
   {
     "name": "Kobe Brown",
     "team": "LAC",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 40,
     "fgm": 0.825,
     "fga": 1.8,
@@ -11405,7 +11405,7 @@
   {
     "name": "Garrett Temple",
     "team": "TOR",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 28,
     "fgm": 0.6428571428571429,
     "fga": 2.142857142857143,
@@ -11426,7 +11426,7 @@
   {
     "name": "Jordan McLaughlin",
     "team": "SAC",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 28,
     "fgm": 0.5714285714285714,
     "fga": 1.5714285714285714,
@@ -11468,7 +11468,7 @@
   {
     "name": "Adam Flagler",
     "team": "OKC",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 37,
     "fgm": 0.6756756756756757,
     "fga": 2.5945945945945947,
@@ -11489,7 +11489,7 @@
   {
     "name": "Jaden Springer",
     "team": "BOS",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 26,
     "fgm": 0.46153846153846156,
     "fga": 1.3076923076923077,
@@ -11531,7 +11531,7 @@
   {
     "name": "Alex Ducas",
     "team": "OKC",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 21,
     "fgm": 0.5714285714285714,
     "fga": 1.4285714285714286,
@@ -11573,7 +11573,7 @@
   {
     "name": "Yuki Kawamura",
     "team": "MEM",
-    "position": "G",
+    "position": "PG",
     "gamesPlayed": 22,
     "fgm": 0.5,
     "fga": 1.3636363636363635,
@@ -11615,7 +11615,7 @@
   {
     "name": "Jordan Walsh",
     "team": "BOS",
-    "position": "F",
+    "position": "PF",
     "gamesPlayed": 52,
     "fgm": 0.5769230769230769,
     "fga": 1.5961538461538463,
@@ -11636,7 +11636,7 @@
   {
     "name": "Sidy Cissoko",
     "team": "2TM",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 22,
     "fgm": 0.5909090909090909,
     "fga": 1.3636363636363635,
@@ -11678,7 +11678,7 @@
   {
     "name": "Chris Livingston",
     "team": "MIL",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 21,
     "fgm": 0.42857142857142855,
     "fga": 1.2857142857142858,
@@ -11699,7 +11699,7 @@
   {
     "name": "Trey Alexander",
     "team": "DEN",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 24,
     "fgm": 0.5416666666666666,
     "fga": 1.7083333333333333,
@@ -11720,7 +11720,7 @@
   {
     "name": "Spencer Jones",
     "team": "DEN",
-    "position": "F",
+    "position": "SF",
     "gamesPlayed": 20,
     "fgm": 0.55,
     "fga": 1.7,
@@ -11741,7 +11741,7 @@
   {
     "name": "Colby Jones",
     "team": "SAC",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 24,
     "fgm": 0.4583333333333333,
     "fga": 1.0833333333333333,
@@ -11783,7 +11783,7 @@
   {
     "name": "Stanley Umude",
     "team": "MIL",
-    "position": "G",
+    "position": "SG",
     "gamesPlayed": 22,
     "fgm": 0.22727272727272727,
     "fga": 1.1818181818181819,

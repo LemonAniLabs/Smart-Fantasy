@@ -49,7 +49,7 @@ async function main() {
   console.log(`💾 已更新 public/data/draft-rankings-2024-25.json`)
 
   // 生成各位置 Top 10
-  const positions = ['G', 'F', 'C']
+  const positions = ['PG', 'SG', 'SF', 'PF', 'C']
 
   console.log('\n\n📋 各位置 Top 10:\n')
 
