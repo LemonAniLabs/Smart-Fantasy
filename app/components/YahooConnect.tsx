@@ -19,8 +19,8 @@ export default function YahooConnect() {
     setLoading(true)
     setError(null)
     try {
-      // Try current season (2024 = 2024-25 NBA season)
-      const response = await fetch('/api/yahoo/leagues?season=2024')
+      // Try current season (2025 = 2024-25 NBA season)
+      const response = await fetch('/api/yahoo/leagues?season=2025')
       if (!response.ok) {
         const errorData = await response.json()
         throw new Error(errorData.error || 'Failed to fetch leagues')
@@ -117,7 +117,7 @@ export default function YahooConnect() {
 
           {!loading && leagues.length === 0 && !error && (
             <p className="text-purple-200 text-sm">
-              No leagues found for the 2024-25 season. Try creating a league on Yahoo Fantasy Basketball!
+              No leagues found for the current season. Try creating a league on Yahoo Fantasy Basketball!
             </p>
           )}
         </div>

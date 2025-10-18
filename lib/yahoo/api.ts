@@ -45,8 +45,8 @@ export interface YahooPlayer {
  */
 export async function getUserLeagues(accessToken: string, season?: string): Promise<YahooLeague[]> {
   try {
-    // Current NBA season is 2024-25, which Yahoo represents as "2024"
-    const seasonYear = season || '2024'
+    // Current NBA season is 2024-25, which Yahoo represents as "2025"
+    const seasonYear = season || '2025'
 
     // Add format=json to get JSON response instead of XML
     const url = `${YAHOO_FANTASY_API_BASE}/users;use_login=1/games;game_codes=nba;seasons=${seasonYear}/leagues?format=json`
