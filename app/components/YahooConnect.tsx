@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react'
 
 export default function YahooConnect() {
   const { data: session, status } = useSession()
-  const [leagues, setLeagues] = useState<any[]>([])
+  const [leagues, setLeagues] = useState<unknown[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -25,8 +25,8 @@ export default function YahooConnect() {
       }
       const data = await response.json()
       setLeagues(data.leagues || [])
-    } catch (err: any) {
-      setError(err.message)
+    } catch (err: unknown) {
+      setError((err as Error).message)
       console.error('Error fetching leagues:', err)
     } finally {
       setLoading(false)
@@ -89,22 +89,25 @@ export default function YahooConnect() {
             <div>
               <h3 className="text-lg font-semibold text-white mb-2">Your Leagues</h3>
               <div className="space-y-2">
-                {leagues.map((league: any, index: number) => (
+                {leagues.map((league: unknown, index: number) => {
+                  const leagueData = league as { name?: string; season?: string; num_teams?: number }
+                  return (
                   <div
                     key={index}
                     className="bg-slate-800/50 p-3 rounded flex justify-between items-center"
                   >
                     <div>
-                      <div className="font-semibold text-white">{league.name || 'League'}</div>
+                      <div className="font-semibold text-white">{leagueData.name || 'League'}</div>
                       <div className="text-xs text-purple-200">
-                        {league.season} | {league.num_teams} teams
+                        {leagueData.season} | {leagueData.num_teams} teams
                       </div>
                     </div>
                     <button className="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 rounded text-xs font-semibold">
                       Import
                     </button>
                   </div>
-                ))}
+                  )
+                })}
               </div>
             </div>
           )}

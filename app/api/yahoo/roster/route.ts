@@ -26,10 +26,10 @@ export async function GET(request: NextRequest) {
     const roster = await getTeamRoster(session.accessToken, teamKey)
 
     return NextResponse.json({ roster })
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error in /api/yahoo/roster:', error)
     return NextResponse.json(
-      { error: error.message || 'Failed to fetch roster' },
+      { error: (error as Error).message || 'Failed to fetch roster' },
       { status: 500 }
     )
   }

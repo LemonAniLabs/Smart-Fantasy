@@ -30,12 +30,12 @@ export async function GET(request: NextRequest) {
       gameKey: finalGameKey,
       data: players,
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error fetching Yahoo players:', error)
     return NextResponse.json(
       {
         success: false,
-        error: error.message || 'Failed to fetch players',
+        error: (error as Error).message || 'Failed to fetch players',
       },
       { status: 500 }
     )

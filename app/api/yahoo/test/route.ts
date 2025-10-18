@@ -22,13 +22,14 @@ export async function GET() {
         gamesResponse: games,
       },
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Yahoo API test failed:', error)
+    const err = error as { response?: { data?: unknown }; message?: string }
     return NextResponse.json(
       {
         success: false,
-        error: error.message || 'Unknown error',
-        details: error.response?.data || null,
+        error: err.message || 'Unknown error',
+        details: err.response?.data || null,
       },
       { status: 500 }
     )

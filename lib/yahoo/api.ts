@@ -23,8 +23,8 @@ export interface YahooTeam {
   team_id: string
   name: string
   is_owned_by_current_login: boolean
-  team_logos: any[]
-  managers: any[]
+  team_logos: unknown[]
+  managers: unknown[]
 }
 
 export interface YahooPlayer {

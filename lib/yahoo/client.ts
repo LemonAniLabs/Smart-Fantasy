@@ -58,8 +58,9 @@ class YahooFantasyClient {
       this.tokenExpiresAt = Date.now() + (response.data.expires_in - 300) * 1000
 
       return this.accessToken
-    } catch (error: any) {
-      console.error('Error getting Yahoo access token:', error.response?.data || error.message)
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: unknown }; message?: string }
+      console.error('Error getting Yahoo access token:', err.response?.data || err.message)
       throw new Error('Failed to authenticate with Yahoo API')
     }
   }
@@ -81,8 +82,9 @@ class YahooFantasyClient {
       })
 
       return response.data
-    } catch (error: any) {
-      console.error('Yahoo API request error:', error.response?.data || error.message)
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: unknown }; message?: string }
+      console.error('Yahoo API request error:', err.response?.data || err.message)
       throw error
     }
   }

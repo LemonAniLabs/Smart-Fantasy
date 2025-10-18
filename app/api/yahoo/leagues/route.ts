@@ -19,10 +19,10 @@ export async function GET(request: NextRequest) {
     const leagues = await getUserLeagues(session.accessToken, season)
 
     return NextResponse.json({ leagues })
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error in /api/yahoo/leagues:', error)
     return NextResponse.json(
-      { error: error.message || 'Failed to fetch leagues' },
+      { error: (error as Error).message || 'Failed to fetch leagues' },
       { status: 500 }
     )
   }
