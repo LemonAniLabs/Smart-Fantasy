@@ -1,41 +1,89 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { yahooClient } from '@/lib/yahoo/client'
+import { getServerSession } from 'next-auth'
+import axios from 'axios'
+
+const YAHOO_FANTASY_API_BASE = 'https://fantasysports.yahooapis.com/fantasy/v2'
 
 /**
  * Get players from Yahoo Fantasy API
- * GET /api/yahoo/players?gameKey=nba.g.xxx&position=PG&start=0&count=25
+ * GET /api/yahoo/players?gameKey=423&position=PG&start=0&count=25
+ *
+ * Requires user authentication via Yahoo OAuth
  */
 export async function GET(request: NextRequest) {
   try {
+    const session = await getServerSession()
+
+    if (!session || !session.accessToken) {
+      return NextResponse.json(
+        { error: 'Unauthorized. Please sign in with Yahoo.' },
+        { status: 401 }
+      )
+    }
+
     const searchParams = request.nextUrl.searchParams
     const gameKey = searchParams.get('gameKey')
     const position = searchParams.get('position') || undefined
     const start = searchParams.get('start') ? parseInt(searchParams.get('start')!) : 0
     const count = searchParams.get('count') ? parseInt(searchParams.get('count')!) : 25
 
-    // If no game key provided, get current season
     let finalGameKey = gameKey
     if (!finalGameKey) {
-      finalGameKey = await yahooClient.getCurrentSeasonGameKey()
+      // Get current season game key if not provided
+      const currentYear = new Date().getFullYear()
+      const seasonResponse = await axios.get(
+        `${YAHOO_FANTASY_API_BASE}/game/nba;seasons=${currentYear}`,
+        {
+          headers: {
+            'Authorization': `Bearer ${session.accessToken}`,
+            'Accept': 'application/json',
+          },
+        }
+      )
+
+      const gameData = seasonResponse.data as {
+        fantasy_content?: {
+          game?: Array<{ game_key?: string }>
+        }
+      }
+
+      finalGameKey = gameData.fantasy_content?.game?.[0]?.game_key || `nba.l.${currentYear}`
     }
 
-    const players = await yahooClient.getPlayers(finalGameKey, {
-      start,
-      count,
-      position,
-    })
+    // Build endpoint with parameters
+    let endpoint = `/game/${finalGameKey}/players`
+    const params: string[] = []
+    if (start !== undefined) params.push(`start=${start}`)
+    if (count !== undefined) params.push(`count=${count}`)
+    if (position) params.push(`position=${position}`)
+
+    if (params.length > 0) {
+      endpoint += `;${params.join(';')}`
+    }
+
+    const response = await axios.get(
+      `${YAHOO_FANTASY_API_BASE}${endpoint}`,
+      {
+        headers: {
+          'Authorization': `Bearer ${session.accessToken}`,
+          'Accept': 'application/json',
+        },
+      }
+    )
 
     return NextResponse.json({
       success: true,
       gameKey: finalGameKey,
-      data: players,
+      data: response.data,
     })
   } catch (error: unknown) {
-    console.error('Error fetching Yahoo players:', error)
+    console.error('Error in /api/yahoo/players:', error)
+    const err = error as { response?: { data?: unknown }; message?: string }
     return NextResponse.json(
       {
         success: false,
-        error: (error as Error).message || 'Failed to fetch players',
+        error: err.message || 'Failed to fetch players',
+        details: err.response?.data || null,
       },
       { status: 500 }
     )

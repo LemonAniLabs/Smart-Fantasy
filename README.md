@@ -16,23 +16,21 @@ AI-powered Yahoo Fantasy Basketball draft assistant, optimized for **11-Cat H2H 
 - **Position-specific Rankings**: Detailed breakdowns for PG, SG, SF, PF, C
 - **Dynamic Category Coverage**: Adjusts based on your league format
 
-### Yahoo Fantasy Integration (Hybrid Mode)
+### Yahoo Fantasy Integration
 
 **Mode 1: Basic Assistant (No Yahoo Account Required)**
 - Manual league configuration
-- Static player rankings
+- Static player rankings based on 2024-25 season data
 - General draft strategy
 
-**Mode 2: Yahoo Public Data (Developer Credentials Only)**
-- Access latest player stats via Yahoo Fantasy API
-- No user login required
-- Real-time player data updates
-
-**Mode 3: Personal Integration (Coming Soon)**
-- Connect your Yahoo Fantasy account
+**Mode 2: Yahoo Personal Integration (User Authentication Required)**
+- Connect your Yahoo Fantasy account via OAuth
 - Import your league settings automatically
 - Sync your team roster
+- Access real-time player data
 - Personalized draft strategy based on your actual league
+
+**Important Note**: Yahoo Fantasy API only supports 3-legged OAuth (authorization_code flow), which requires user login. 2-legged OAuth (client credentials) is NOT supported by Yahoo. All Yahoo Fantasy data access requires users to authenticate with their Yahoo account.
 
 ## Quick Start
 
@@ -49,12 +47,13 @@ npm install
 cp .env.example .env
 ```
 
-2. **For Yahoo API Integration** (Optional - Mode 2 & 3):
+2. **For Yahoo API Integration** (Optional - Mode 2):
    - Go to [Yahoo Developer Network](https://developer.yahoo.com/apps/create/)
    - Create a new application
-   - Select "Fantasy Sports" with Read/Write access
-   - Set Redirect URI: `http://localhost:3000/api/auth/callback/yahoo`
+   - Select "Fantasy Sports" with Read access (or Read/Write if you plan to make roster changes)
+   - Set Redirect URI: `https://your-domain.vercel.app/api/auth/callback/yahoo` (must be HTTPS)
    - Copy Client ID and Client Secret to `.env`
+   - Note: For production deployment, update `NEXTAUTH_URL` in Vercel environment variables
 
 3. Generate NextAuth secret:
 ```bash
@@ -71,7 +70,10 @@ Visit: **http://localhost:3000**
 
 ### Test Yahoo API Connection
 
+Note: Yahoo API requires user authentication. Visit the app and click "Connect with Yahoo" to sign in with your Yahoo account. After signing in, you can test the API:
+
 ```bash
+# This will show authentication status
 curl http://localhost:3000/api/yahoo/test
 ```
 
