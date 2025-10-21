@@ -7,7 +7,7 @@ import YahooConnect from './components/YahooConnect'
 type Tab = 'draft' | 'team'
 
 export default function Home() {
-  const [activeTab, setActiveTab] = useState<Tab>('draft')
+  const [activeTab, setActiveTab] = useState<Tab>('team')
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
@@ -25,16 +25,6 @@ export default function Home() {
         <div className="flex justify-center mb-8">
           <div className="bg-white/10 backdrop-blur-md rounded-lg p-1 inline-flex">
             <button
-              onClick={() => setActiveTab('draft')}
-              className={`px-6 py-3 rounded-lg font-semibold transition-all ${
-                activeTab === 'draft'
-                  ? 'bg-purple-600 text-white shadow-lg'
-                  : 'text-purple-200 hover:text-white'
-              }`}
-            >
-              Draft Assistant
-            </button>
-            <button
               onClick={() => setActiveTab('team')}
               className={`px-6 py-3 rounded-lg font-semibold transition-all ${
                 activeTab === 'team'
@@ -43,6 +33,16 @@ export default function Home() {
               }`}
             >
               My Yahoo Team
+            </button>
+            <button
+              onClick={() => setActiveTab('draft')}
+              className={`px-6 py-3 rounded-lg font-semibold transition-all ${
+                activeTab === 'draft'
+                  ? 'bg-purple-600 text-white shadow-lg'
+                  : 'text-purple-200 hover:text-white'
+              }`}
+            >
+              Draft Assistant
             </button>
           </div>
         </div>

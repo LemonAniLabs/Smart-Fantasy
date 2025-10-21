@@ -6,7 +6,9 @@ import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Legend, 
 interface RosterManagerProps {
   teamKey: string
   teamName: string
+  leagueKey: string
   leagueSettings: unknown
+  allTeams?: Array<{ team_key: string; team_id: string; name: string; is_owned_by_current_login: boolean }>
   onClose: () => void
 }
 
@@ -49,7 +51,7 @@ interface RosterPosition {
   is_starting: boolean
 }
 
-export default function RosterManager({ teamKey, teamName, leagueSettings, onClose }: RosterManagerProps) {
+export default function RosterManager({ teamKey, teamName, leagueKey, leagueSettings, allTeams, onClose }: RosterManagerProps) {
   const [roster, setRoster] = useState<Player[]>([])
   const [playerStatsMap, setPlayerStatsMap] = useState<Record<string, PlayerStats>>({})
   const [loading, setLoading] = useState(true)
@@ -57,6 +59,12 @@ export default function RosterManager({ teamKey, teamName, leagueSettings, onClo
   const [comparePlayer1, setComparePlayer1] = useState<PlayerWithStats | null>(null)
   const [comparePlayer2, setComparePlayer2] = useState<PlayerWithStats | null>(null)
   const [showComparison, setShowComparison] = useState(false)
+  const [showPlayerSelector, setShowPlayerSelector] = useState(false)
+  const [playerSelectorSource, setPlayerSelectorSource] = useState<'my-team' | 'free-agents' | 'other-teams'>('my-team')
+  const [freeAgents, setFreeAgents] = useState<PlayerWithStats[]>([])
+  const [otherTeamRosters, setOtherTeamRosters] = useState<Record<string, Player[]>>({})
+  const [loadingFreeAgents, setLoadingFreeAgents] = useState(false)
+  const [selectedOtherTeam, setSelectedOtherTeam] = useState<string>('')
 
   useEffect(() => {
     fetchData()
@@ -153,18 +161,64 @@ export default function RosterManager({ teamKey, teamName, leagueSettings, onClo
     )
   }
 
+  const fetchFreeAgents = async () => {
+    setLoadingFreeAgents(true)
+    try {
+      const response = await fetch(`/api/yahoo/freeagents?leagueKey=${leagueKey}&count=50`)
+      if (response.ok) {
+        const data = await response.json()
+        const agents: Player[] = data.freeAgents || []
+        const agentsWithStats: PlayerWithStats[] = agents.map((agent) => ({
+          ...agent,
+          stats: playerStatsMap[agent.name.full],
+        }))
+        setFreeAgents(agentsWithStats)
+      }
+    } catch (error) {
+      console.error('Error fetching free agents:', error)
+    } finally {
+      setLoadingFreeAgents(false)
+    }
+  }
+
+  const fetchOtherTeamRoster = async (otherTeamKey: string) => {
+    if (otherTeamRosters[otherTeamKey]) return // Already loaded
+
+    try {
+      const response = await fetch(`/api/yahoo/roster?teamKey=${otherTeamKey}`)
+      if (response.ok) {
+        const data = await response.json()
+        setOtherTeamRosters((prev) => ({
+          ...prev,
+          [otherTeamKey]: data.roster || [],
+        }))
+      }
+    } catch (error) {
+      console.error('Error fetching other team roster:', error)
+    }
+  }
+
   const handleSelectForComparison = (player: PlayerWithStats) => {
     if (!comparePlayer1) {
       setComparePlayer1(player)
+      setShowPlayerSelector(true) // Show player selector for second player
     } else if (!comparePlayer2) {
       setComparePlayer2(player)
       setShowComparison(true)
+      setShowPlayerSelector(false)
     } else {
       // Reset and start new comparison
       setComparePlayer1(player)
       setComparePlayer2(null)
       setShowComparison(false)
+      setShowPlayerSelector(true)
     }
+  }
+
+  const handleSelectPlayer2 = (player: PlayerWithStats) => {
+    setComparePlayer2(player)
+    setShowComparison(true)
+    setShowPlayerSelector(false)
   }
 
   const resetComparison = () => {
@@ -246,21 +300,21 @@ export default function RosterManager({ teamKey, teamName, leagueSettings, onClo
         {/* Comparison Bar */}
         {(comparePlayer1 || comparePlayer2) && (
           <div className="bg-purple-900/30 border-b border-purple-500/30 p-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
                 <span className="text-purple-300 text-sm font-semibold">比較球員:</span>
                 {comparePlayer1 && (
-                  <span className="px-3 py-1 bg-blue-600 text-white rounded text-sm">
+                  <span className="px-2 sm:px-3 py-1 bg-blue-600 text-white rounded text-xs sm:text-sm">
                     {comparePlayer1.name.full}
                   </span>
                 )}
                 {comparePlayer1 && !comparePlayer2 && (
-                  <span className="text-purple-300 text-sm">← 選擇第二位球員進行比較</span>
+                  <span className="text-purple-300 text-xs sm:text-sm">← 選擇第二位球員</span>
                 )}
                 {comparePlayer2 && (
                   <>
-                    <span className="text-purple-300">vs</span>
-                    <span className="px-3 py-1 bg-green-600 text-white rounded text-sm">
+                    <span className="text-purple-300 text-xs sm:text-sm">vs</span>
+                    <span className="px-2 sm:px-3 py-1 bg-green-600 text-white rounded text-xs sm:text-sm">
                       {comparePlayer2.name.full}
                     </span>
                   </>
@@ -268,10 +322,237 @@ export default function RosterManager({ teamKey, teamName, leagueSettings, onClo
               </div>
               <button
                 onClick={resetComparison}
-                className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white rounded text-sm"
+                className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white rounded text-xs sm:text-sm self-start sm:self-auto"
               >
                 重置
               </button>
+            </div>
+          </div>
+        )}
+
+        {/* Player Selector Modal */}
+        {showPlayerSelector && comparePlayer1 && !comparePlayer2 && (
+          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 z-10">
+            <div className="bg-slate-800 rounded-lg w-full max-w-4xl max-h-[85vh] sm:max-h-[90vh] overflow-hidden border border-purple-500/30">
+              <div className="bg-gradient-to-r from-purple-900 to-slate-900 p-3 sm:p-4 border-b border-purple-500/30">
+                <div className="flex justify-between items-center">
+                  <h4 className="text-lg sm:text-xl font-bold text-white">選擇第二位球員進行比較</h4>
+                  <button
+                    onClick={() => setShowPlayerSelector(false)}
+                    className="text-purple-200 hover:text-white"
+                  >
+                    <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              {/* Source Selector */}
+              <div className="flex gap-2 p-3 bg-slate-900/50 border-b border-slate-700 flex-wrap">
+                <button
+                  onClick={() => setPlayerSelectorSource('my-team')}
+                  className={`px-3 py-1.5 rounded text-xs sm:text-sm font-semibold transition-colors ${
+                    playerSelectorSource === 'my-team'
+                      ? 'bg-purple-600 text-white'
+                      : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                  }`}
+                >
+                  我的球隊
+                </button>
+                <button
+                  onClick={() => {
+                    setPlayerSelectorSource('free-agents')
+                    if (freeAgents.length === 0) fetchFreeAgents()
+                  }}
+                  className={`px-3 py-1.5 rounded text-xs sm:text-sm font-semibold transition-colors ${
+                    playerSelectorSource === 'free-agents'
+                      ? 'bg-purple-600 text-white'
+                      : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                  }`}
+                >
+                  Free Agents
+                </button>
+                {allTeams && allTeams.length > 1 && (
+                  <button
+                    onClick={() => setPlayerSelectorSource('other-teams')}
+                    className={`px-3 py-1.5 rounded text-xs sm:text-sm font-semibold transition-colors ${
+                      playerSelectorSource === 'other-teams'
+                        ? 'bg-purple-600 text-white'
+                        : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                    }`}
+                  >
+                    其他球隊
+                  </button>
+                )}
+              </div>
+
+              {/* Player List */}
+              <div className="overflow-y-auto p-3 sm:p-4" style={{ maxHeight: 'calc(85vh - 180px)' }}>
+                {playerSelectorSource === 'my-team' && (
+                  <div className="space-y-2">
+                    {roster.map((player) => {
+                      const stats = playerStatsMap[player.name.full]
+                      if (player.player_key === comparePlayer1.player_key) return null // Don't show player 1
+
+                      return (
+                        <div
+                          key={player.player_key}
+                          onClick={() => handleSelectPlayer2({ ...player, stats })}
+                          className="bg-slate-700/50 border-2 border-slate-600 hover:border-purple-500 rounded p-2 sm:p-3 cursor-pointer transition-all"
+                        >
+                          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
+                                <span className="font-medium text-white text-sm sm:text-base truncate">{player.name.full}</span>
+                                {getInjuryStatusBadge(player)}
+                              </div>
+                              <div className="text-xs text-slate-400 mt-1">
+                                {player.eligible_positions?.join(', ')}
+                              </div>
+                            </div>
+                            {stats && (
+                              <div className="flex gap-2 text-xs">
+                                <div className="text-center">
+                                  <div className="text-blue-300 font-semibold">{stats.ppg.toFixed(1)}</div>
+                                  <div className="text-slate-400">PPG</div>
+                                </div>
+                                <div className="text-center">
+                                  <div className="text-green-300 font-semibold">{stats.rpg.toFixed(1)}</div>
+                                  <div className="text-slate-400">RPG</div>
+                                </div>
+                                <div className="text-center">
+                                  <div className="text-purple-300 font-semibold">{stats.apg.toFixed(1)}</div>
+                                  <div className="text-slate-400">APG</div>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
+
+                {playerSelectorSource === 'free-agents' && (
+                  <div className="space-y-2">
+                    {loadingFreeAgents && (
+                      <div className="text-center py-8">
+                        <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500"></div>
+                        <p className="text-purple-200 mt-2 text-sm">載入 Free Agents...</p>
+                      </div>
+                    )}
+                    {!loadingFreeAgents && freeAgents.map((player) => (
+                      <div
+                        key={player.player_key}
+                        onClick={() => handleSelectPlayer2(player)}
+                        className="bg-slate-700/50 border-2 border-slate-600 hover:border-purple-500 rounded p-2 sm:p-3 cursor-pointer transition-all"
+                      >
+                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
+                              <span className="font-medium text-white text-sm sm:text-base truncate">{player.name.full}</span>
+                              {getInjuryStatusBadge(player)}
+                            </div>
+                            <div className="text-xs text-slate-400 mt-1">
+                              {player.eligible_positions?.join(', ')}
+                            </div>
+                          </div>
+                          {player.stats && (
+                            <div className="flex gap-2 text-xs">
+                              <div className="text-center">
+                                <div className="text-blue-300 font-semibold">{player.stats.ppg.toFixed(1)}</div>
+                                <div className="text-slate-400">PPG</div>
+                              </div>
+                              <div className="text-center">
+                                <div className="text-green-300 font-semibold">{player.stats.rpg.toFixed(1)}</div>
+                                <div className="text-slate-400">RPG</div>
+                              </div>
+                              <div className="text-center">
+                                <div className="text-purple-300 font-semibold">{player.stats.apg.toFixed(1)}</div>
+                                <div className="text-slate-400">APG</div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {playerSelectorSource === 'other-teams' && allTeams && (
+                  <div className="space-y-3">
+                    {!selectedOtherTeam && (
+                      <div className="space-y-2">
+                        <p className="text-purple-300 text-sm mb-2">選擇一個球隊：</p>
+                        {allTeams.filter(t => t.team_key !== teamKey).map((team) => (
+                          <div
+                            key={team.team_key}
+                            onClick={() => {
+                              setSelectedOtherTeam(team.team_key)
+                              fetchOtherTeamRoster(team.team_key)
+                            }}
+                            className="bg-slate-700/50 border-2 border-slate-600 hover:border-purple-500 rounded p-3 cursor-pointer transition-all"
+                          >
+                            <div className="font-medium text-white text-sm sm:text-base">{team.name}</div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {selectedOtherTeam && (
+                      <>
+                        <button
+                          onClick={() => setSelectedOtherTeam('')}
+                          className="text-purple-300 hover:text-purple-100 text-xs sm:text-sm mb-3 flex items-center gap-1"
+                        >
+                          ← 返回選擇球隊
+                        </button>
+                        <div className="space-y-2">
+                          {otherTeamRosters[selectedOtherTeam]?.map((player) => {
+                            const stats = playerStatsMap[player.name.full]
+                            return (
+                              <div
+                                key={player.player_key}
+                                onClick={() => handleSelectPlayer2({ ...player, stats })}
+                                className="bg-slate-700/50 border-2 border-slate-600 hover:border-purple-500 rounded p-2 sm:p-3 cursor-pointer transition-all"
+                              >
+                                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">
+                                  <div className="flex-1 min-w-0">
+                                    <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
+                                      <span className="font-medium text-white text-sm sm:text-base truncate">{player.name.full}</span>
+                                      {getInjuryStatusBadge(player)}
+                                    </div>
+                                    <div className="text-xs text-slate-400 mt-1">
+                                      {player.eligible_positions?.join(', ')}
+                                    </div>
+                                  </div>
+                                  {stats && (
+                                    <div className="flex gap-2 text-xs">
+                                      <div className="text-center">
+                                        <div className="text-blue-300 font-semibold">{stats.ppg.toFixed(1)}</div>
+                                        <div className="text-slate-400">PPG</div>
+                                      </div>
+                                      <div className="text-center">
+                                        <div className="text-green-300 font-semibold">{stats.rpg.toFixed(1)}</div>
+                                        <div className="text-slate-400">RPG</div>
+                                      </div>
+                                      <div className="text-center">
+                                        <div className="text-purple-300 font-semibold">{stats.apg.toFixed(1)}</div>
+                                        <div className="text-slate-400">APG</div>
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            )
+                          })}
+                        </div>
+                      </>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         )}

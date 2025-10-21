@@ -917,11 +917,13 @@ export default function YahooConnect() {
       )}
 
       {/* Roster Manager Modal */}
-      {showRosterManager && myTeam && (
+      {showRosterManager && myTeam && selectedLeague && (
         <RosterManager
           teamKey={myTeam.team_key}
           teamName={myTeam.name}
+          leagueKey={selectedLeague.league_key}
           leagueSettings={leagueSettings}
+          allTeams={allTeams}
           onClose={() => setShowRosterManager(false)}
         />
       )}
