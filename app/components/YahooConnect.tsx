@@ -54,7 +54,9 @@ export default function YahooConnect() {
   const [error, setError] = useState<string | null>(null)
   const [showDebug, setShowDebug] = useState(false)
   const [debugData, setDebugData] = useState<string>('')
-  const [view, setView] = useState<'myteam' | 'allteams' | 'matchup'>('myteam')
+  const [view, setView] = useState<'myteam' | 'allteams' | 'matchup' | 'settings'>('myteam')
+  const [leagueSettings, setLeagueSettings] = useState<unknown>(null)
+  const [loadingSettings, setLoadingSettings] = useState(false)
 
   useEffect(() => {
     if (session?.accessToken) {
@@ -115,6 +117,9 @@ export default function YahooConnect() {
 
       // Fetch current week's matchup
       fetchMatchup(userTeam.team_key)
+
+      // Fetch league settings
+      fetchLeagueSettings(league.league_key)
     } catch (err: unknown) {
       setError((err as Error).message)
       console.error('Error fetching team data:', err)
@@ -189,6 +194,24 @@ export default function YahooConnect() {
       console.error('Error fetching matchup:', err)
     } finally {
       setLoadingMatchup(false)
+    }
+  }
+
+  const fetchLeagueSettings = async (leagueKey: string) => {
+    setLoadingSettings(true)
+    try {
+      const settingsResponse = await fetch(`/api/yahoo/settings?leagueKey=${leagueKey}`)
+      if (!settingsResponse.ok) {
+        console.warn('Failed to fetch league settings')
+        return
+      }
+      const settingsData = await settingsResponse.json()
+      console.log('League settings data:', settingsData)
+      setLeagueSettings(settingsData.settings || null)
+    } catch (err) {
+      console.error('Error fetching league settings:', err)
+    } finally {
+      setLoadingSettings(false)
     }
   }
 
@@ -311,7 +334,7 @@ export default function YahooConnect() {
 
               {/* Sub Navigation */}
               {myTeam && (
-                <div className="flex gap-2 mb-4">
+                <div className="flex gap-2 mb-4 flex-wrap">
                   <button
                     onClick={() => setView('myteam')}
                     className={`px-4 py-2 rounded text-sm font-semibold transition-colors ${
@@ -341,6 +364,16 @@ export default function YahooConnect() {
                     }`}
                   >
                     所有隊伍
+                  </button>
+                  <button
+                    onClick={() => setView('settings')}
+                    className={`px-4 py-2 rounded text-sm font-semibold transition-colors ${
+                      view === 'settings'
+                        ? 'bg-purple-600 text-white'
+                        : 'bg-slate-700 text-purple-200 hover:bg-slate-600'
+                    }`}
+                  >
+                    League 設定 ⚙️
                   </button>
                 </div>
               )}
@@ -519,6 +552,36 @@ export default function YahooConnect() {
                   {!loadingMatchup && !opponentTeam && (
                     <div className="bg-yellow-900/30 border border-yellow-500 rounded-lg p-3 text-sm text-yellow-200">
                       無法獲取本周對手資訊。可能還沒有安排對戰或賽季尚未開始。
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* League Settings View */}
+              {view === 'settings' && (
+                <div className="space-y-4">
+                  {loadingSettings && (
+                    <p className="text-purple-200">Loading league settings...</p>
+                  )}
+
+                  {!loadingSettings && leagueSettings && (
+                    <div className="space-y-4">
+                      <h4 className="font-semibold text-white text-lg mb-3">
+                        League 設定 ⚙️
+                      </h4>
+
+                      <div className="bg-slate-800/50 p-4 rounded">
+                        <h5 className="font-semibold text-white text-sm mb-3">Raw Settings Data</h5>
+                        <pre className="text-xs text-green-300 whitespace-pre-wrap break-words bg-slate-900/50 p-3 rounded overflow-x-auto">
+                          {JSON.stringify(leagueSettings, null, 2)}
+                        </pre>
+                      </div>
+                    </div>
+                  )}
+
+                  {!loadingSettings && !leagueSettings && (
+                    <div className="bg-yellow-900/30 border border-yellow-500 rounded-lg p-3 text-sm text-yellow-200">
+                      無法獲取 League 設定資訊。
                     </div>
                   )}
                 </div>
