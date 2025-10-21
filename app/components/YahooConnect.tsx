@@ -39,6 +39,22 @@ interface Player {
   }
 }
 
+interface PlayerStats {
+  name: string
+  team: string
+  position: string
+  gamesPlayed: number
+  ppg: number
+  rpg: number
+  apg: number
+  spg: number
+  bpg: number
+  tpg: number
+  fgPct: number
+  ftPct: number
+  threepm: number
+}
+
 export default function YahooConnect() {
   const { data: session, status } = useSession()
   const [leagues, setLeagues] = useState<League[]>([])
@@ -57,6 +73,8 @@ export default function YahooConnect() {
   const [view, setView] = useState<'myteam' | 'allteams' | 'matchup' | 'settings'>('myteam')
   const [leagueSettings, setLeagueSettings] = useState<unknown>(null)
   const [loadingSettings, setLoadingSettings] = useState(false)
+  const [playerStats, setPlayerStats] = useState<Record<string, PlayerStats>>({})
+  const [loadingStats, setLoadingStats] = useState(false)
 
   useEffect(() => {
     if (session?.accessToken) {
@@ -120,6 +138,9 @@ export default function YahooConnect() {
 
       // Fetch league settings
       fetchLeagueSettings(league.league_key)
+
+      // Fetch NBA stats
+      fetchNBAStats()
     } catch (err: unknown) {
       setError((err as Error).message)
       console.error('Error fetching team data:', err)
@@ -212,6 +233,24 @@ export default function YahooConnect() {
       console.error('Error fetching league settings:', err)
     } finally {
       setLoadingSettings(false)
+    }
+  }
+
+  const fetchNBAStats = async () => {
+    setLoadingStats(true)
+    try {
+      const statsResponse = await fetch('/api/nba/stats?season=2025')
+      if (!statsResponse.ok) {
+        console.warn('Failed to fetch NBA stats')
+        return
+      }
+      const statsData = await statsResponse.json()
+      console.log('NBA stats loaded:', statsData.count, 'players')
+      setPlayerStats(statsData.stats || {})
+    } catch (err) {
+      console.error('Error fetching NBA stats:', err)
+    } finally {
+      setLoadingStats(false)
     }
   }
 
@@ -397,26 +436,59 @@ export default function YahooConnect() {
 
                   {roster.length > 0 ? (
                     <div className="bg-slate-800/50 p-4 rounded">
-                      <h4 className="font-semibold text-white mb-3 text-lg">
-                        Roster ({roster.length} players)
+                      <h4 className="font-semibold text-white mb-3 text-lg flex items-center justify-between">
+                        <span>Roster ({roster.length} players)</span>
+                        {loadingStats && <span className="text-xs text-purple-300">Loading stats...</span>}
                       </h4>
                       <div className="space-y-2 max-h-96 overflow-y-auto">
-                        {roster.map((player, index) => (
-                          <div
-                            key={player.player_key || index}
-                            className="bg-slate-700/50 p-3 rounded hover:bg-slate-700/70 transition-colors"
-                          >
-                            <div className="font-medium text-white">{player.name?.full || 'Unknown Player'}</div>
-                            <div className="text-xs text-purple-200 mt-1">
-                              {player.eligible_positions?.join(', ') || 'No positions'}
-                              {player.selected_position && typeof player.selected_position === 'object' && 'position' in player.selected_position
-                                ? ` • Current: ${player.selected_position.position}`
-                                : player.selected_position && typeof player.selected_position === 'string'
-                                ? ` • Current: ${player.selected_position}`
-                                : ''}
+                        {roster.map((player, index) => {
+                          const stats = playerStats[player.name.full]
+                          return (
+                            <div
+                              key={player.player_key || index}
+                              className="bg-slate-700/50 p-3 rounded hover:bg-slate-700/70 transition-colors"
+                            >
+                              <div className="flex justify-between items-start">
+                                <div className="flex-1">
+                                  <div className="font-medium text-white">{player.name?.full || 'Unknown Player'}</div>
+                                  <div className="text-xs text-purple-200 mt-1">
+                                    {player.eligible_positions?.join(', ') || 'No positions'}
+                                    {player.selected_position && typeof player.selected_position === 'object' && 'position' in player.selected_position
+                                      ? ` • Current: ${player.selected_position.position}`
+                                      : player.selected_position && typeof player.selected_position === 'string'
+                                      ? ` • Current: ${player.selected_position}`
+                                      : ''}
+                                  </div>
+                                </div>
+                                {stats && (
+                                  <div className="flex gap-3 text-xs">
+                                    <div className="text-center">
+                                      <div className="text-blue-300 font-semibold">{stats.ppg.toFixed(1)}</div>
+                                      <div className="text-slate-400">PPG</div>
+                                    </div>
+                                    <div className="text-center">
+                                      <div className="text-green-300 font-semibold">{stats.rpg.toFixed(1)}</div>
+                                      <div className="text-slate-400">RPG</div>
+                                    </div>
+                                    <div className="text-center">
+                                      <div className="text-purple-300 font-semibold">{stats.apg.toFixed(1)}</div>
+                                      <div className="text-slate-400">APG</div>
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                              {stats && (
+                                <div className="mt-2 flex gap-3 text-xs border-t border-slate-600 pt-2">
+                                  <span className="text-yellow-300">{stats.spg.toFixed(1)} STL</span>
+                                  <span className="text-red-300">{stats.bpg.toFixed(1)} BLK</span>
+                                  <span className="text-cyan-300">{stats.threepm.toFixed(1)} 3PM</span>
+                                  <span className="text-slate-300">{(stats.fgPct * 100).toFixed(1)}% FG</span>
+                                  <span className="text-slate-300">{(stats.ftPct * 100).toFixed(1)}% FT</span>
+                                </div>
+                              )}
                             </div>
-                          </div>
-                        ))}
+                          )
+                        })}
                       </div>
                     </div>
                   ) : (
