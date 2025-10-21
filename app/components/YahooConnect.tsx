@@ -6,6 +6,7 @@ import PlayerCard from './PlayerCard'
 import TeamComparison from './TeamComparison'
 import MatchupStrategy from './MatchupStrategy'
 import FreeAgents from './FreeAgents'
+import AcquisitionRecommendations from './AcquisitionRecommendations'
 
 interface League {
   league_key: string
@@ -82,6 +83,7 @@ export default function YahooConnect() {
   const [selectedPlayer, setSelectedPlayer] = useState<{ name: string; key: string } | null>(null)
   const [showTeamComparison, setShowTeamComparison] = useState(false)
   const [showFreeAgents, setShowFreeAgents] = useState(false)
+  const [showRecommendations, setShowRecommendations] = useState(false)
 
   useEffect(() => {
     if (session?.accessToken) {
@@ -379,6 +381,15 @@ export default function YahooConnect() {
                   {selectedLeague.name}
                 </h3>
                 <div className="flex gap-2">
+                  <button
+                    onClick={() => setShowRecommendations(true)}
+                    className="px-4 py-2 bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white rounded-lg text-sm font-semibold transition-all flex items-center gap-2"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    補強建議
+                  </button>
                   <button
                     onClick={() => setShowFreeAgents(true)}
                     className="px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white rounded-lg text-sm font-semibold transition-all flex items-center gap-2"
@@ -881,6 +892,16 @@ export default function YahooConnect() {
           leagueKey={selectedLeague.league_key}
           myTeamKey={myTeam.team_key}
           onClose={() => setShowFreeAgents(false)}
+        />
+      )}
+
+      {/* Acquisition Recommendations Modal */}
+      {showRecommendations && selectedLeague && myTeam && (
+        <AcquisitionRecommendations
+          leagueKey={selectedLeague.league_key}
+          myTeamKey={myTeam.team_key}
+          myTeamName={myTeam.name}
+          onClose={() => setShowRecommendations(false)}
         />
       )}
     </div>
