@@ -383,8 +383,8 @@ export async function getAvailablePlayers(
   count?: number
 ) {
   try {
-    let url = `${YAHOO_FANTASY_API_BASE}/league/${leagueKey}/players;status=A` // A = Available
-    
+    let url = `${YAHOO_FANTASY_API_BASE}/league/${leagueKey}/players;status=A;sort=AR` // A = Available, sort by Average Rank
+
     if (position) {
       url += `;position=${position}`
     }
@@ -395,16 +395,84 @@ export async function getAvailablePlayers(
       url += `;count=${count}`
     }
 
+    url += '?format=json'
+
+    console.log('Fetching free agents from:', url)
+
     const response = await axios.get(url, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
+        Accept: 'application/json',
       },
     })
 
-    return response.data.fantasy_content?.league?.[1]?.players || []
+    console.log('Free agents response:', JSON.stringify(response.data, null, 2))
+
+    const league = response.data?.fantasy_content?.league
+    if (!league || !Array.isArray(league) || league.length < 2) {
+      console.log('Invalid league structure')
+      return []
+    }
+
+    const playersObj = league[1]?.players
+    if (!playersObj || typeof playersObj !== 'object') {
+      console.log('No players found')
+      return []
+    }
+
+    // players is an object like: {"0": {"player": [...]}, "count": 50}
+    const playerData: YahooPlayer[] = []
+    for (const key in playersObj) {
+      if (key === 'count') continue
+      const playerItem = playersObj[key]?.player
+      if (playerItem && Array.isArray(playerItem)) {
+        let playerInfo: Partial<YahooPlayer> & Record<string, unknown> = {}
+
+        if (Array.isArray(playerItem[0])) {
+          for (const prop of playerItem[0]) {
+            if (typeof prop === 'object' && prop !== null) {
+              playerInfo = { ...playerInfo, ...prop }
+            }
+          }
+        } else if (typeof playerItem[0] === 'object') {
+          playerInfo = playerItem[0] as Partial<YahooPlayer> & Record<string, unknown>
+        }
+
+        // Process eligible_positions
+        if (playerInfo.eligible_positions && Array.isArray(playerInfo.eligible_positions)) {
+          playerInfo.eligible_positions = playerInfo.eligible_positions.map((pos: unknown) => {
+            if (typeof pos === 'object' && pos !== null && 'position' in pos) {
+              return (pos as { position: string }).position
+            }
+            return typeof pos === 'string' ? pos : ''
+          }).filter(Boolean)
+        }
+
+        if (playerInfo.player_key) {
+          playerData.push(playerInfo as YahooPlayer)
+        }
+      }
+    }
+
+    console.log('Parsed free agents:', playerData.length)
+    return playerData
   } catch (error) {
     console.error('Error fetching available players:', error)
+    if (axios.isAxiosError(error)) {
+      console.error('Response data:', error.response?.data)
+    }
     throw error
   }
+}
+
+/**
+ * Fetch league free agents (wrapper for getAvailablePlayers)
+ */
+export async function getLeagueFreeAgents(
+  accessToken: string,
+  leagueKey: string,
+  position: string = '',
+  count: number = 50
+): Promise<YahooPlayer[]> {
+  return getAvailablePlayers(accessToken, leagueKey, position || undefined, 0, count)
 }
