@@ -468,7 +468,8 @@ export async function getAvailablePlayers(
 }
 
 /**
- * Fetch league free agents (wrapper for getAvailablePlayers)
+ * Fetch league free agents (wrapper for getAvailablePlayers with pagination)
+ * Yahoo API limits each request to 25 results, so we need to make multiple requests
  */
 export async function getLeagueFreeAgents(
   accessToken: string,
@@ -476,6 +477,46 @@ export async function getLeagueFreeAgents(
   position: string = '',
   count: number = 150
 ): Promise<YahooPlayer[]> {
-  // Increase default from 50 to 150
-  return getAvailablePlayers(accessToken, leagueKey, position || undefined, 0, count)
+  const allPlayers: YahooPlayer[] = []
+  const batchSize = 25 // Yahoo API limit per request
+  const numBatches = Math.ceil(count / batchSize)
+
+  console.log(`Fetching ${count} free agents in ${numBatches} batches of ${batchSize}`)
+
+  for (let i = 0; i < numBatches; i++) {
+    const start = i * batchSize
+    const batchCount = Math.min(batchSize, count - start)
+
+    console.log(`Fetching batch ${i + 1}/${numBatches}: start=${start}, count=${batchCount}`)
+
+    try {
+      const players = await getAvailablePlayers(
+        accessToken,
+        leagueKey,
+        position || undefined,
+        start,
+        batchCount
+      )
+
+      if (players.length === 0) {
+        console.log(`No more players available at start=${start}, stopping pagination`)
+        break // No more players available
+      }
+
+      allPlayers.push(...players)
+
+      // If we got fewer players than requested, we've reached the end
+      if (players.length < batchCount) {
+        console.log(`Received ${players.length} players (less than ${batchCount}), stopping pagination`)
+        break
+      }
+    } catch (error) {
+      console.error(`Error fetching batch ${i + 1}:`, error)
+      // Continue with what we have so far
+      break
+    }
+  }
+
+  console.log(`Total free agents fetched: ${allPlayers.length}`)
+  return allPlayers
 }

@@ -51,7 +51,6 @@ export default function FreeAgents({ leagueKey, myTeamKey, onClose }: FreeAgents
   const [sortBy, setSortBy] = useState<'name' | 'ppg' | 'rpg' | 'apg'>('ppg')
   const [selectedPlayer, setSelectedPlayer] = useState<PlayerWithStats | null>(null)
   const [hideInjured, setHideInjured] = useState(false)
-  const [myRoster, setMyRoster] = useState<Player[]>([])
 
   const positions = ['ALL', 'PG', 'SG', 'G', 'SF', 'PF', 'F', 'C', 'UTIL']
 
@@ -73,13 +72,6 @@ export default function FreeAgents({ leagueKey, myTeamKey, onClose }: FreeAgents
       if (statsResponse.ok) {
         const statsData = await statsResponse.json()
         setPlayerStatsMap(statsData.stats || {})
-      }
-
-      // Fetch my roster for comparison
-      const rosterResponse = await fetch(`/api/yahoo/roster?teamKey=${myTeamKey}`)
-      if (rosterResponse.ok) {
-        const rosterData = await rosterResponse.json()
-        setMyRoster(rosterData.roster || [])
       }
 
       // Fetch free agents from Yahoo (increased from 100 to 200)
@@ -201,55 +193,26 @@ export default function FreeAgents({ leagueKey, myTeamKey, onClose }: FreeAgents
     )
   }
 
-  const calculateTeamStats = (roster: Player[], statsMap: Record<string, PlayerStats>) => {
-    let totalPPG = 0, totalRPG = 0, totalAPG = 0, totalSPG = 0
-    let totalBPG = 0, total3PM = 0, totalFGPct = 0, totalFTPct = 0
-    let playerCount = 0
-
-    roster.forEach((player) => {
-      const stats = statsMap[player.name.full]
-      if (stats && stats.gamesPlayed >= 5) {
-        totalPPG += stats.ppg
-        totalRPG += stats.rpg
-        totalAPG += stats.apg
-        totalSPG += stats.spg
-        totalBPG += stats.bpg
-        total3PM += stats.threepm
-        totalFGPct += stats.fgPct
-        totalFTPct += stats.ftPct
-        playerCount++
-      }
-    })
-
-    return {
-      ppg: totalPPG,
-      rpg: totalRPG,
-      apg: totalAPG,
-      spg: totalSPG,
-      bpg: totalBPG,
-      threepm: total3PM,
-      fgPct: playerCount > 0 ? (totalFGPct / playerCount) * 100 : 0,
-      ftPct: playerCount > 0 ? (totalFTPct / playerCount) * 100 : 0,
-    }
-  }
-
-  const getRadarData = (currentStats: ReturnType<typeof calculateTeamStats>, withPlayer: ReturnType<typeof calculateTeamStats>) => {
+  const getPlayerRadarData = (stats: PlayerStats) => {
     const categories = [
-      { key: 'ppg', name: '得分', max: 150 },
-      { key: 'rpg', name: '籃板', max: 60 },
-      { key: 'apg', name: '助攻', max: 35 },
-      { key: 'spg', name: '抄截', max: 12 },
-      { key: 'bpg', name: '阻攻', max: 8 },
-      { key: 'threepm', name: '三分', max: 15 },
-      { key: 'fgPct', name: 'FG%', max: 50 },
-      { key: 'ftPct', name: 'FT%', max: 85 },
+      { key: 'ppg', name: '得分', max: 35 },
+      { key: 'rpg', name: '籃板', max: 15 },
+      { key: 'apg', name: '助攻', max: 12 },
+      { key: 'spg', name: '抄截', max: 3 },
+      { key: 'bpg', name: '阻攻', max: 3 },
+      { key: 'threepm', name: '三分', max: 5 },
+      { key: 'fgPct', name: 'FG%', max: 0.60 },
+      { key: 'ftPct', name: 'FT%', max: 0.95 },
     ]
 
-    return categories.map(cat => ({
-      category: cat.name,
-      當前: ((currentStats[cat.key as keyof typeof currentStats] / cat.max) * 100),
-      加入後: ((withPlayer[cat.key as keyof typeof withPlayer] / cat.max) * 100),
-    }))
+    return categories.map(cat => {
+      const value = stats[cat.key as keyof PlayerStats] as number
+      const normalizedValue = (value / cat.max) * 100
+      return {
+        category: cat.name,
+        數值: Math.min(normalizedValue, 100), // Cap at 100%
+      }
+    })
   }
 
   if (loading) {
@@ -566,45 +529,29 @@ export default function FreeAgents({ leagueKey, myTeamKey, onClose }: FreeAgents
                 </div>
               </div>
 
-              {/* Radar Chart - Team Stats Comparison */}
-              {myRoster.length > 0 && selectedPlayer.stats && (
+              {/* Radar Chart - Player Stats */}
+              {selectedPlayer.stats && (
                 <div className="mt-6 bg-slate-900/50 p-4 rounded border border-purple-500/30">
                   <h5 className="text-lg font-semibold text-purple-300 mb-4">
-                    加入後球隊數據變化
+                    球員能力雷達圖
                   </h5>
                   <ResponsiveContainer width="100%" height={400}>
-                    <RadarChart
-                      data={(() => {
-                        const currentTeamStats = calculateTeamStats(myRoster, playerStatsMap)
-                        const withPlayerStats = calculateTeamStats(
-                          [...myRoster, selectedPlayer as Player],
-                          { ...playerStatsMap, [selectedPlayer.name.full]: selectedPlayer.stats! }
-                        )
-                        return getRadarData(currentTeamStats, withPlayerStats)
-                      })()}
-                    >
+                    <RadarChart data={getPlayerRadarData(selectedPlayer.stats)}>
                       <PolarGrid stroke="#475569" />
                       <PolarAngleAxis dataKey="category" stroke="#94a3b8" tick={{ fill: '#94a3b8' }} />
                       <PolarRadiusAxis angle={90} domain={[0, 100]} stroke="#475569" />
                       <Radar
-                        name="當前"
-                        dataKey="當前"
-                        stroke="#22c55e"
-                        fill="#22c55e"
-                        fillOpacity={0.3}
-                      />
-                      <Radar
-                        name="加入後"
-                        dataKey="加入後"
-                        stroke="#3b82f6"
-                        fill="#3b82f6"
-                        fillOpacity={0.3}
+                        name={selectedPlayer.name.full}
+                        dataKey="數值"
+                        stroke="#8b5cf6"
+                        fill="#8b5cf6"
+                        fillOpacity={0.5}
                       />
                       <Legend />
                     </RadarChart>
                   </ResponsiveContainer>
                   <div className="mt-2 text-xs text-slate-400 text-center">
-                    雷達圖顯示球隊在各項統計類別的總和（綠色=當前，藍色=加入該球員後）
+                    雷達圖顯示球員在各項統計類別的相對能力（基於本賽季平均數據）
                   </div>
                 </div>
               )}
