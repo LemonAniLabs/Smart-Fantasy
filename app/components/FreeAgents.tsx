@@ -16,6 +16,8 @@ interface Player {
   }
   position_type: string
   eligible_positions: string[]
+  status?: string
+  injury_note?: string
 }
 
 interface PlayerStats {
@@ -47,6 +49,7 @@ export default function FreeAgents({ leagueKey, myTeamKey, onClose }: FreeAgents
   const [searchQuery, setSearchQuery] = useState('')
   const [sortBy, setSortBy] = useState<'name' | 'ppg' | 'rpg' | 'apg'>('ppg')
   const [selectedPlayer, setSelectedPlayer] = useState<PlayerWithStats | null>(null)
+  const [hideInjured, setHideInjured] = useState(false)
 
   const positions = ['ALL', 'PG', 'SG', 'G', 'SF', 'PF', 'F', 'C', 'UTIL']
 
@@ -58,7 +61,7 @@ export default function FreeAgents({ leagueKey, myTeamKey, onClose }: FreeAgents
   useEffect(() => {
     applyFilters()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [freeAgents, selectedPosition, searchQuery, sortBy, playerStatsMap])
+  }, [freeAgents, selectedPosition, searchQuery, sortBy, playerStatsMap, hideInjured])
 
   const fetchData = async () => {
     setLoading(true)
@@ -70,9 +73,9 @@ export default function FreeAgents({ leagueKey, myTeamKey, onClose }: FreeAgents
         setPlayerStatsMap(statsData.stats || {})
       }
 
-      // Fetch free agents from Yahoo
+      // Fetch free agents from Yahoo (increased from 100 to 200)
       const response = await fetch(
-        `/api/yahoo/freeagents?leagueKey=${leagueKey}&count=100`
+        `/api/yahoo/freeagents?leagueKey=${leagueKey}&count=200`
       )
 
       if (!response.ok) {
@@ -120,6 +123,15 @@ export default function FreeAgents({ leagueKey, myTeamKey, onClose }: FreeAgents
       )
     }
 
+    // Filter out injured players if hideInjured is true
+    if (hideInjured) {
+      filtered = filtered.filter((player) => {
+        const status = player.status?.toUpperCase()
+        // Filter out INJ, GTD, O (Out), DTD (Day-to-Day)
+        return !status || !['INJ', 'GTD', 'O', 'DTD', 'OUT'].includes(status)
+      })
+    }
+
     // Sort
     filtered.sort((a, b) => {
       if (sortBy === 'name') {
@@ -153,6 +165,31 @@ export default function FreeAgents({ leagueKey, myTeamKey, onClose }: FreeAgents
     if (value >= 30) return 'text-blue-400'
     if (value >= 20) return 'text-purple-400'
     return 'text-slate-400'
+  }
+
+  const isInjured = (player: Player): boolean => {
+    const status = player.status?.toUpperCase()
+    return status ? ['INJ', 'GTD', 'O', 'DTD', 'OUT'].includes(status) : false
+  }
+
+  const getInjuryStatusBadge = (player: Player) => {
+    if (!player.status) return null
+
+    const status = player.status.toUpperCase()
+    let bgColor = 'bg-red-600'
+    const textColor = 'text-white'
+
+    if (status === 'GTD') {
+      bgColor = 'bg-yellow-600'
+    } else if (status === 'DTD') {
+      bgColor = 'bg-orange-600'
+    }
+
+    return (
+      <span className={`px-2 py-0.5 ${bgColor} ${textColor} rounded text-xs font-bold`}>
+        {status}
+      </span>
+    )
   }
 
   if (loading) {
@@ -214,6 +251,16 @@ export default function FreeAgents({ leagueKey, myTeamKey, onClose }: FreeAgents
               <option value="apg">排序：助攻</option>
               <option value="name">排序：姓名</option>
             </select>
+            <button
+              onClick={() => setHideInjured(!hideInjured)}
+              className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors flex items-center gap-2 ${
+                hideInjured
+                  ? 'bg-green-600 text-white'
+                  : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+              }`}
+            >
+              {hideInjured ? '✓' : '✗'} 隱藏受傷
+            </button>
           </div>
 
           {/* Position Filter */}
@@ -244,10 +291,15 @@ export default function FreeAgents({ leagueKey, myTeamKey, onClose }: FreeAgents
             <div className="space-y-2">
               {filteredPlayers.map((player) => {
                 const value = getPlayerValue(player.stats)
+                const injured = isInjured(player)
                 return (
                   <div
                     key={player.player_key}
-                    className="bg-slate-800/50 p-4 rounded-lg hover:bg-slate-700/50 transition-colors border border-slate-700 hover:border-purple-500/50"
+                    className={`bg-slate-800/50 p-4 rounded-lg hover:bg-slate-700/50 transition-colors border-2 ${
+                      injured
+                        ? 'border-red-600 hover:border-red-500'
+                        : 'border-slate-700 hover:border-purple-500/50'
+                    }`}
                   >
                     <div className="flex justify-between items-start">
                       <div className="flex-1">
@@ -267,6 +319,7 @@ export default function FreeAgents({ leagueKey, myTeamKey, onClose }: FreeAgents
                                 {pos}
                               </span>
                             ))}
+                            {getInjuryStatusBadge(player)}
                           </div>
                         </div>
 

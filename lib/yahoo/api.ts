@@ -38,6 +38,8 @@ export interface YahooPlayer {
   position_type: string
   eligible_positions: string[]
   selected_position?: string
+  status?: string // Injury status: 'INJ', 'GTD', 'O', 'DTD', etc.
+  injury_note?: string
 }
 
 /**
@@ -472,7 +474,8 @@ export async function getLeagueFreeAgents(
   accessToken: string,
   leagueKey: string,
   position: string = '',
-  count: number = 50
+  count: number = 150
 ): Promise<YahooPlayer[]> {
+  // Increase default from 50 to 150
   return getAvailablePlayers(accessToken, leagueKey, position || undefined, 0, count)
 }

@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams
     const leagueKey = searchParams.get('leagueKey')
     const position = searchParams.get('position') || '' // Filter by position
-    const count = parseInt(searchParams.get('count') || '50')
+    const count = parseInt(searchParams.get('count') || '150') // Increase default from 50 to 150
 
     if (!leagueKey) {
       return NextResponse.json(

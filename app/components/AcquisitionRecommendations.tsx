@@ -193,47 +193,47 @@ export default function AcquisitionRecommendations({
   ): PlayerRecommendation[] => {
     const recs: PlayerRecommendation[] = []
 
-    // Get top 3 weaknesses
-    const topWeaknesses = weaknesses.filter((w) => w.rank === 'weak').slice(0, 3)
+    // Get weak and moderate weaknesses (not just weak)
+    const targetWeaknesses = weaknesses.filter((w) => w.rank === 'weak' || w.rank === 'moderate')
 
     freeAgents.forEach((player) => {
       const stats = statsMap[player.name.full]
-      if (!stats || stats.gamesPlayed < 10) return // Require minimum games
+      if (!stats || stats.gamesPlayed < 5) return // Lower minimum games requirement
 
       const strengthens: string[] = []
       let impactScore = 0
 
-      // Check which weaknesses this player addresses
-      topWeaknesses.forEach((weakness) => {
-        if (weakness.category.includes('得分') && stats.ppg > 15) {
+      // Check which weaknesses this player addresses (lower thresholds)
+      targetWeaknesses.forEach((weakness) => {
+        if (weakness.category.includes('得分') && stats.ppg > 10) { // Lower from 15 to 10
           strengthens.push('得分')
           impactScore += stats.ppg * 2
         }
-        if (weakness.category.includes('籃板') && stats.rpg > 7) {
+        if (weakness.category.includes('籃板') && stats.rpg > 5) { // Lower from 7 to 5
           strengthens.push('籃板')
           impactScore += stats.rpg * 3
         }
-        if (weakness.category.includes('助攻') && stats.apg > 5) {
+        if (weakness.category.includes('助攻') && stats.apg > 3) { // Lower from 5 to 3
           strengthens.push('助攻')
           impactScore += stats.apg * 4
         }
-        if (weakness.category.includes('抄截') && stats.spg > 1.2) {
+        if (weakness.category.includes('抄截') && stats.spg > 0.8) { // Lower from 1.2 to 0.8
           strengthens.push('抄截')
           impactScore += stats.spg * 8
         }
-        if (weakness.category.includes('阻攻') && stats.bpg > 1.0) {
+        if (weakness.category.includes('阻攻') && stats.bpg > 0.6) { // Lower from 1.0 to 0.6
           strengthens.push('阻攻')
           impactScore += stats.bpg * 8
         }
-        if (weakness.category.includes('三分球') && stats.threepm > 2) {
+        if (weakness.category.includes('三分球') && stats.threepm > 1.5) { // Lower from 2 to 1.5
           strengthens.push('三分')
           impactScore += stats.threepm * 3
         }
-        if (weakness.category.includes('投籃') && stats.fgPct > 0.48) {
+        if (weakness.category.includes('投籃') && stats.fgPct > 0.45) { // Lower from 0.48 to 0.45
           strengthens.push('FG%')
           impactScore += stats.fgPct * 50
         }
-        if (weakness.category.includes('罰球') && stats.ftPct > 0.80) {
+        if (weakness.category.includes('罰球') && stats.ftPct > 0.75) { // Lower from 0.80 to 0.75
           strengthens.push('FT%')
           impactScore += stats.ftPct * 40
         }
@@ -271,7 +271,7 @@ export default function AcquisitionRecommendations({
     })
 
     // Sort by impact score (descending)
-    return recs.sort((a, b) => b.impactScore - a.impactScore).slice(0, 20)
+    return recs.sort((a, b) => b.impactScore - a.impactScore).slice(0, 30) // Increase from 20 to 30
   }
 
   const getWeaknessColor = (rank: string) => {
