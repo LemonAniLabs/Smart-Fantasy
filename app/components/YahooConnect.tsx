@@ -564,7 +564,7 @@ export default function YahooConnect() {
                     <p className="text-purple-200">Loading league settings...</p>
                   )}
 
-                  {!loadingSettings && leagueSettings && (
+                  {!loadingSettings && leagueSettings ? (
                     <div className="space-y-4">
                       <h4 className="font-semibold text-white text-lg mb-3">
                         League 設定 ⚙️
@@ -577,7 +577,7 @@ export default function YahooConnect() {
                         </pre>
                       </div>
                     </div>
-                  )}
+                  ) : null}
 
                   {!loadingSettings && !leagueSettings && (
                     <div className="bg-yellow-900/30 border border-yellow-500 rounded-lg p-3 text-sm text-yellow-200">
