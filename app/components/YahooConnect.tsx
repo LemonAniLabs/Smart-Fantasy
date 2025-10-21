@@ -570,12 +570,166 @@ export default function YahooConnect() {
                         League 設定 ⚙️
                       </h4>
 
-                      <div className="bg-slate-800/50 p-4 rounded">
-                        <h5 className="font-semibold text-white text-sm mb-3">Raw Settings Data</h5>
-                        <pre className="text-xs text-green-300 whitespace-pre-wrap break-words bg-slate-900/50 p-3 rounded overflow-x-auto">
-                          {JSON.stringify(leagueSettings, null, 2)}
-                        </pre>
-                      </div>
+                      {(() => {
+                        const settings = Array.isArray(leagueSettings) ? leagueSettings[0] : leagueSettings as Record<string, unknown>
+                        const scoringType = settings.scoring_type === 'head' ? 'Head-to-Head' : settings.scoring_type as string
+                        const isAuction = settings.is_auction_draft === '1'
+                        const draftType = isAuction ? 'Auction Draft' : 'Snake Draft'
+
+                        // Parse stat categories
+                        const statCategoriesData = settings.stat_categories as { stats?: Array<{ stat: { enabled: string; display_name: string; is_only_display_stat?: string } }> } | undefined
+                        const enabledStats = statCategoriesData?.stats?.filter((s: { stat: { enabled: string; is_only_display_stat?: string } }) =>
+                          s.stat.enabled === '1' && s.stat.is_only_display_stat !== '1'
+                        ).map((s: { stat: { display_name: string } }) => s.stat.display_name) || []
+
+                        // Parse roster positions
+                        const rosterPositions = settings.roster_positions as Array<{ roster_position: { position: string; count: number | string; is_starting_position: number | string } }> | undefined
+                        const startingPositions = rosterPositions?.filter((r: { roster_position: { is_starting_position: number | string } }) =>
+                          r.roster_position.is_starting_position === 1 || r.roster_position.is_starting_position === '1'
+                        ) || []
+                        const benchPositions = rosterPositions?.filter((r: { roster_position: { is_starting_position: number | string } }) =>
+                          r.roster_position.is_starting_position === 0 || r.roster_position.is_starting_position === '0'
+                        ) || []
+
+                        return (
+                          <>
+                            {/* League Format */}
+                            <div className="bg-slate-800/50 p-4 rounded">
+                              <h5 className="font-semibold text-white text-sm mb-3 flex items-center gap-2">
+                                🏀 League 格式
+                              </h5>
+                              <div className="grid grid-cols-2 gap-3 text-sm">
+                                <div>
+                                  <div className="text-purple-300 text-xs">計分方式</div>
+                                  <div className="text-white font-medium">{scoringType}</div>
+                                </div>
+                                <div>
+                                  <div className="text-purple-300 text-xs">選秀類型</div>
+                                  <div className="text-white font-medium">{draftType}</div>
+                                </div>
+                                <div>
+                                  <div className="text-purple-300 text-xs">隊伍數量</div>
+                                  <div className="text-white font-medium">{settings.max_teams} Teams</div>
+                                </div>
+                                <div>
+                                  <div className="text-purple-300 text-xs">統計類別</div>
+                                  <div className="text-white font-medium">{enabledStats.length}-Cat</div>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Scoring Categories */}
+                            <div className="bg-slate-800/50 p-4 rounded">
+                              <h5 className="font-semibold text-white text-sm mb-3 flex items-center gap-2">
+                                📊 統計類別 ({enabledStats.length} Categories)
+                              </h5>
+                              <div className="flex flex-wrap gap-2">
+                                {enabledStats.map((stat: string, idx: number) => (
+                                  <span
+                                    key={idx}
+                                    className="bg-purple-900/50 border border-purple-600 px-3 py-1 rounded text-white text-sm font-medium"
+                                  >
+                                    {stat}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+
+                            {/* Roster Configuration */}
+                            <div className="bg-slate-800/50 p-4 rounded">
+                              <h5 className="font-semibold text-white text-sm mb-3 flex items-center gap-2">
+                                👥 Roster 配置
+                              </h5>
+                              <div className="space-y-3">
+                                <div>
+                                  <div className="text-purple-300 text-xs mb-2">先發位置</div>
+                                  <div className="flex flex-wrap gap-2">
+                                    {startingPositions.map((pos: { roster_position: { position: string; count: number | string } }, idx: number) => (
+                                      <span
+                                        key={idx}
+                                        className="bg-green-900/30 border border-green-600 px-3 py-1 rounded text-green-300 text-sm"
+                                      >
+                                        {pos.roster_position.position} × {pos.roster_position.count}
+                                      </span>
+                                    ))}
+                                  </div>
+                                </div>
+                                <div>
+                                  <div className="text-purple-300 text-xs mb-2">板凳 / 傷病名單</div>
+                                  <div className="flex flex-wrap gap-2">
+                                    {benchPositions.map((pos: { roster_position: { position: string; count: number | string } }, idx: number) => (
+                                      <span
+                                        key={idx}
+                                        className="bg-slate-700 border border-slate-500 px-3 py-1 rounded text-slate-300 text-sm"
+                                      >
+                                        {pos.roster_position.position} × {pos.roster_position.count}
+                                      </span>
+                                    ))}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Waiver & Trading */}
+                            <div className="bg-slate-800/50 p-4 rounded">
+                              <h5 className="font-semibold text-white text-sm mb-3 flex items-center gap-2">
+                                🔄 Waiver & 交易
+                              </h5>
+                              <div className="grid grid-cols-2 gap-3 text-sm">
+                                <div>
+                                  <div className="text-purple-300 text-xs">Waiver 類型</div>
+                                  <div className="text-white font-medium">
+                                    {settings.waiver_type === 'R' ? 'Rolling Waivers' : settings.waiver_type as string}
+                                  </div>
+                                </div>
+                                <div>
+                                  <div className="text-purple-300 text-xs">每週可加入人數</div>
+                                  <div className="text-white font-medium">{settings.max_weekly_adds}</div>
+                                </div>
+                                <div>
+                                  <div className="text-purple-300 text-xs">交易截止日</div>
+                                  <div className="text-white font-medium">{settings.trade_end_date as string}</div>
+                                </div>
+                                <div>
+                                  <div className="text-purple-300 text-xs">交易批准方式</div>
+                                  <div className="text-white font-medium">
+                                    {settings.trade_ratify_type === 'vote' ? 'League Vote' : settings.trade_ratify_type as string}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Playoff Settings */}
+                            <div className="bg-slate-800/50 p-4 rounded">
+                              <h5 className="font-semibold text-white text-sm mb-3 flex items-center gap-2">
+                                🏆 Playoff 設定
+                              </h5>
+                              <div className="grid grid-cols-2 gap-3 text-sm">
+                                <div>
+                                  <div className="text-purple-300 text-xs">Playoff 隊伍數</div>
+                                  <div className="text-white font-medium">{settings.num_playoff_teams} Teams</div>
+                                </div>
+                                <div>
+                                  <div className="text-purple-300 text-xs">開始週次</div>
+                                  <div className="text-white font-medium">Week {settings.playoff_start_week as string}</div>
+                                </div>
+                                <div>
+                                  <div className="text-purple-300 text-xs">安慰賽</div>
+                                  <div className="text-white font-medium">
+                                    {settings.has_playoff_consolation_games ? 'Yes' : 'No'}
+                                  </div>
+                                </div>
+                                <div>
+                                  <div className="text-purple-300 text-xs">Playoff 重新排序</div>
+                                  <div className="text-white font-medium">
+                                    {settings.uses_playoff_reseeding === 1 ? 'Yes' : 'No'}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </>
+                        )
+                      })()}
                     </div>
                   ) : null}
 
