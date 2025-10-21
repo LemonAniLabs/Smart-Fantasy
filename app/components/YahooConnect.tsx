@@ -2,6 +2,7 @@
 
 import { useSession, signIn, signOut } from 'next-auth/react'
 import { useState, useEffect } from 'react'
+import PlayerCard from './PlayerCard'
 
 interface League {
   league_key: string
@@ -75,6 +76,7 @@ export default function YahooConnect() {
   const [loadingSettings, setLoadingSettings] = useState(false)
   const [playerStats, setPlayerStats] = useState<Record<string, PlayerStats>>({})
   const [loadingStats, setLoadingStats] = useState(false)
+  const [selectedPlayer, setSelectedPlayer] = useState<{ name: string; key: string } | null>(null)
 
   useEffect(() => {
     if (session?.accessToken) {
@@ -450,7 +452,12 @@ export default function YahooConnect() {
                             >
                               <div className="flex justify-between items-start">
                                 <div className="flex-1">
-                                  <div className="font-medium text-white">{player.name?.full || 'Unknown Player'}</div>
+                                  <button
+                                    onClick={() => setSelectedPlayer({ name: player.name.full, key: player.player_key })}
+                                    className="font-medium text-white hover:text-purple-300 transition-colors text-left"
+                                  >
+                                    {player.name?.full || 'Unknown Player'}
+                                  </button>
                                   <div className="text-xs text-purple-200 mt-1">
                                     {player.eligible_positions?.join(', ') || 'No positions'}
                                     {player.selected_position && typeof player.selected_position === 'object' && 'position' in player.selected_position
@@ -821,6 +828,15 @@ export default function YahooConnect() {
             </p>
           )}
         </div>
+      )}
+
+      {/* Player Card Modal */}
+      {selectedPlayer && (
+        <PlayerCard
+          playerName={selectedPlayer.name}
+          yahooPlayerKey={selectedPlayer.key}
+          onClose={() => setSelectedPlayer(null)}
+        />
       )}
     </div>
   )
