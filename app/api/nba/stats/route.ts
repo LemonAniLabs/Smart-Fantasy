@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { fetchPlayerStats } from '@/lib/nba/api'
 
 // Cache player stats in memory (refreshes when server restarts)
-let statsCache: Map<string, { data: unknown; timestamp: number }> = new Map()
+const statsCache: Map<string, { data: unknown; timestamp: number }> = new Map()
 const CACHE_DURATION = 1000 * 60 * 60 * 24 // 24 hours
 
 /**
