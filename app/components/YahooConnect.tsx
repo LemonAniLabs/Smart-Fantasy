@@ -4,6 +4,7 @@ import { useSession, signIn, signOut } from 'next-auth/react'
 import { useState, useEffect } from 'react'
 import PlayerCard from './PlayerCard'
 import TeamComparison from './TeamComparison'
+import MatchupStrategy from './MatchupStrategy'
 
 interface League {
   league_key: string
@@ -589,7 +590,7 @@ export default function YahooConnect() {
                     <p className="text-purple-200">Loading matchup...</p>
                   )}
 
-                  {!loadingMatchup && opponentTeam && (
+                  {!loadingMatchup && opponentTeam && myTeam && (
                     <div>
                       <h4 className="font-semibold text-white text-lg mb-3">
                         本周對戰 🔥
@@ -600,12 +601,10 @@ export default function YahooConnect() {
                         <div className="flex-1 w-full bg-green-900/20 border-2 border-green-600 rounded-lg p-4">
                           <div className="text-center mb-2">
                             <div className="text-xs text-green-400 font-semibold">你的球隊</div>
-                            <div className="text-lg font-bold text-white mt-1">{myTeam?.name}</div>
+                            <div className="text-lg font-bold text-white mt-1">{myTeam.name}</div>
                           </div>
                           <button
-                            onClick={() => {
-                              if (myTeam) handleViewTeam(myTeam)
-                            }}
+                            onClick={() => handleViewTeam(myTeam)}
                             className="w-full bg-green-600 hover:bg-green-700 text-white text-sm py-2 rounded font-semibold mt-2"
                           >
                             查看我的 Roster
@@ -632,11 +631,13 @@ export default function YahooConnect() {
                         </div>
                       </div>
 
-                      <div className="mt-4 bg-slate-800/50 p-4 rounded">
-                        <h5 className="font-semibold text-white text-sm mb-2">戰略提示</h5>
-                        <p className="text-purple-200 text-sm">
-                          點擊「查看對手 Roster」來分析對手的球員陣容，找出他們的優勢和弱點，制定你的戰略！
-                        </p>
+                      <div className="mt-6">
+                        <MatchupStrategy
+                          myTeamKey={myTeam.team_key}
+                          myTeamName={myTeam.name}
+                          opponentTeamKey={opponentTeam.team_key}
+                          opponentTeamName={opponentTeam.name}
+                        />
                       </div>
                     </div>
                   )}
