@@ -7,6 +7,7 @@ import TeamComparison from './TeamComparison'
 import MatchupStrategy from './MatchupStrategy'
 import FreeAgents from './FreeAgents'
 import AcquisitionRecommendations from './AcquisitionRecommendations'
+import RosterManager from './RosterManager'
 
 interface League {
   league_key: string
@@ -84,6 +85,7 @@ export default function YahooConnect() {
   const [showTeamComparison, setShowTeamComparison] = useState(false)
   const [showFreeAgents, setShowFreeAgents] = useState(false)
   const [showRecommendations, setShowRecommendations] = useState(false)
+  const [showRosterManager, setShowRosterManager] = useState(false)
 
   useEffect(() => {
     if (session?.accessToken) {
@@ -380,7 +382,16 @@ export default function YahooConnect() {
                 <h3 className="text-lg font-semibold text-white">
                   {selectedLeague.name}
                 </h3>
-                <div className="flex gap-2">
+                <div className="flex gap-2 flex-wrap">
+                  <button
+                    onClick={() => setShowRosterManager(true)}
+                    className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-lg text-sm font-semibold transition-all flex items-center gap-2"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                    Roster 管理
+                  </button>
                   <button
                     onClick={() => setShowRecommendations(true)}
                     className="px-4 py-2 bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white rounded-lg text-sm font-semibold transition-all flex items-center gap-2"
@@ -902,6 +913,16 @@ export default function YahooConnect() {
           myTeamKey={myTeam.team_key}
           myTeamName={myTeam.name}
           onClose={() => setShowRecommendations(false)}
+        />
+      )}
+
+      {/* Roster Manager Modal */}
+      {showRosterManager && myTeam && (
+        <RosterManager
+          teamKey={myTeam.team_key}
+          teamName={myTeam.name}
+          leagueSettings={leagueSettings}
+          onClose={() => setShowRosterManager(false)}
         />
       )}
     </div>
