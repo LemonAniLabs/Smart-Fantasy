@@ -1,12 +1,14 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Legend, ResponsiveContainer } from 'recharts'
 
 interface AcquisitionRecommendationsProps {
   leagueKey: string
   myTeamKey: string
   myTeamName: string
   onClose: () => void
+  onOpenRosterManager?: () => void
 }
 
 interface Player {
@@ -56,12 +58,14 @@ export default function AcquisitionRecommendations({
   myTeamKey,
   myTeamName,
   onClose,
+  onOpenRosterManager,
 }: AcquisitionRecommendationsProps) {
   const [loading, setLoading] = useState(true)
   const [weaknesses, setWeaknesses] = useState<TeamWeakness[]>([])
   const [recommendations, setRecommendations] = useState<PlayerRecommendation[]>([])
   const [playerStatsMap, setPlayerStatsMap] = useState<Record<string, PlayerStats>>({})
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL')
+  const [selectedPlayer, setSelectedPlayer] = useState<PlayerRecommendation | null>(null)
 
   useEffect(() => {
     fetchRecommendations()
@@ -294,6 +298,28 @@ export default function AcquisitionRecommendations({
     return 'text-slate-400'
   }
 
+  const getPlayerRadarData = (stats: PlayerStats) => {
+    const categories = [
+      { key: 'ppg', name: '得分', max: 35 },
+      { key: 'rpg', name: '籃板', max: 15 },
+      { key: 'apg', name: '助攻', max: 12 },
+      { key: 'spg', name: '抄截', max: 3 },
+      { key: 'bpg', name: '阻攻', max: 3 },
+      { key: 'threepm', name: '三分', max: 5 },
+      { key: 'fgPct', name: 'FG%', max: 0.60 },
+      { key: 'ftPct', name: 'FT%', max: 0.95 },
+    ]
+
+    return categories.map((cat) => {
+      const value = stats[cat.key as keyof PlayerStats] as number
+      const normalizedValue = (value / cat.max) * 100
+      return {
+        category: cat.name,
+        數值: Math.min(normalizedValue, 100),
+      }
+    })
+  }
+
   if (loading) {
     return (
       <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -410,7 +436,8 @@ export default function AcquisitionRecommendations({
                 {filteredRecs.map((rec, idx) => (
                   <div
                     key={rec.player.player_key}
-                    className="bg-slate-700/50 p-4 rounded-lg border border-orange-500/30 hover:border-orange-500/60 transition-colors"
+                    onClick={() => setSelectedPlayer(rec)}
+                    className="bg-slate-700/50 p-4 rounded-lg border border-orange-500/30 hover:border-orange-500 transition-all cursor-pointer hover:shadow-lg hover:shadow-orange-500/20"
                   >
                     <div className="flex justify-between items-start mb-3">
                       <div className="flex-1">
@@ -507,6 +534,119 @@ export default function AcquisitionRecommendations({
             )}
           </div>
         </div>
+
+        {/* Player Detail Modal */}
+        {selectedPlayer && (
+          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 z-10">
+            <div className="bg-slate-800 rounded-lg w-full max-w-3xl max-h-[90vh] overflow-y-auto p-4 sm:p-6 border border-orange-500/30">
+              <div className="flex justify-between items-start mb-4">
+                <div>
+                  <h4 className="text-xl sm:text-2xl font-bold text-white">{selectedPlayer.player.name.full}</h4>
+                  <div className="flex gap-2 mt-2 flex-wrap">
+                    {selectedPlayer.player.eligible_positions?.map((pos, idx) => (
+                      <span
+                        key={idx}
+                        className="px-2 py-1 bg-blue-900/50 border border-blue-600 rounded text-blue-300 text-xs sm:text-sm"
+                      >
+                        {pos}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+                <button
+                  onClick={() => setSelectedPlayer(null)}
+                  className="text-orange-200 hover:text-white"
+                >
+                  <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              {/* Stats Grid */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+                <div className="bg-blue-900/20 border border-blue-600 p-3 rounded text-center">
+                  <div className="text-blue-300 text-xs sm:text-sm">得分</div>
+                  <div className="text-xl sm:text-2xl font-bold text-white">{selectedPlayer.stats.ppg.toFixed(1)}</div>
+                  <div className="text-xs text-slate-400">PPG</div>
+                </div>
+                <div className="bg-green-900/20 border border-green-600 p-3 rounded text-center">
+                  <div className="text-green-300 text-xs sm:text-sm">籃板</div>
+                  <div className="text-xl sm:text-2xl font-bold text-white">{selectedPlayer.stats.rpg.toFixed(1)}</div>
+                  <div className="text-xs text-slate-400">RPG</div>
+                </div>
+                <div className="bg-purple-900/20 border border-purple-600 p-3 rounded text-center">
+                  <div className="text-purple-300 text-xs sm:text-sm">助攻</div>
+                  <div className="text-xl sm:text-2xl font-bold text-white">{selectedPlayer.stats.apg.toFixed(1)}</div>
+                  <div className="text-xs text-slate-400">APG</div>
+                </div>
+                <div className="bg-orange-900/20 border border-orange-600 p-3 rounded text-center">
+                  <div className="text-orange-300 text-xs sm:text-sm">Fantasy Value</div>
+                  <div className="text-xl sm:text-2xl font-bold text-white">{selectedPlayer.fantasyValue.toFixed(1)}</div>
+                  <div className="text-xs text-slate-400">Overall</div>
+                </div>
+              </div>
+
+              {/* Radar Chart */}
+              <div className="bg-slate-900/50 p-3 sm:p-4 rounded border border-orange-500/30 mb-4">
+                <h5 className="text-base sm:text-lg font-semibold text-orange-300 mb-3">球員能力雷達圖</h5>
+                <ResponsiveContainer width="100%" height={300}>
+                  <RadarChart data={getPlayerRadarData(selectedPlayer.stats)}>
+                    <PolarGrid stroke="#475569" />
+                    <PolarAngleAxis dataKey="category" stroke="#94a3b8" tick={{ fill: '#94a3b8', fontSize: 12 }} />
+                    <PolarRadiusAxis angle={90} domain={[0, 100]} stroke="#475569" />
+                    <Radar
+                      name={selectedPlayer.player.name.full}
+                      dataKey="數值"
+                      stroke="#f97316"
+                      fill="#f97316"
+                      fillOpacity={0.5}
+                    />
+                    <Legend />
+                  </RadarChart>
+                </ResponsiveContainer>
+              </div>
+
+              {/* Strengthens */}
+              <div className="bg-orange-900/20 border border-orange-600/50 p-3 sm:p-4 rounded mb-4">
+                <div className="text-orange-400 font-semibold text-sm sm:text-base mb-2">補強優勢</div>
+                <div className="flex flex-wrap gap-2 mb-3">
+                  {selectedPlayer.strengthens.map((cat, i) => (
+                    <span
+                      key={i}
+                      className="px-2 py-1 bg-orange-600 text-white rounded text-xs sm:text-sm font-semibold"
+                    >
+                      {cat}
+                    </span>
+                  ))}
+                </div>
+                <div className="text-xs sm:text-sm text-slate-300">{selectedPlayer.reason}</div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+                {onOpenRosterManager && (
+                  <button
+                    onClick={() => {
+                      setSelectedPlayer(null)
+                      onClose()
+                      onOpenRosterManager()
+                    }}
+                    className="flex-1 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-sm font-semibold transition-colors"
+                  >
+                    前往 Roster Manager 比較
+                  </button>
+                )}
+                <button
+                  onClick={() => setSelectedPlayer(null)}
+                  className="flex-1 px-4 py-2 bg-slate-600 hover:bg-slate-700 text-white rounded-lg text-sm font-semibold transition-colors"
+                >
+                  關閉
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )

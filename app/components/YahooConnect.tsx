@@ -913,6 +913,10 @@ export default function YahooConnect() {
           myTeamKey={myTeam.team_key}
           myTeamName={myTeam.name}
           onClose={() => setShowRecommendations(false)}
+          onOpenRosterManager={() => {
+            setShowRecommendations(false)
+            setShowRosterManager(true)
+          }}
         />
       )}
 
