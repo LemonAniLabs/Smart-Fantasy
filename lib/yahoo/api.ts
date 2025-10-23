@@ -536,3 +536,160 @@ export async function getLeagueFreeAgents(
   console.log(`Total free agents fetched: ${allPlayers.length}`)
   return allPlayers
 }
+
+/**
+ * Fetch team's weekly stats for a specific week
+ * Returns the team's accumulated stats for that week
+ */
+export async function getTeamWeeklyStats(
+  accessToken: string,
+  teamKey: string,
+  week: number
+): Promise<Record<string, number>> {
+  try {
+    // Fetch team's matchup stats for the specified week
+    const url = `${YAHOO_FANTASY_API_BASE}/team/${teamKey}/matchups;weeks=${week}?format=json`
+
+    console.log('Fetching weekly stats from:', url)
+
+    const response = await axios.get(url, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        Accept: 'application/json',
+      },
+    })
+
+    console.log('Weekly stats response:', JSON.stringify(response.data, null, 2))
+
+    const team = response.data?.fantasy_content?.team
+    if (!team || !Array.isArray(team) || team.length < 2) {
+      console.log('Invalid team structure')
+      return {}
+    }
+
+    const matchupsObj = team[1]?.matchups
+    if (!matchupsObj || typeof matchupsObj !== 'object') {
+      console.log('No matchups found')
+      return {}
+    }
+
+    // Get the matchup for the specified week
+    const matchupData = matchupsObj['0']?.matchup || matchupsObj[0]?.matchup
+    if (!matchupData) {
+      console.log('No matchup data found')
+      return {}
+    }
+
+    // Find the team's stats within the matchup
+    // matchup[0] contains matchup info
+    // matchup[1] contains teams data: {"0": {"team": [...]}, "1": {"team": [...]}}
+    const teamsData = matchupData[1]
+    if (!teamsData || typeof teamsData !== 'object') {
+      console.log('No teams data in matchup')
+      return {}
+    }
+
+    // Find our team in the matchup
+    for (const key in teamsData) {
+      if (key === 'count') continue
+
+      const teamItem = teamsData[key]?.team
+      if (!teamItem || !Array.isArray(teamItem)) continue
+
+      // team[0] contains team info
+      let teamInfo: Record<string, unknown> = {}
+      if (Array.isArray(teamItem[0])) {
+        for (const prop of teamItem[0]) {
+          if (typeof prop === 'object' && prop !== null) {
+            Object.assign(teamInfo, prop)
+          }
+        }
+      } else if (typeof teamItem[0] === 'object') {
+        teamInfo = teamItem[0] as Record<string, unknown>
+      }
+
+      // Check if this is our team
+      if (teamInfo.team_key !== teamKey) continue
+
+      // team[1] contains team_stats
+      const teamStatsData = teamItem[1]?.team_stats
+      if (!teamStatsData || typeof teamStatsData !== 'object') {
+        console.log('No team_stats found')
+        continue
+      }
+
+      // Parse stats
+      // team_stats[1]?.stats contains the actual stats array
+      const statsData = teamStatsData[1] || teamStatsData['1'] || teamStatsData
+      const statsObj = statsData?.stats
+
+      if (!statsObj || typeof statsObj !== 'object') {
+        console.log('No stats object found')
+        continue
+      }
+
+      const stats: Record<string, number> = {}
+
+      // Parse stats array/object
+      for (const statKey in statsObj) {
+        if (statKey === 'count') continue
+
+        const statItem = statsObj[statKey]?.stat
+        if (!statItem) continue
+
+        let statInfo: Record<string, unknown> = {}
+        if (Array.isArray(statItem)) {
+          for (const prop of statItem) {
+            if (typeof prop === 'object' && prop !== null) {
+              Object.assign(statInfo, prop)
+            }
+          }
+        } else if (typeof statItem === 'object') {
+          statInfo = statItem as Record<string, unknown>
+        }
+
+        // Map stat_id to readable name
+        const statIdMap: Record<string, string> = {
+          '5': 'FGM',   // Field Goals Made
+          '8': 'FGA',   // Field Goals Attempted
+          '9': 'FG%',   // Field Goal Percentage
+          '6': 'FTM',   // Free Throws Made
+          '11': 'FTA',  // Free Throws Attempted
+          '10': 'FT%',  // Free Throw Percentage
+          '1': '3PTM',  // 3-pointers Made
+          '12': 'PTS',  // Points
+          '15': 'OREB', // Offensive Rebounds
+          '16': 'REB',  // Total Rebounds
+          '17': 'AST',  // Assists
+          '18': 'ST',   // Steals
+          '19': 'BLK',  // Blocks
+          '20': 'TO',   // Turnovers
+          '27': 'A/T',  // Assist/Turnover Ratio
+        }
+
+        const statId = String(statInfo.stat_id || '')
+        const statName = statIdMap[statId]
+        const statValue = parseFloat(String(statInfo.value || '0'))
+
+        if (statName) {
+          stats[statName] = statValue
+        }
+      }
+
+      return stats
+    }
+
+    return {}
+  } catch (error) {
+    console.error('Error fetching team weekly stats:', error)
+    if (axios.isAxiosError(error)) {
+      console.error('Response data:', error.response?.data)
+      if (error.response?.status === 401) {
+        const authError = new Error('Authentication failed. Please reconnect your Yahoo account.')
+        ;(authError as Error & { status: number }).status = 401
+        throw authError
+      }
+    }
+    throw error
+  }
+}

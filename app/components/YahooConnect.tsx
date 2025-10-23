@@ -8,6 +8,7 @@ import MatchupStrategy from './MatchupStrategy'
 import FreeAgents from './FreeAgents'
 import AcquisitionRecommendations from './AcquisitionRecommendations'
 import RosterManager from './RosterManager'
+import WeeklyMatchupComparison from './WeeklyMatchupComparison'
 
 interface League {
   league_key: string
@@ -86,6 +87,7 @@ export default function YahooConnect() {
   const [showFreeAgents, setShowFreeAgents] = useState(false)
   const [showRecommendations, setShowRecommendations] = useState(false)
   const [showRosterManager, setShowRosterManager] = useState(false)
+  const [showWeeklyComparison, setShowWeeklyComparison] = useState(false)
   const [authError, setAuthError] = useState(false)
 
   useEffect(() => {
@@ -479,6 +481,15 @@ export default function YahooConnect() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                     </svg>
                     球隊數據比較
+                  </button>
+                  <button
+                    onClick={() => setShowWeeklyComparison(true)}
+                    className="px-4 py-2 bg-gradient-to-r from-cyan-600 to-teal-600 hover:from-cyan-700 hover:to-teal-700 text-white rounded-lg text-sm font-semibold transition-all flex items-center gap-2"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    週數據對戰
                   </button>
                 </div>
               </div>
@@ -991,6 +1002,17 @@ export default function YahooConnect() {
           leagueSettings={leagueSettings}
           allTeams={allTeams}
           onClose={() => setShowRosterManager(false)}
+        />
+      )}
+
+      {/* Weekly Matchup Comparison Modal */}
+      {showWeeklyComparison && myTeam && selectedLeague && (
+        <WeeklyMatchupComparison
+          leagueKey={selectedLeague.league_key}
+          allTeams={allTeams}
+          myTeamKey={myTeam.team_key}
+          leagueSettings={leagueSettings}
+          onClose={() => setShowWeeklyComparison(false)}
         />
       )}
     </div>
