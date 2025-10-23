@@ -54,12 +54,15 @@ export default function WeeklyMatchupComparison({
 
   useEffect(() => {
     // Parse league stat categories
+    console.log('Parsing league settings:', leagueSettings)
     if (leagueSettings) {
       const settings = Array.isArray(leagueSettings) ? leagueSettings[0] : leagueSettings as Record<string, unknown>
       const statCategoriesData = settings.stat_categories as { stats?: Array<{ stat: { enabled: string; display_name: string; stat_id: number; is_only_display_stat?: string } }> } | undefined
       const enabledStats = statCategoriesData?.stats?.filter((s: { stat: { enabled: string; is_only_display_stat?: string } }) =>
         s.stat.enabled === '1' && s.stat.is_only_display_stat !== '1'
       ) || []
+
+      console.log('Enabled stats:', enabledStats)
 
       // Map stat names to simplified keys
       const statMapping: Record<string, { key: string; higherIsBetter: boolean }> = {
@@ -95,6 +98,7 @@ export default function WeeklyMatchupComparison({
         })
         .filter((c): c is StatCategory => c !== null)
 
+      console.log('Parsed stat categories:', categories)
       setStatCategories(categories)
     }
   }, [leagueSettings])
@@ -109,12 +113,19 @@ export default function WeeklyMatchupComparison({
     setLoading(true)
     try {
       const statsPromises = selectedTeams.map(async (teamKey) => {
+        console.log(`Fetching stats for team: ${teamKey}, week: ${selectedWeek}`)
         const response = await fetch(`/api/yahoo/weekly-stats?teamKey=${teamKey}&week=${selectedWeek}`)
+        console.log(`Response status for ${teamKey}:`, response.status)
+
         if (response.ok) {
           const data = await response.json()
+          console.log(`Stats data for ${teamKey}:`, data)
           return { teamKey, data: data.stats }
+        } else {
+          const errorData = await response.json().catch(() => ({ error: 'Unknown error' }))
+          console.error(`Failed to fetch stats for ${teamKey}:`, response.status, errorData)
+          return null
         }
-        return null
       })
 
       const results = await Promise.all(statsPromises)
@@ -133,6 +144,7 @@ export default function WeeklyMatchupComparison({
         }
       })
 
+      console.log('Final stats map:', statsMap)
       setWeeklyStats(statsMap)
     } catch (error) {
       console.error('Error fetching weekly stats:', error)
