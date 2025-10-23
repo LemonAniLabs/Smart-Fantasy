@@ -7,6 +7,7 @@ interface MatchupStrategyProps {
   myTeamName: string
   opponentTeamKey: string
   opponentTeamName: string
+  leagueSettings?: unknown
 }
 
 interface Player {
@@ -59,16 +60,98 @@ export default function MatchupStrategy({
   myTeamName,
   opponentTeamKey,
   opponentTeamName,
+  leagueSettings,
 }: MatchupStrategyProps) {
   const [loading, setLoading] = useState(true)
   const [myStats, setMyStats] = useState<TeamStats | null>(null)
   const [oppStats, setOppStats] = useState<TeamStats | null>(null)
   const [comparison, setComparison] = useState<CategoryComparison[]>([])
+  const [statCategories, setStatCategories] = useState<Array<{key: string, name: string, higherIsBetter: boolean}>>([])
 
   useEffect(() => {
-    fetchAnalysis()
+    // Parse league stat categories from settings
+    if (leagueSettings) {
+      const settings = Array.isArray(leagueSettings) ? leagueSettings[0] : leagueSettings as Record<string, unknown>
+      const statCategoriesData = settings.stat_categories as { stats?: Array<{ stat: { enabled: string; display_name: string; sort_order: string; is_only_display_stat?: string } }> } | undefined
+      const enabledStats = statCategoriesData?.stats?.filter((s: { stat: { enabled: string; is_only_display_stat?: string } }) =>
+        s.stat.enabled === '1' && s.stat.is_only_display_stat !== '1'
+      ) || []
+
+      // Map Yahoo stat names to our internal keys
+      const statMapping: Record<string, {key: string, higherIsBetter: boolean}> = {
+        'Points': { key: 'ppg', higherIsBetter: true },
+        'Rebounds': { key: 'rpg', higherIsBetter: true },
+        'Assists': { key: 'apg', higherIsBetter: true },
+        'Steals': { key: 'spg', higherIsBetter: true },
+        'Blocks': { key: 'bpg', higherIsBetter: true },
+        '3-pointers Made': { key: 'threepm', higherIsBetter: true },
+        'Turnovers': { key: 'tpg', higherIsBetter: false },
+        'Field Goal Percentage': { key: 'fgPct', higherIsBetter: true },
+        'Free Throw Percentage': { key: 'ftPct', higherIsBetter: true },
+        'FG%': { key: 'fgPct', higherIsBetter: true },
+        'FT%': { key: 'ftPct', higherIsBetter: true },
+        '3PM': { key: 'threepm', higherIsBetter: true },
+        'PTS': { key: 'ppg', higherIsBetter: true },
+        'REB': { key: 'rpg', higherIsBetter: true },
+        'AST': { key: 'apg', higherIsBetter: true },
+        'STL': { key: 'spg', higherIsBetter: true },
+        'BLK': { key: 'bpg', higherIsBetter: true },
+        'TO': { key: 'tpg', higherIsBetter: false },
+      }
+
+      const categories = enabledStats
+        .map((s: { stat: { display_name: string } }) => {
+          const displayName = s.stat.display_name
+          const mapped = statMapping[displayName]
+          if (mapped) {
+            return {
+              key: mapped.key,
+              name: displayName,
+              higherIsBetter: mapped.higherIsBetter
+            }
+          }
+          return null
+        })
+        .filter((c): c is {key: string, name: string, higherIsBetter: boolean} => c !== null)
+
+      if (categories.length > 0) {
+        setStatCategories(categories)
+      } else {
+        // Fallback to default 9-cat if parsing fails
+        setStatCategories([
+          { key: 'ppg', name: 'Points', higherIsBetter: true },
+          { key: 'rpg', name: 'Rebounds', higherIsBetter: true },
+          { key: 'apg', name: 'Assists', higherIsBetter: true },
+          { key: 'spg', name: 'Steals', higherIsBetter: true },
+          { key: 'bpg', name: 'Blocks', higherIsBetter: true },
+          { key: 'threepm', name: '3-pointers Made', higherIsBetter: true },
+          { key: 'tpg', name: 'Turnovers', higherIsBetter: false },
+          { key: 'fgPct', name: 'Field Goal Percentage', higherIsBetter: true },
+          { key: 'ftPct', name: 'Free Throw Percentage', higherIsBetter: true },
+        ])
+      }
+    } else {
+      // Fallback to default 9-cat if no settings provided
+      setStatCategories([
+        { key: 'ppg', name: 'Points', higherIsBetter: true },
+        { key: 'rpg', name: 'Rebounds', higherIsBetter: true },
+        { key: 'apg', name: 'Assists', higherIsBetter: true },
+        { key: 'spg', name: 'Steals', higherIsBetter: true },
+        { key: 'bpg', name: 'Blocks', higherIsBetter: true },
+        { key: 'threepm', name: '3-pointers Made', higherIsBetter: true },
+        { key: 'tpg', name: 'Turnovers', higherIsBetter: false },
+        { key: 'fgPct', name: 'Field Goal Percentage', higherIsBetter: true },
+        { key: 'ftPct', name: 'Free Throw Percentage', higherIsBetter: true },
+      ])
+    }
+  }, [leagueSettings])
+
+  useEffect(() => {
+    if (statCategories.length > 0) {
+      fetchAnalysis()
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [myTeamKey, opponentTeamKey])
+  }, [myTeamKey, opponentTeamKey, statCategories])
 
   const fetchAnalysis = async () => {
     setLoading(true)
@@ -159,19 +242,8 @@ export default function MatchupStrategy({
   }
 
   const generateComparison = (myTeam: TeamStats, oppTeam: TeamStats): CategoryComparison[] => {
-    const categories = [
-      { key: 'ppg', name: '得分 (PTS)', higherIsBetter: true },
-      { key: 'rpg', name: '籃板 (REB)', higherIsBetter: true },
-      { key: 'apg', name: '助攻 (AST)', higherIsBetter: true },
-      { key: 'spg', name: '抄截 (STL)', higherIsBetter: true },
-      { key: 'bpg', name: '阻攻 (BLK)', higherIsBetter: true },
-      { key: 'threepm', name: '三分球 (3PM)', higherIsBetter: true },
-      { key: 'tpg', name: '失誤 (TO)', higherIsBetter: false },
-      { key: 'fgPct', name: '投籃命中率 (FG%)', higherIsBetter: true },
-      { key: 'ftPct', name: '罰球命中率 (FT%)', higherIsBetter: true },
-    ]
-
-    return categories.map((cat) => {
+    // Use dynamic stat categories from league settings
+    return statCategories.map((cat) => {
       const myValue = myTeam[cat.key as keyof TeamStats]
       const oppValue = oppTeam[cat.key as keyof TeamStats]
       const difference = cat.higherIsBetter ? myValue - oppValue : oppValue - myValue

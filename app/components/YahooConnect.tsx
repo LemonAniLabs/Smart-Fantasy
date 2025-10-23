@@ -733,6 +733,7 @@ export default function YahooConnect() {
                           myTeamName={myTeam.name}
                           opponentTeamKey={opponentTeam.team_key}
                           opponentTeamName={opponentTeam.name}
+                          leagueSettings={leagueSettings}
                         />
                       </div>
                     </div>
