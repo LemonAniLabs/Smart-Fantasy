@@ -86,13 +86,17 @@ export default function WeeklyMatchupComparison({
       const categories = enabledStats
         .map((s: { stat: { display_name: string } }) => {
           const displayName = s.stat.display_name
+          console.log('Trying to map stat:', displayName)
           const mapped = statMapping[displayName]
           if (mapped) {
+            console.log('  ✓ Mapped to:', mapped.key)
             return {
               key: mapped.key,
               name: displayName,
               higherIsBetter: mapped.higherIsBetter,
             }
+          } else {
+            console.log('  ✗ No mapping found for:', displayName)
           }
           return null
         })
