@@ -31,6 +31,14 @@ interface PlayerStats {
   fgPct: number
   ftPct: number
   threepm: number
+  // Additional stats
+  fgm: number
+  fga: number
+  ftm: number
+  fta: number
+  oreb: number
+  dreb: number
+  atoratio: number
 }
 
 interface TeamStats {
@@ -43,6 +51,14 @@ interface TeamStats {
   tpg: number
   fgPct: number
   ftPct: number
+  // Additional stats
+  fgm: number
+  fga: number
+  ftm: number
+  fta: number
+  oreb: number
+  dreb: number
+  atoratio: number
 }
 
 interface CategoryComparison {
@@ -232,6 +248,13 @@ export default function MatchupStrategy({
     let totalTPG = 0
     let totalFGPct = 0
     let totalFTPct = 0
+    let totalFGM = 0
+    let totalFGA = 0
+    let totalFTM = 0
+    let totalFTA = 0
+    let totalOREB = 0
+    let totalDREB = 0
+    let totalATRatio = 0
     let playerCount = 0
 
     roster.forEach((player) => {
@@ -246,6 +269,13 @@ export default function MatchupStrategy({
         totalTPG += stats.tpg
         totalFGPct += stats.fgPct
         totalFTPct += stats.ftPct
+        totalFGM += stats.fgm
+        totalFGA += stats.fga
+        totalFTM += stats.ftm
+        totalFTA += stats.fta
+        totalOREB += stats.oreb
+        totalDREB += stats.dreb
+        totalATRatio += stats.atoratio
         playerCount++
       }
     })
@@ -260,6 +290,13 @@ export default function MatchupStrategy({
       tpg: totalTPG,
       fgPct: playerCount > 0 ? (totalFGPct / playerCount) * 100 : 0,
       ftPct: playerCount > 0 ? (totalFTPct / playerCount) * 100 : 0,
+      fgm: totalFGM,
+      fga: totalFGA,
+      ftm: totalFTM,
+      fta: totalFTA,
+      oreb: totalOREB,
+      dreb: totalDREB,
+      atoratio: playerCount > 0 ? totalATRatio / playerCount : 0,
     }
   }
 

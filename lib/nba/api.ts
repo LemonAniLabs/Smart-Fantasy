@@ -44,6 +44,14 @@ export interface PlayerAverages {
   fgPct: number
   ftPct: number
   threepm: number
+  // Additional stats
+  fgm: number // Field Goals Made per game
+  fga: number // Field Goals Attempted per game
+  ftm: number // Free Throws Made per game
+  fta: number // Free Throws Attempted per game
+  oreb: number // Offensive Rebounds per game
+  dreb: number // Defensive Rebounds per game
+  atoratio: number // Assist to Turnover ratio
 }
 
 /**
@@ -86,6 +94,9 @@ export async function fetchPlayerStats(season: string = '2025'): Promise<Map<str
 
             const gamesPlayed = player.games
 
+            const apg = player.assists / gamesPlayed
+            const tpg = player.turnovers / gamesPlayed
+
             const averages: PlayerAverages = {
               name: player.playerName,
               team: player.team,
@@ -93,13 +104,21 @@ export async function fetchPlayerStats(season: string = '2025'): Promise<Map<str
               gamesPlayed,
               ppg: player.points / gamesPlayed,
               rpg: player.totalRb / gamesPlayed,
-              apg: player.assists / gamesPlayed,
+              apg,
               spg: player.steals / gamesPlayed,
               bpg: player.blocks / gamesPlayed,
-              tpg: player.turnovers / gamesPlayed,
+              tpg,
               fgPct: player.fieldAttempts > 0 ? player.fieldGoals / player.fieldAttempts : 0,
               ftPct: player.ftAttempts > 0 ? player.ft / player.ftAttempts : 0,
               threepm: player.threeFg / gamesPlayed,
+              // Additional stats
+              fgm: player.fieldGoals / gamesPlayed,
+              fga: player.fieldAttempts / gamesPlayed,
+              ftm: player.ft / gamesPlayed,
+              fta: player.ftAttempts / gamesPlayed,
+              oreb: player.offensiveRb / gamesPlayed,
+              dreb: player.defensiveRb / gamesPlayed,
+              atoratio: tpg > 0 ? apg / tpg : apg, // A/T ratio
             }
 
             // Handle duplicates: keep entry with more games (current team)
