@@ -64,8 +64,10 @@ export default function WeeklyMatchupComparison({
 
       console.log('Enabled stats:', enabledStats)
 
-      // Map stat names to simplified keys
+      // Map stat names to properties
+      // Support both full names and abbreviated names
       const statMapping: Record<string, { key: string; higherIsBetter: boolean }> = {
+        // Full English names
         'Field Goals Made': { key: 'FGM', higherIsBetter: true },
         'Field Goals Attempted': { key: 'FGA', higherIsBetter: true },
         'Field Goal Percentage': { key: 'FG%', higherIsBetter: true },
@@ -81,6 +83,22 @@ export default function WeeklyMatchupComparison({
         'Blocks': { key: 'BLK', higherIsBetter: true },
         'Turnovers': { key: 'TO', higherIsBetter: false },
         'Assist/Turnover Ratio': { key: 'A/T', higherIsBetter: true },
+        // Abbreviated names (already in correct format)
+        'FGM': { key: 'FGM', higherIsBetter: true },
+        'FGA': { key: 'FGA', higherIsBetter: true },
+        'FG%': { key: 'FG%', higherIsBetter: true },
+        'FTM': { key: 'FTM', higherIsBetter: true },
+        'FTA': { key: 'FTA', higherIsBetter: true },
+        'FT%': { key: 'FT%', higherIsBetter: true },
+        '3PTM': { key: '3PTM', higherIsBetter: true },
+        'PTS': { key: 'PTS', higherIsBetter: true },
+        'OREB': { key: 'OREB', higherIsBetter: true },
+        'REB': { key: 'REB', higherIsBetter: true },
+        'AST': { key: 'AST', higherIsBetter: true },
+        'ST': { key: 'ST', higherIsBetter: true },
+        'BLK': { key: 'BLK', higherIsBetter: true },
+        'TO': { key: 'TO', higherIsBetter: false },
+        'A/T': { key: 'A/T', higherIsBetter: true },
       }
 
       const categories = enabledStats
