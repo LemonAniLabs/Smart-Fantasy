@@ -113,6 +113,12 @@ export async function getUserLeagues(accessToken: string, season?: string): Prom
     if (axios.isAxiosError(error)) {
       console.error('Response data:', error.response?.data)
       console.error('Response status:', error.response?.status)
+      // Preserve 401 status for proper error handling
+      if (error.response?.status === 401) {
+        const authError = new Error('Authentication failed. Please reconnect your Yahoo account.')
+        ;(authError as Error & { status: number }).status = 401
+        throw authError
+      }
     }
     throw error
   }
@@ -189,6 +195,11 @@ export async function getLeagueTeams(accessToken: string, leagueKey: string): Pr
     console.error('Error fetching league teams:', error)
     if (axios.isAxiosError(error)) {
       console.error('Response data:', error.response?.data)
+      if (error.response?.status === 401) {
+        const authError = new Error('Authentication failed. Please reconnect your Yahoo account.')
+        ;(authError as Error & { status: number }).status = 401
+        throw authError
+      }
     }
     throw error
   }
@@ -296,6 +307,11 @@ export async function getTeamRoster(accessToken: string, teamKey: string): Promi
     console.error('Error fetching team roster:', error)
     if (axios.isAxiosError(error)) {
       console.error('Response data:', error.response?.data)
+      if (error.response?.status === 401) {
+        const authError = new Error('Authentication failed. Please reconnect your Yahoo account.')
+        ;(authError as Error & { status: number }).status = 401
+        throw authError
+      }
     }
     throw error
   }

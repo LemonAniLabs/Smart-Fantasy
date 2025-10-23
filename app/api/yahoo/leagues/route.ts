@@ -22,9 +22,11 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ leagues })
   } catch (error: unknown) {
     console.error('Error in /api/yahoo/leagues:', error)
+    const err = error as Error & { status?: number }
+    const status = err.status === 401 ? 401 : 500
     return NextResponse.json(
-      { error: (error as Error).message || 'Failed to fetch leagues' },
-      { status: 500 }
+      { error: err.message || 'Failed to fetch leagues' },
+      { status }
     )
   }
 }
