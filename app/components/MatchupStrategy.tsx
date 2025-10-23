@@ -77,6 +77,9 @@ export default function MatchupStrategy({
         s.stat.enabled === '1' && s.stat.is_only_display_stat !== '1'
       ) || []
 
+      // Debug: Log actual stat names from Yahoo
+      console.log('League stat categories:', enabledStats.map((s: { stat: { display_name: string } }) => s.stat.display_name))
+
       // Map Yahoo stat names to our internal keys
       const statMapping: Record<string, {key: string, higherIsBetter: boolean}> = {
         'Points': { key: 'ppg', higherIsBetter: true },
@@ -97,7 +100,22 @@ export default function MatchupStrategy({
         'STL': { key: 'spg', higherIsBetter: true },
         'BLK': { key: 'bpg', higherIsBetter: true },
         'TO': { key: 'tpg', higherIsBetter: false },
+        // Additional variations
+        'ST': { key: 'spg', higherIsBetter: true },
+        '3PTM': { key: 'threepm', higherIsBetter: true },
+        'Field Goals Made': { key: 'fgm', higherIsBetter: true },
+        'FGM': { key: 'fgm', higherIsBetter: true },
+        'Free Throws Made': { key: 'ftm', higherIsBetter: true },
+        'FTM': { key: 'ftm', higherIsBetter: true },
+        'Offensive Rebounds': { key: 'oreb', higherIsBetter: true },
+        'OREB': { key: 'oreb', higherIsBetter: true },
+        'Defensive Rebounds': { key: 'dreb', higherIsBetter: true },
+        'DREB': { key: 'dreb', higherIsBetter: true },
+        'Assist/Turnover Ratio': { key: 'atoratio', higherIsBetter: true },
+        'A/T': { key: 'atoratio', higherIsBetter: true },
       }
+
+      console.log('Stat mapping keys:', Object.keys(statMapping))
 
       const categories = enabledStats
         .map((s: { stat: { display_name: string } }) => {
@@ -109,10 +127,14 @@ export default function MatchupStrategy({
               name: displayName,
               higherIsBetter: mapped.higherIsBetter
             }
+          } else {
+            console.warn(`Unmapped stat category: ${displayName}`)
           }
           return null
         })
         .filter((c): c is {key: string, name: string, higherIsBetter: boolean} => c !== null)
+
+      console.log('Parsed categories:', categories)
 
       if (categories.length > 0) {
         setStatCategories(categories)
