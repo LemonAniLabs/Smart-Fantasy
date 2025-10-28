@@ -313,9 +313,14 @@ export default function MatchupStrategy({
       } else {
         // Use Yahoo API for time range stats (only fetches roster players)
         console.log(`Fetching ${selectedTimeRange} stats from Yahoo API`)
+        console.log(`API URL: /api/yahoo/league-players?myTeamKey=${myTeamKey}&oppTeamKey=${opponentTeamKey}&range=${selectedTimeRange}`)
+
         const statsResponse = await fetch(`/api/yahoo/league-players?myTeamKey=${myTeamKey}&oppTeamKey=${opponentTeamKey}&range=${selectedTimeRange}`)
+        console.log(`API Response status: ${statsResponse.status}`)
+
         if (!statsResponse.ok) {
           const errorData = await statsResponse.json().catch(() => ({}))
+          console.error('API Error:', errorData)
 
           // Check if it's a rate limit error
           if (statsResponse.status === 429 || errorData.rateLimited) {
@@ -333,11 +338,30 @@ export default function MatchupStrategy({
           }
         } else {
           const statsDataResponse = await statsResponse.json()
+          console.log('Yahoo API Response:', {
+            cached: statsDataResponse.cached,
+            count: statsDataResponse.count,
+            range: statsDataResponse.range,
+            numWeeks: statsDataResponse.numWeeks,
+            statsKeys: Object.keys(statsDataResponse.stats || {}).length
+          })
+
           stats = statsDataResponse.stats || {}
-          rangeLabel = selectedTimeRange === 'last7' ? 'last 1 week averages' :
-                      selectedTimeRange === 'last14' ? 'last 2 weeks averages' :
-                      'last 4 weeks averages'
-          console.log(`Using ${rangeLabel} - loaded ${Object.keys(stats).length} players (cached: ${statsDataResponse.cached})`)
+
+          if (Object.keys(stats).length === 0) {
+            console.warn('Yahoo API returned empty stats, falling back to season averages')
+            const fallbackResponse = await fetch('/api/nba/stats?season=2025')
+            if (fallbackResponse.ok) {
+              const fallbackData = await fallbackResponse.json()
+              stats = fallbackData.stats || {}
+              rangeLabel = 'season averages (no data for time range)'
+            }
+          } else {
+            rangeLabel = selectedTimeRange === 'last7' ? 'last 1 week averages' :
+                        selectedTimeRange === 'last14' ? 'last 2 weeks averages' :
+                        'last 4 weeks averages'
+            console.log(`Using ${rangeLabel} - loaded ${Object.keys(stats).length} players (cached: ${statsDataResponse.cached})`)
+          }
         }
       }
 
