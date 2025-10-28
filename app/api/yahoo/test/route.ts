@@ -174,6 +174,71 @@ export async function GET(request: NextRequest) {
         }
       }
 
+      await new Promise(resolve => setTimeout(resolve, 200))
+
+      // Test 4: Player stats with type=date for today
+      console.log(`\n--- Test 4: Player Stats (type=date) ---`)
+      const today = new Date().toISOString().split('T')[0] // YYYY-MM-DD
+      const url4 = `${YAHOO_FANTASY_API_BASE}/player/${player.player_key}/stats;type=date;date=${today}?format=json`
+      console.log(`URL: ${url4}`)
+
+      try {
+        const response = await axios.get(url4, {
+          headers: {
+            Authorization: `Bearer ${session.accessToken}`,
+            Accept: 'application/json',
+          },
+        })
+
+        const playerData = response.data?.fantasy_content?.player
+        const stats = playerData?.[1]?.player_stats?.stats
+
+        playerResults.weeks['test4_date'] = {
+          description: `Player stats with type=date;date=${today}`,
+          url: url4,
+          status: response.status,
+          hasData: !!stats && Array.isArray(stats) && stats.length > 0,
+          statsCount: Array.isArray(stats) ? stats.length : 0,
+          rawStats: stats || null,
+          fullResponse: response.data
+        }
+      } catch (error) {
+        playerResults.weeks['test4_date'] = {
+          description: `Player stats with type=date;date=${today}`,
+          url: url4,
+          error: error instanceof Error ? error.message : String(error)
+        }
+      }
+
+      await new Promise(resolve => setTimeout(resolve, 200))
+
+      // Test 5: Try to get game logs
+      console.log(`\n--- Test 5: Player Stats (stats resource) ---`)
+      const url5 = `${YAHOO_FANTASY_API_BASE}/player/${player.player_key}/stats?format=json`
+      console.log(`URL: ${url5}`)
+
+      try {
+        const response = await axios.get(url5, {
+          headers: {
+            Authorization: `Bearer ${session.accessToken}`,
+            Accept: 'application/json',
+          },
+        })
+
+        playerResults.weeks['test5_stats'] = {
+          description: 'Player stats (default)',
+          url: url5,
+          status: response.status,
+          fullResponse: response.data
+        }
+      } catch (error) {
+        playerResults.weeks['test5_stats'] = {
+          description: 'Player stats (default)',
+          url: url5,
+          error: error instanceof Error ? error.message : String(error)
+        }
+      }
+
       results.push(playerResults)
 
       // Delay between players
