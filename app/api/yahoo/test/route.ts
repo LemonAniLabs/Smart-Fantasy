@@ -69,47 +69,109 @@ export async function GET(request: NextRequest) {
         weeks: {}
       }
 
-      // Test current week and previous 2 weeks
-      const weeksToTest = [currentWeek, currentWeek - 1, currentWeek - 2].filter(w => w >= 1)
+      // Test different API formats for week data
+      const week = currentWeek
 
-      for (const week of weeksToTest) {
-        console.log(`\n--- Testing Week ${week} ---`)
-        const url = `${YAHOO_FANTASY_API_BASE}/player/${player.player_key}/stats;type=week;week=${week}?format=json`
-        console.log(`URL: ${url}`)
+      // Test 1: Player stats with type=week
+      console.log(`\n--- Test 1: Player Weekly Stats (type=week;week=${week}) ---`)
+      const url1 = `${YAHOO_FANTASY_API_BASE}/player/${player.player_key}/stats;type=week;week=${week}?format=json`
+      console.log(`URL: ${url1}`)
 
-        try {
-          const response = await axios.get(url, {
-            headers: {
-              Authorization: `Bearer ${session.accessToken}`,
-              Accept: 'application/json',
-            },
-          })
+      try {
+        const response = await axios.get(url1, {
+          headers: {
+            Authorization: `Bearer ${session.accessToken}`,
+            Accept: 'application/json',
+          },
+        })
 
-          console.log(`Status: ${response.status}`)
-          console.log(`Response data:`, JSON.stringify(response.data, null, 2))
+        const playerData = response.data?.fantasy_content?.player
+        const stats = playerData?.[1]?.player_stats?.stats
 
-          // Extract the stats from Yahoo's nested structure
-          const playerData = response.data?.fantasy_content?.player
-          const stats = playerData?.[1]?.player_stats?.stats
-
-          playerResults.weeks[`week${week}`] = {
-            status: response.status,
-            hasData: !!stats && Array.isArray(stats) && stats.length > 0,
-            statsCount: Array.isArray(stats) ? stats.length : 0,
-            rawStats: stats || null,
-            fullResponse: response.data
-          }
-
-        } catch (error) {
-          console.error(`Error fetching week ${week}:`, error)
-          playerResults.weeks[`week${week}`] = {
-            status: axios.isAxiosError(error) ? error.response?.status : 'unknown',
-            error: error instanceof Error ? error.message : String(error)
-          }
+        playerResults.weeks['test1_type_week'] = {
+          description: 'Player stats with type=week;week=N',
+          url: url1,
+          status: response.status,
+          hasData: !!stats && Array.isArray(stats) && stats.length > 0,
+          statsCount: Array.isArray(stats) ? stats.length : 0,
+          rawStats: stats || null,
+          fullResponse: response.data
         }
+      } catch (error) {
+        playerResults.weeks['test1_type_week'] = {
+          description: 'Player stats with type=week;week=N',
+          url: url1,
+          error: error instanceof Error ? error.message : String(error)
+        }
+      }
 
-        // Small delay between requests
-        await new Promise(resolve => setTimeout(resolve, 100))
+      await new Promise(resolve => setTimeout(resolve, 200))
+
+      // Test 2: Player stats with type=lastweek
+      console.log(`\n--- Test 2: Player Stats (type=lastweek) ---`)
+      const url2 = `${YAHOO_FANTASY_API_BASE}/player/${player.player_key}/stats;type=lastweek?format=json`
+      console.log(`URL: ${url2}`)
+
+      try {
+        const response = await axios.get(url2, {
+          headers: {
+            Authorization: `Bearer ${session.accessToken}`,
+            Accept: 'application/json',
+          },
+        })
+
+        const playerData = response.data?.fantasy_content?.player
+        const stats = playerData?.[1]?.player_stats?.stats
+
+        playerResults.weeks['test2_lastweek'] = {
+          description: 'Player stats with type=lastweek',
+          url: url2,
+          status: response.status,
+          hasData: !!stats && Array.isArray(stats) && stats.length > 0,
+          statsCount: Array.isArray(stats) ? stats.length : 0,
+          rawStats: stats || null,
+          fullResponse: response.data
+        }
+      } catch (error) {
+        playerResults.weeks['test2_lastweek'] = {
+          description: 'Player stats with type=lastweek',
+          url: url2,
+          error: error instanceof Error ? error.message : String(error)
+        }
+      }
+
+      await new Promise(resolve => setTimeout(resolve, 200))
+
+      // Test 3: Player stats with type=season
+      console.log(`\n--- Test 3: Player Stats (type=season) ---`)
+      const url3 = `${YAHOO_FANTASY_API_BASE}/player/${player.player_key}/stats;type=season?format=json`
+      console.log(`URL: ${url3}`)
+
+      try {
+        const response = await axios.get(url3, {
+          headers: {
+            Authorization: `Bearer ${session.accessToken}`,
+            Accept: 'application/json',
+          },
+        })
+
+        const playerData = response.data?.fantasy_content?.player
+        const stats = playerData?.[1]?.player_stats?.stats
+
+        playerResults.weeks['test3_season'] = {
+          description: 'Player stats with type=season',
+          url: url3,
+          status: response.status,
+          hasData: !!stats && Array.isArray(stats) && stats.length > 0,
+          statsCount: Array.isArray(stats) ? stats.length : 0,
+          rawStats: stats || null
+        }
+      } catch (error) {
+        playerResults.weeks['test3_season'] = {
+          description: 'Player stats with type=season',
+          url: url3,
+          error: error instanceof Error ? error.message : String(error)
+        }
       }
 
       results.push(playerResults)
