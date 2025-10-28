@@ -142,6 +142,8 @@ export default function WeeklyMatchupComparison({
         if (response.ok) {
           const data = await response.json()
           console.log(`Stats data for ${teamKey}:`, data)
+          console.log(`Stats object for ${teamKey}:`, data.stats)
+          console.log(`Stats keys for ${teamKey}:`, data.stats ? Object.keys(data.stats) : 'no stats')
           return { teamKey, data: data.stats }
         } else {
           const errorData = await response.json().catch(() => ({ error: 'Unknown error' }))
@@ -157,16 +159,19 @@ export default function WeeklyMatchupComparison({
         if (result) {
           const team = allTeams.find((t) => t.team_key === result.teamKey)
           if (team) {
-            statsMap[result.teamKey] = {
+            const teamStats = {
               team_key: result.teamKey,
               team_name: team.name,
               stats: result.data || {},
             }
+            console.log(`Building stats for ${team.name}:`, teamStats)
+            statsMap[result.teamKey] = teamStats
           }
         }
       })
 
       console.log('Final stats map:', statsMap)
+      console.log('Final stats map keys:', Object.keys(statsMap))
       setWeeklyStats(statsMap)
     } catch (error) {
       console.error('Error fetching weekly stats:', error)
