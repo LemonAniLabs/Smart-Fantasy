@@ -16,6 +16,8 @@ interface Player {
   name: {
     full: string
   }
+  status?: string // Injury status: 'INJ', 'GTD', 'O', 'DTD', etc.
+  injury_note?: string
 }
 
 interface PlayerStats {
@@ -72,7 +74,7 @@ interface CategoryComparison {
   recommendation: string
 }
 
-type TimeRange = 'season' | 'week' | 'last7' | 'last14' | 'last30'
+type TimeRange = 'season' | 'last7' | 'last14' | 'last30'
 
 export default function MatchupStrategy({
   myTeamKey,
@@ -88,6 +90,8 @@ export default function MatchupStrategy({
   const [comparison, setComparison] = useState<CategoryComparison[]>([])
   const [statCategories, setStatCategories] = useState<Array<{key: string, name: string, higherIsBetter: boolean}>>([])
   const [selectedTimeRange, setSelectedTimeRange] = useState<TimeRange>('season')
+  const [myInjuredPlayers, setMyInjuredPlayers] = useState<Player[]>([])
+  const [oppInjuredPlayers, setOppInjuredPlayers] = useState<Player[]>([])
 
   useEffect(() => {
     // Parse league stat categories from settings
@@ -222,46 +226,46 @@ export default function MatchupStrategy({
       console.log('My roster:', myRoster.length, 'players')
       console.log('Opponent roster:', oppRoster.length, 'players')
 
-      let myTeamStats: TeamStats
-      let oppTeamStats: TeamStats
+      // Analyze injury status
+      const myInjured = myRoster.filter(p => p.status && p.status !== 'Healthy')
+      const oppInjured = oppRoster.filter(p => p.status && p.status !== 'Healthy')
 
-      if (selectedTimeRange === 'week') {
-        // Try to use weekly stats
-        console.log('Fetching weekly stats...')
-        const myWeeklyStats = await fetchRosterWeeklyStats(myRoster, currentWeek)
-        const oppWeeklyStats = await fetchRosterWeeklyStats(oppRoster, currentWeek)
+      setMyInjuredPlayers(myInjured)
+      setOppInjuredPlayers(oppInjured)
 
-        // Check if we got valid data
-        const myHasData = Object.keys(myWeeklyStats).length > 0
-        const oppHasData = Object.keys(oppWeeklyStats).length > 0
+      console.log('My injured players:', myInjured.length)
+      console.log('Opponent injured players:', oppInjured.length)
 
-        if (myHasData && oppHasData) {
-          myTeamStats = calculateTeamStatsFromWeekly(myWeeklyStats)
-          oppTeamStats = calculateTeamStatsFromWeekly(oppWeeklyStats)
-          console.log('Using weekly stats')
-        } else {
-          console.warn('Weekly stats returned empty, falling back to season averages')
-          // Fallback to season averages
-          const statsResponse = await fetch('/api/nba/stats?season=2025')
-          const statsData = await statsResponse.json()
-          const stats = statsData.stats || {}
-          myTeamStats = calculateTeamStats(myRoster, stats)
-          oppTeamStats = calculateTeamStats(oppRoster, stats)
-        }
-      } else {
-        // Use season averages (default)
-        console.log('Fetching season average stats...')
-        const statsResponse = await fetch('/api/nba/stats?season=2025')
-        if (!statsResponse.ok) {
-          throw new Error('Failed to fetch NBA stats')
-        }
-        const statsData = await statsResponse.json()
-        const stats = statsData.stats || {}
+      myInjured.forEach(p => {
+        console.log(`  - ${p.name.full}: ${p.status}${p.injury_note ? ` (${p.injury_note})` : ''}`)
+      })
 
-        myTeamStats = calculateTeamStats(myRoster, stats)
-        oppTeamStats = calculateTeamStats(oppRoster, stats)
-        console.log('Using season averages')
+      // Determine the range parameter for the API
+      let rangeParam = ''
+      if (selectedTimeRange === 'last7') {
+        rangeParam = '&range=last7Days'
+      } else if (selectedTimeRange === 'last14') {
+        rangeParam = '&range=last14Days'
+      } else if (selectedTimeRange === 'last30') {
+        rangeParam = '&range=last30Days'
       }
+
+      console.log(`Fetching stats for range: ${selectedTimeRange}`)
+      const statsResponse = await fetch(`/api/nba/stats?season=2025${rangeParam}`)
+      if (!statsResponse.ok) {
+        throw new Error('Failed to fetch NBA stats')
+      }
+      const statsData = await statsResponse.json()
+      const stats = statsData.stats || {}
+
+      const myTeamStats = calculateTeamStats(myRoster, stats)
+      const oppTeamStats = calculateTeamStats(oppRoster, stats)
+
+      const rangeLabel = selectedTimeRange === 'season' ? 'season averages' :
+                        selectedTimeRange === 'last7' ? 'last 7 days average' :
+                        selectedTimeRange === 'last14' ? 'last 14 days average' :
+                        'last 30 days average'
+      console.log(`Using ${rangeLabel}`)
 
       console.log('My team stats:', myTeamStats)
       console.log('Opponent team stats:', oppTeamStats)
@@ -548,8 +552,89 @@ export default function MatchupStrategy({
   const closeCategories = comparison.filter((c) => c.status === 'close')
   const losingCategories = comparison.filter((c) => c.status === 'losing')
 
+  // Get injury status badge color and label
+  const getInjuryBadge = (status: string) => {
+    switch (status) {
+      case 'GTD':
+        return { color: 'bg-yellow-600', label: 'GTD', textColor: 'text-yellow-200' }
+      case 'O':
+      case 'Out':
+        return { color: 'bg-red-600', label: 'O', textColor: 'text-red-200' }
+      case 'INJ':
+      case 'IL':
+        return { color: 'bg-red-700', label: 'INJ', textColor: 'text-red-200' }
+      case 'DTD':
+        return { color: 'bg-orange-600', label: 'DTD', textColor: 'text-orange-200' }
+      default:
+        return { color: 'bg-gray-600', label: status, textColor: 'text-gray-200' }
+    }
+  }
+
   return (
     <div className="space-y-6">
+      {/* Injury Alert */}
+      {(myInjuredPlayers.length > 0 || oppInjuredPlayers.length > 0) && (
+        <div className="bg-yellow-900/20 border border-yellow-600 rounded-lg p-4">
+          <h4 className="text-yellow-400 font-semibold mb-3 flex items-center gap-2">
+            ⚠️ 傷病警報
+          </h4>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* My injured players */}
+            {myInjuredPlayers.length > 0 && (
+              <div>
+                <div className="text-green-400 font-medium mb-2 text-sm">{myTeamName} ({myInjuredPlayers.length} 人)</div>
+                <div className="space-y-2">
+                  {myInjuredPlayers.map((player) => {
+                    const badge = getInjuryBadge(player.status || '')
+                    return (
+                      <div key={player.player_key} className="flex items-start gap-2 text-sm">
+                        <span className={`${badge.color} ${badge.textColor} px-2 py-0.5 rounded text-xs font-bold`}>
+                          {badge.label}
+                        </span>
+                        <div className="flex-1">
+                          <div className="text-white font-medium">{player.name.full}</div>
+                          {player.injury_note && (
+                            <div className="text-slate-400 text-xs mt-0.5">{player.injury_note}</div>
+                          )}
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Opponent injured players */}
+            {oppInjuredPlayers.length > 0 && (
+              <div>
+                <div className="text-red-400 font-medium mb-2 text-sm">{opponentTeamName} ({oppInjuredPlayers.length} 人)</div>
+                <div className="space-y-2">
+                  {oppInjuredPlayers.map((player) => {
+                    const badge = getInjuryBadge(player.status || '')
+                    return (
+                      <div key={player.player_key} className="flex items-start gap-2 text-sm">
+                        <span className={`${badge.color} ${badge.textColor} px-2 py-0.5 rounded text-xs font-bold`}>
+                          {badge.label}
+                        </span>
+                        <div className="flex-1">
+                          <div className="text-white font-medium">{player.name.full}</div>
+                          {player.injury_note && (
+                            <div className="text-slate-400 text-xs mt-0.5">{player.injury_note}</div>
+                          )}
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+          <div className="mt-3 text-xs text-yellow-300">
+            💡 提示：傷病球員的數據仍計入分析中。根據傷病狀況調整你的陣容策略。
+          </div>
+        </div>
+      )}
+
       {/* Overview */}
       <div className="bg-gradient-to-r from-purple-900/30 to-blue-900/30 p-6 rounded-lg border border-purple-500/30">
         <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
@@ -564,10 +649,9 @@ export default function MatchupStrategy({
               className="bg-slate-700 text-white px-3 py-2 rounded border border-slate-600 focus:border-purple-500 focus:outline-none text-sm"
             >
               <option value="season">賽季平均</option>
-              <option value="week">本週累計 (第 {currentWeek} 週)</option>
-              <option value="last7" disabled>近 7 天平均 (即將推出)</option>
-              <option value="last14" disabled>近 14 天平均 (即將推出)</option>
-              <option value="last30" disabled>近 30 天平均 (即將推出)</option>
+              <option value="last7">近 7 天平均</option>
+              <option value="last14">近 14 天平均</option>
+              <option value="last30">近 30 天平均</option>
             </select>
             <div className="bg-purple-600/30 border border-purple-500 px-4 py-2 rounded-lg">
               <span className="text-purple-200 text-sm">第 {currentWeek} 週</span>

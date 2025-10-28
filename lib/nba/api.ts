@@ -57,9 +57,24 @@ export interface PlayerAverages {
 /**
  * Fetch player stats from NBA Stats API
  * Returns season averages for all players
+ *
+ * @param season - Season year (e.g., '2025' for 2024-25 season)
+ * @param range - Time range filter (currently uses season data for all ranges)
+ *                'season', 'last7Days', 'last14Days', 'last30Days'
+ *
+ * Note: Time range filtering is not yet implemented in the current NBA API.
+ * All ranges currently return season averages. Will be enhanced in Phase 2.
  */
-export async function fetchPlayerStats(season: string = '2025'): Promise<Map<string, PlayerAverages>> {
+export async function fetchPlayerStats(
+  season: string = '2025',
+  range: string = 'season'
+): Promise<Map<string, PlayerAverages>> {
   const playerMap = new Map<string, PlayerAverages>()
+
+  // Log the range being used (for debugging)
+  if (range !== 'season') {
+    console.log(`Note: Time range '${range}' requested, but using season averages. Time range filtering will be implemented in Phase 2.`)
+  }
 
   try {
     let page = 1
