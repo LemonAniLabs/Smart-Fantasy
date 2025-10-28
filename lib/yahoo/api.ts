@@ -562,21 +562,26 @@ export async function getTeamWeeklyStats(
     console.log('Weekly stats response:', JSON.stringify(response.data, null, 2))
 
     const team = response.data?.fantasy_content?.team
+    console.log('Team object type:', Array.isArray(team) ? 'array' : typeof team)
+    console.log('Team length:', Array.isArray(team) ? team.length : 'not array')
     if (!team || !Array.isArray(team) || team.length < 2) {
-      console.log('Invalid team structure')
+      console.log('Invalid team structure - returning empty')
       return {}
     }
 
     const matchupsObj = team[1]?.matchups
+    console.log('Matchups object:', matchupsObj ? Object.keys(matchupsObj) : 'null')
     if (!matchupsObj || typeof matchupsObj !== 'object') {
-      console.log('No matchups found')
+      console.log('No matchups found - returning empty')
       return {}
     }
 
     // Get the matchup for the specified week
     const matchupData = matchupsObj['0']?.matchup || matchupsObj[0]?.matchup
+    console.log('Matchup data found:', !!matchupData)
+    console.log('Matchup data length:', Array.isArray(matchupData) ? matchupData.length : 'not array')
     if (!matchupData) {
-      console.log('No matchup data found')
+      console.log('No matchup data found - returning empty')
       return {}
     }
 
@@ -584,16 +589,19 @@ export async function getTeamWeeklyStats(
     // matchup[0] contains matchup info
     // matchup[1] contains teams data: {"0": {"team": [...]}, "1": {"team": [...]}}
     const teamsData = matchupData[1]
+    console.log('Teams data:', teamsData ? Object.keys(teamsData) : 'null')
     if (!teamsData || typeof teamsData !== 'object') {
-      console.log('No teams data in matchup')
+      console.log('No teams data in matchup - returning empty')
       return {}
     }
 
     // Find our team in the matchup
+    console.log(`Looking for team: ${teamKey}`)
     for (const key in teamsData) {
       if (key === 'count') continue
 
       const teamItem = teamsData[key]?.team
+      console.log(`Team item ${key}:`, teamItem ? 'exists' : 'null', Array.isArray(teamItem) ? `array length ${teamItem.length}` : typeof teamItem)
       if (!teamItem || !Array.isArray(teamItem)) continue
 
       // team[0] contains team info
@@ -608,27 +616,37 @@ export async function getTeamWeeklyStats(
         teamInfo = teamItem[0] as Record<string, unknown>
       }
 
+      console.log(`Team info for ${key}:`, teamInfo.team_key, teamInfo.team_key === teamKey ? '(MATCH!)' : '(not match)')
+
       // Check if this is our team
       if (teamInfo.team_key !== teamKey) continue
 
+      console.log(`Found target team! Extracting stats...`)
+
       // team[1] contains team_stats
       const teamStatsData = teamItem[1]?.team_stats
+      console.log('team_stats exists:', !!teamStatsData)
+      console.log('team_stats keys:', teamStatsData ? Object.keys(teamStatsData) : 'null')
       if (!teamStatsData || typeof teamStatsData !== 'object') {
-        console.log('No team_stats found')
+        console.log('No team_stats found - skipping')
         continue
       }
 
       // Parse stats
       // team_stats[1]?.stats contains the actual stats array
       const statsData = teamStatsData[1] || teamStatsData['1'] || teamStatsData
+      console.log('statsData keys:', statsData ? Object.keys(statsData) : 'null')
       const statsObj = statsData?.stats
+      console.log('statsObj exists:', !!statsObj)
+      console.log('statsObj keys:', statsObj ? Object.keys(statsObj) : 'null')
 
       if (!statsObj || typeof statsObj !== 'object') {
-        console.log('No stats object found')
+        console.log('No stats object found - skipping')
         continue
       }
 
       const stats: Record<string, number> = {}
+      let statsCount = 0
 
       // Parse stats array/object
       for (const statKey in statsObj) {
@@ -673,12 +691,17 @@ export async function getTeamWeeklyStats(
 
         if (statName) {
           stats[statName] = statValue
+          statsCount++
+          console.log(`  Mapped stat ${statId} -> ${statName}: ${statValue}`)
         }
       }
 
+      console.log(`Total stats extracted: ${statsCount}`)
+      console.log(`Final stats object:`, stats)
       return stats
     }
 
+    console.log('No matching team found - returning empty')
     return {}
   } catch (error) {
     console.error('Error fetching team weekly stats:', error)
