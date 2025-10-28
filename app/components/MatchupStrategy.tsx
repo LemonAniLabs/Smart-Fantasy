@@ -296,23 +296,47 @@ export default function MatchupStrategy({
         console.log(`  - ${p.name.full}: ${p.status}${p.injury_note ? ` (${p.injury_note})` : ''}`)
       })
 
-      // Determine the range parameter for the API
-      let rangeParam = ''
-      if (selectedTimeRange === 'last7') {
-        rangeParam = '&range=last7Days'
-      } else if (selectedTimeRange === 'last14') {
-        rangeParam = '&range=last14Days'
-      } else if (selectedTimeRange === 'last30') {
-        rangeParam = '&range=last30Days'
+      let stats: Record<string, PlayerStats> = {}
+      let rangeLabel = ''
+
+      // Determine data source based on time range
+      if (selectedTimeRange === 'season') {
+        // Use NBA API for season averages
+        console.log('Fetching season stats from NBA API')
+        const statsResponse = await fetch('/api/nba/stats?season=2025')
+        if (!statsResponse.ok) {
+          throw new Error('Failed to fetch NBA stats')
+        }
+        const statsDataResponse = await statsResponse.json()
+        stats = statsDataResponse.stats || {}
+        rangeLabel = 'season averages'
+      } else {
+        // Use Yahoo API for recent weeks
+        const weeksMap: Record<string, number> = {
+          'last7': 1,   // ~7 days = 1 week
+          'last14': 2,  // ~14 days = 2 weeks
+          'last30': 4,  // ~30 days = 4 weeks
+        }
+
+        const numWeeks = weeksMap[selectedTimeRange] || 1
+        console.log(`Fetching stats for last ${numWeeks} week(s) from Yahoo API`)
+
+        // Fetch weekly stats for both teams
+        const [myWeeklyStats, oppWeeklyStats] = await Promise.all([
+          fetchRosterMultiWeekStats(myRosterPlayers, currentWeek, numWeeks),
+          fetchRosterMultiWeekStats(oppRosterPlayers, currentWeek, numWeeks),
+        ])
+
+        // Merge into single stats map
+        stats = { ...myWeeklyStats, ...oppWeeklyStats }
+
+        rangeLabel = selectedTimeRange === 'last7' ? 'last week average' :
+                     selectedTimeRange === 'last14' ? 'last 2 weeks average' :
+                     'last 4 weeks average'
       }
 
-      console.log(`Fetching stats for range: ${selectedTimeRange}`)
-      const statsResponse = await fetch(`/api/nba/stats?season=2025${rangeParam}`)
-      if (!statsResponse.ok) {
-        throw new Error('Failed to fetch NBA stats')
-      }
-      const statsDataResponse = await statsResponse.json()
-      const stats = statsDataResponse.stats || {}
+      console.log(`Using ${rangeLabel}`)
+      console.log(`Stats loaded for ${Object.keys(stats).length} players`)
 
       // Cache stats data for recalculation
       setStatsData(stats)
@@ -320,12 +344,6 @@ export default function MatchupStrategy({
       // Calculate team stats with current exclusion settings
       const myTeamStats = calculateTeamStats(myRosterPlayers, stats, excludeAllInjured, excludedPlayerKeys)
       const oppTeamStats = calculateTeamStats(oppRosterPlayers, stats, excludeAllInjured, excludedPlayerKeys)
-
-      const rangeLabel = selectedTimeRange === 'season' ? 'season averages' :
-                        selectedTimeRange === 'last7' ? 'last 7 days average' :
-                        selectedTimeRange === 'last14' ? 'last 14 days average' :
-                        'last 30 days average'
-      console.log(`Using ${rangeLabel}`)
 
       console.log('My team stats:', myTeamStats)
       console.log('Opponent team stats:', oppTeamStats)
@@ -344,7 +362,114 @@ export default function MatchupStrategy({
   }
 
   /**
-   * Fetch weekly stats for all players in a roster
+   * Fetch and aggregate weekly stats for multiple weeks
+   */
+  const fetchRosterMultiWeekStats = async (
+    roster: Player[],
+    currentWeek: number,
+    numWeeks: number
+  ): Promise<Record<string, PlayerStats>> => {
+    const playerStatsMap: Record<string, PlayerStats> = {}
+
+    // Fetch stats for each player across multiple weeks
+    const allPromises = roster.map(async (player) => {
+      const weeklyStatsArray: Record<string, number>[] = []
+
+      // Fetch stats for the last N weeks
+      for (let i = 0; i < numWeeks; i++) {
+        const weekNum = currentWeek - i
+        if (weekNum < 1) break // Don't go before week 1
+
+        try {
+          const response = await fetch(`/api/yahoo/player-gamelogs?playerKey=${player.player_key}&week=${weekNum}`)
+          if (response.ok) {
+            const data = await response.json()
+            if (data.stats && Object.keys(data.stats).length > 0) {
+              weeklyStatsArray.push(data.stats)
+            }
+          }
+        } catch {
+          console.warn(`Failed to fetch week ${weekNum} stats for ${player.name.full}`)
+        }
+      }
+
+      // Aggregate stats from all weeks
+      if (weeklyStatsArray.length > 0) {
+        const aggregated = {
+          name: player.name.full,
+          team: '',
+          position: '',
+          gamesPlayed: weeklyStatsArray.length, // Number of weeks with data
+          ppg: 0,
+          rpg: 0,
+          apg: 0,
+          spg: 0,
+          bpg: 0,
+          tpg: 0,
+          fgPct: 0,
+          ftPct: 0,
+          threepm: 0,
+          fgm: 0,
+          fga: 0,
+          ftm: 0,
+          fta: 0,
+          oreb: 0,
+          dreb: 0,
+          atoratio: 0,
+        }
+
+        let totalFGM = 0, totalFGA = 0, totalFTM = 0, totalFTA = 0
+
+        weeklyStatsArray.forEach(stats => {
+          aggregated.ppg += stats['PTS'] || 0
+          aggregated.rpg += stats['REB'] || 0
+          aggregated.apg += stats['AST'] || 0
+          aggregated.spg += stats['ST'] || 0
+          aggregated.bpg += stats['BLK'] || 0
+          aggregated.tpg += stats['TO'] || 0
+          aggregated.threepm += stats['3PTM'] || 0
+          totalFGM += stats['FGM'] || 0
+          totalFGA += stats['FGA'] || 0
+          totalFTM += stats['FTM'] || 0
+          totalFTA += stats['FTA'] || 0
+          aggregated.oreb += stats['OREB'] || 0
+        })
+
+        // Calculate averages (total / number of weeks)
+        const weeks = weeklyStatsArray.length
+        aggregated.ppg /= weeks
+        aggregated.rpg /= weeks
+        aggregated.apg /= weeks
+        aggregated.spg /= weeks
+        aggregated.bpg /= weeks
+        aggregated.tpg /= weeks
+        aggregated.threepm /= weeks
+        aggregated.oreb /= weeks
+
+        // Calculate percentages from totals
+        aggregated.fgPct = totalFGA > 0 ? totalFGM / totalFGA : 0
+        aggregated.ftPct = totalFTA > 0 ? totalFTM / totalFTA : 0
+        aggregated.fgm = totalFGM / weeks
+        aggregated.fga = totalFGA / weeks
+        aggregated.ftm = totalFTM / weeks
+        aggregated.fta = totalFTA / weeks
+        aggregated.dreb = aggregated.rpg - aggregated.oreb
+        aggregated.atoratio = aggregated.tpg > 0 ? aggregated.apg / aggregated.tpg : aggregated.apg
+
+        playerStatsMap[player.name.full] = aggregated
+      }
+
+      return player.name.full
+    })
+
+    await Promise.all(allPromises)
+
+    console.log(`Aggregated stats for ${Object.keys(playerStatsMap).length} players from ${numWeeks} weeks`)
+    return playerStatsMap
+  }
+
+  /**
+   * Fetch weekly stats for all players in a roster (single week)
    */
   const fetchRosterWeeklyStats = async (roster: Player[], week: number): Promise<Record<string, Record<string, number>>> => {
     const statsPromises = roster.map(async (player) => {
@@ -758,9 +883,9 @@ export default function MatchupStrategy({
               className="bg-slate-700 text-white px-3 py-2 rounded border border-slate-600 focus:border-purple-500 focus:outline-none text-sm"
             >
               <option value="season">賽季平均</option>
-              <option value="last7">近 7 天平均</option>
-              <option value="last14">近 14 天平均</option>
-              <option value="last30">近 30 天平均</option>
+              <option value="last7">最近 1 週</option>
+              <option value="last14">最近 2 週</option>
+              <option value="last30">最近 4 週</option>
             </select>
             <div className="bg-purple-600/30 border border-purple-500 px-4 py-2 rounded-lg">
               <span className="text-purple-200 text-sm">第 {currentWeek} 週</span>
