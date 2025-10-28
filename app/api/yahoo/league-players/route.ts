@@ -1,15 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
-import { getLeaguePlayersStats, getLeagueMetadata } from '@/lib/yahoo/api'
+import { getRosterPlayersStats, getLeagueMetadata, getTeamRoster } from '@/lib/yahoo/api'
 
 // Cache player stats in memory (refreshes when server restarts)
 const statsCache: Map<string, { data: unknown; timestamp: number }> = new Map()
 const CACHE_DURATION = 1000 * 60 * 30 // 30 minutes (shorter than NBA stats cache)
 
 /**
- * Get all league players stats with time range filtering
- * GET /api/yahoo/league-players?leagueKey=xxx&range=last7Days
+ * Get roster players stats with time range filtering
+ * GET /api/yahoo/league-players?myTeamKey=xxx&oppTeamKey=yyy&range=last7
  *
  * Range options:
  * - season: Full season stats (uses NBA API for better performance)
@@ -29,12 +29,13 @@ export async function GET(request: NextRequest) {
     }
 
     const searchParams = request.nextUrl.searchParams
-    const leagueKey = searchParams.get('leagueKey')
+    const myTeamKey = searchParams.get('myTeamKey')
+    const oppTeamKey = searchParams.get('oppTeamKey')
     const range = searchParams.get('range') || 'last7'
 
-    if (!leagueKey) {
+    if (!myTeamKey || !oppTeamKey) {
       return NextResponse.json(
-        { error: 'leagueKey parameter is required' },
+        { error: 'myTeamKey and oppTeamKey parameters are required' },
         { status: 400 }
       )
     }
@@ -56,13 +57,16 @@ export async function GET(request: NextRequest) {
       )
     }
 
+    // Extract leagueKey from teamKey
+    const leagueKey = myTeamKey.substring(0, myTeamKey.lastIndexOf('.t.'))
+
     // Create cache key
-    const cacheKey = `${leagueKey}-${range}`
+    const cacheKey = `${myTeamKey}-${oppTeamKey}-${range}`
 
     // Check cache
     const cached = statsCache.get(cacheKey)
     if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
-      console.log(`Returning cached league players stats for ${cacheKey}`)
+      console.log(`Returning cached roster players stats for ${cacheKey}`)
       return NextResponse.json({
         stats: cached.data,
         cached: true,
@@ -77,11 +81,22 @@ export async function GET(request: NextRequest) {
     const currentWeek = parseInt(String(metadata?.current_week || '1'))
     console.log(`Current week: ${currentWeek}`)
 
-    // Fetch fresh data from Yahoo API
-    console.log(`Fetching fresh league players stats for ${cacheKey} (week ${currentWeek}, ${numWeeks} weeks)`)
-    const playerStatsMap = await getLeaguePlayersStats(
+    // Fetch both team rosters
+    console.log(`Fetching rosters for ${myTeamKey} and ${oppTeamKey}`)
+    const [myRoster, oppRoster] = await Promise.all([
+      getTeamRoster(session.accessToken, myTeamKey),
+      getTeamRoster(session.accessToken, oppTeamKey)
+    ])
+
+    // Combine both rosters
+    const allPlayers = [...myRoster, ...oppRoster]
+    console.log(`Total roster players: ${allPlayers.length}`)
+
+    // Fetch fresh data from Yahoo API (only for roster players)
+    console.log(`Fetching roster players stats for ${cacheKey} (week ${currentWeek}, ${numWeeks} weeks)`)
+    const playerStatsMap = await getRosterPlayersStats(
       session.accessToken,
-      leagueKey,
+      allPlayers,
       currentWeek,
       numWeeks
     )
@@ -103,9 +118,21 @@ export async function GET(request: NextRequest) {
   } catch (error: unknown) {
     console.error('Error in /api/yahoo/league-players:', error)
     const err = error as Error & { status?: number }
+
+    // Check for rate limiting error (Yahoo returns 999)
+    if (err.message?.includes('999') || err.message?.includes('Request denied')) {
+      return NextResponse.json(
+        {
+          error: 'Yahoo API rate limit exceeded. Please wait a moment and try again.',
+          rateLimited: true
+        },
+        { status: 429 }
+      )
+    }
+
     const status = err.status === 401 ? 401 : 500
     return NextResponse.json(
-      { error: err.message || 'Failed to fetch league players stats' },
+      { error: err.message || 'Failed to fetch roster players stats' },
       { status }
     )
   }

@@ -311,14 +311,19 @@ export default function MatchupStrategy({
         stats = statsDataResponse.stats || {}
         rangeLabel = 'season averages'
       } else {
-        // Use Yahoo API for time range stats
-        // Extract leagueKey from teamKey (format: {game_key}.l.{league_id}.t.{team_id})
-        const leagueKey = myTeamKey.substring(0, myTeamKey.lastIndexOf('.t.'))
-
-        console.log(`Fetching ${selectedTimeRange} stats from Yahoo API for league ${leagueKey}`)
-        const statsResponse = await fetch(`/api/yahoo/league-players?leagueKey=${leagueKey}&range=${selectedTimeRange}`)
+        // Use Yahoo API for time range stats (only fetches roster players)
+        console.log(`Fetching ${selectedTimeRange} stats from Yahoo API`)
+        const statsResponse = await fetch(`/api/yahoo/league-players?myTeamKey=${myTeamKey}&oppTeamKey=${opponentTeamKey}&range=${selectedTimeRange}`)
         if (!statsResponse.ok) {
-          console.error('Failed to fetch Yahoo league players stats, falling back to season averages')
+          const errorData = await statsResponse.json().catch(() => ({}))
+
+          // Check if it's a rate limit error
+          if (statsResponse.status === 429 || errorData.rateLimited) {
+            console.warn('Yahoo API rate limit exceeded, falling back to season averages')
+            throw new Error('Yahoo API 請求頻率過高，請稍後再試，或先使用賽季平均數據')
+          }
+
+          console.error('Failed to fetch Yahoo roster players stats, falling back to season averages')
           // Fallback to NBA API
           const fallbackResponse = await fetch('/api/nba/stats?season=2025')
           if (fallbackResponse.ok) {
@@ -332,6 +337,7 @@ export default function MatchupStrategy({
           rangeLabel = selectedTimeRange === 'last7' ? 'last 1 week averages' :
                       selectedTimeRange === 'last14' ? 'last 2 weeks averages' :
                       'last 4 weeks averages'
+          console.log(`Using ${rangeLabel} - loaded ${Object.keys(stats).length} players (cached: ${statsDataResponse.cached})`)
         }
       }
 

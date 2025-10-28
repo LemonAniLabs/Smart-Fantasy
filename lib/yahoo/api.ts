@@ -744,7 +744,7 @@ export async function getPlayerMultiWeekStats(
 } | null> {
   const weeklyStatsArray: Record<string, number>[] = []
 
-  // Fetch stats for the last N weeks
+  // Fetch stats for the last N weeks with delay between requests
   for (let i = 0; i < numWeeks; i++) {
     const weekNum = currentWeek - i
     if (weekNum < 1) break
@@ -753,6 +753,11 @@ export async function getPlayerMultiWeekStats(
       const stats = await getPlayerWeeklyStats(accessToken, playerKey, weekNum)
       if (stats && Object.keys(stats).length > 0) {
         weeklyStatsArray.push(stats)
+      }
+
+      // Add small delay between week requests for same player (50ms)
+      if (i < numWeeks - 1) {
+        await delay(50)
       }
     } catch (error) {
       console.warn(`Failed to fetch week ${weekNum} stats for ${playerName}:`, error)
@@ -833,15 +838,22 @@ export async function getPlayerMultiWeekStats(
 }
 
 /**
- * Fetch all league players with their stats for a specific time range
+ * Utility function to add delay between API requests
+ */
+function delay(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms))
+}
+
+/**
+ * Fetch roster players with their stats for a specific time range
+ * Optimized to only fetch stats for roster players (not all league players)
  * Returns stats in format compatible with NBA API for easy integration
  */
-export async function getLeaguePlayersStats(
+export async function getRosterPlayersStats(
   accessToken: string,
-  leagueKey: string,
+  players: YahooPlayer[],
   currentWeek: number,
-  numWeeks: number = 1,
-  maxAvailablePlayers: number = 100
+  numWeeks: number = 1
 ): Promise<Record<string, {
   name: string
   team: string
@@ -864,13 +876,8 @@ export async function getLeaguePlayersStats(
   dreb: number
   atoratio: number
 }>> {
-  console.log(`Fetching league players stats: currentWeek=${currentWeek}, numWeeks=${numWeeks}`)
+  console.log(`Fetching stats for ${players.length} roster players: currentWeek=${currentWeek}, numWeeks=${numWeeks}`)
 
-  // Fetch all league players
-  const players = await getAllLeaguePlayers(accessToken, leagueKey, maxAvailablePlayers)
-  console.log(`Fetched ${players.length} total players from league`)
-
-  // Fetch stats for each player
   const playerStatsMap: Record<string, {
     name: string
     team: string
@@ -894,32 +901,34 @@ export async function getLeaguePlayersStats(
     atoratio: number
   }> = {}
 
-  // Process players in batches to avoid overwhelming the API
-  const batchSize = 10
-  for (let i = 0; i < players.length; i += batchSize) {
-    const batch = players.slice(i, i + batchSize)
+  // Process players sequentially with delay to avoid rate limiting
+  for (let i = 0; i < players.length; i++) {
+    const player = players[i]
 
-    const batchPromises = batch.map(async (player) => {
-      try {
-        const stats = await getPlayerMultiWeekStats(
-          accessToken,
-          player.player_key,
-          player.name.full,
-          currentWeek,
-          numWeeks
-        )
+    try {
+      const stats = await getPlayerMultiWeekStats(
+        accessToken,
+        player.player_key,
+        player.name.full,
+        currentWeek,
+        numWeeks
+      )
 
-        if (stats) {
-          playerStatsMap[player.name.full] = stats
-        }
-      } catch (error) {
-        console.warn(`Failed to fetch stats for ${player.name.full}:`, error)
+      if (stats) {
+        playerStatsMap[player.name.full] = stats
       }
-    })
 
-    await Promise.all(batchPromises)
+      // Add delay between requests to avoid rate limiting (150ms per player)
+      if (i < players.length - 1) {
+        await delay(150)
+      }
 
-    console.log(`Processed ${Math.min(i + batchSize, players.length)}/${players.length} players`)
+      if ((i + 1) % 5 === 0) {
+        console.log(`Processed ${i + 1}/${players.length} players`)
+      }
+    } catch (error) {
+      console.warn(`Failed to fetch stats for ${player.name.full}:`, error)
+    }
   }
 
   console.log(`Successfully fetched stats for ${Object.keys(playerStatsMap).length} players`)
