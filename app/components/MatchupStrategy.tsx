@@ -194,45 +194,36 @@ export default function MatchupStrategy({
   const fetchAnalysis = async () => {
     setLoading(true)
     try {
-      // Get current matchup data to determine current week
-      const matchupResponse = await fetch(`/api/yahoo/matchup?teamKey=${myTeamKey}`)
-      let currentWeek = 1
-
-      if (matchupResponse.ok) {
-        const matchupData = await matchupResponse.json()
-        currentWeek = matchupData.matchup?.['0']?.week || matchupData.matchup?.week || 1
-        console.log('Current week from matchup:', currentWeek)
+      // Fetch NBA stats first (use season averages for now as weekly stats API has issues)
+      const statsResponse = await fetch('/api/nba/stats?season=2025')
+      if (!statsResponse.ok) {
+        throw new Error('Failed to fetch NBA stats')
       }
 
-      // Fetch weekly stats for both teams
-      const [myWeeklyStatsRes, oppWeeklyStatsRes] = await Promise.all([
-        fetch(`/api/yahoo/weekly-stats?teamKey=${myTeamKey}&week=${currentWeek}`),
-        fetch(`/api/yahoo/weekly-stats?teamKey=${opponentTeamKey}&week=${currentWeek}`),
+      const statsData = await statsResponse.json()
+      const stats = statsData.stats || {}
+
+      // Fetch both rosters
+      const [myRosterRes, oppRosterRes] = await Promise.all([
+        fetch(`/api/yahoo/roster?teamKey=${myTeamKey}`),
+        fetch(`/api/yahoo/roster?teamKey=${opponentTeamKey}`),
       ])
 
-      if (!myWeeklyStatsRes.ok || !oppWeeklyStatsRes.ok) {
-        throw new Error('Failed to fetch weekly stats')
+      if (!myRosterRes.ok || !oppRosterRes.ok) {
+        throw new Error('Failed to fetch rosters')
       }
 
-      const [myWeeklyData, oppWeeklyData] = await Promise.all([
-        myWeeklyStatsRes.json(),
-        oppWeeklyStatsRes.json(),
+      const [myRosterData, oppRosterData] = await Promise.all([
+        myRosterRes.json(),
+        oppRosterRes.json(),
       ])
 
-      console.log('My team weekly stats FULL:', JSON.stringify(myWeeklyData, null, 2))
-      console.log('Opponent weekly stats FULL:', JSON.stringify(oppWeeklyData, null, 2))
+      const myRoster: Player[] = myRosterData.roster || []
+      const oppRoster: Player[] = oppRosterData.roster || []
 
-      const myWeeklyStats = myWeeklyData.stats || {}
-      const oppWeeklyStats = oppWeeklyData.stats || {}
-
-      console.log('My stats object:', myWeeklyStats)
-      console.log('Opponent stats object:', oppWeeklyStats)
-      console.log('My stats is empty?', Object.keys(myWeeklyStats).length === 0)
-      console.log('Opponent stats is empty?', Object.keys(oppWeeklyStats).length === 0)
-
-      // Convert weekly stats to TeamStats format
-      const myTeamStats = convertWeeklyStatsToTeamStats(myWeeklyStats)
-      const oppTeamStats = convertWeeklyStatsToTeamStats(oppWeeklyStats)
+      // Calculate team stats using season averages
+      const myTeamStats = calculateTeamStats(myRoster, stats)
+      const oppTeamStats = calculateTeamStats(oppRoster, stats)
 
       setMyStats(myTeamStats)
       setOppStats(oppTeamStats)
