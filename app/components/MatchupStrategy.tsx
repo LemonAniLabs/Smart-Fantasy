@@ -296,22 +296,44 @@ export default function MatchupStrategy({
         console.log(`  - ${p.name.full}: ${p.status}${p.injury_note ? ` (${p.injury_note})` : ''}`)
       })
 
-      // Always use NBA API season stats for now
-      // Note: Yahoo weekly stats require authentication and are not available in client-side
-      console.log('Fetching season stats from NBA API')
-      const statsResponse = await fetch('/api/nba/stats?season=2025')
-      if (!statsResponse.ok) {
-        throw new Error('Failed to fetch NBA stats')
-      }
-      const statsDataResponse = await statsResponse.json()
-      const stats = statsDataResponse.stats || {}
+      // Fetch player stats based on selected time range
+      let stats: Record<string, PlayerStats> = {}
+      let rangeLabel = 'season averages'
 
-      const rangeLabel = selectedTimeRange === 'season' ? 'season averages' :
-                        `season averages (${
-                          selectedTimeRange === 'last7' ? 'last 1 week' :
-                          selectedTimeRange === 'last14' ? 'last 2 weeks' :
-                          'last 4 weeks'
-                        } data coming soon)`
+      if (selectedTimeRange === 'season') {
+        // Use NBA API for season averages (faster and more reliable)
+        console.log('Fetching season stats from NBA API')
+        const statsResponse = await fetch('/api/nba/stats?season=2025')
+        if (!statsResponse.ok) {
+          throw new Error('Failed to fetch NBA stats')
+        }
+        const statsDataResponse = await statsResponse.json()
+        stats = statsDataResponse.stats || {}
+        rangeLabel = 'season averages'
+      } else {
+        // Use Yahoo API for time range stats
+        // Extract leagueKey from teamKey (format: {game_key}.l.{league_id}.t.{team_id})
+        const leagueKey = myTeamKey.substring(0, myTeamKey.lastIndexOf('.t.'))
+
+        console.log(`Fetching ${selectedTimeRange} stats from Yahoo API for league ${leagueKey}`)
+        const statsResponse = await fetch(`/api/yahoo/league-players?leagueKey=${leagueKey}&range=${selectedTimeRange}`)
+        if (!statsResponse.ok) {
+          console.error('Failed to fetch Yahoo league players stats, falling back to season averages')
+          // Fallback to NBA API
+          const fallbackResponse = await fetch('/api/nba/stats?season=2025')
+          if (fallbackResponse.ok) {
+            const fallbackData = await fallbackResponse.json()
+            stats = fallbackData.stats || {}
+            rangeLabel = 'season averages (fallback)'
+          }
+        } else {
+          const statsDataResponse = await statsResponse.json()
+          stats = statsDataResponse.stats || {}
+          rangeLabel = selectedTimeRange === 'last7' ? 'last 1 week averages' :
+                      selectedTimeRange === 'last14' ? 'last 2 weeks averages' :
+                      'last 4 weeks averages'
+        }
+      }
 
       console.log(`Using ${rangeLabel}`)
       console.log(`Stats loaded for ${Object.keys(stats).length} players`)
@@ -855,22 +877,17 @@ export default function MatchupStrategy({
           </h4>
           <div className="flex items-center gap-3">
             {/* Time Range Selector */}
-            <div className="relative">
+            <div>
               <select
                 value={selectedTimeRange}
                 onChange={(e) => setSelectedTimeRange(e.target.value as TimeRange)}
                 className="bg-slate-700 text-white px-3 py-2 rounded border border-slate-600 focus:border-purple-500 focus:outline-none text-sm"
               >
                 <option value="season">賽季平均</option>
-                <option value="last7">最近 1 週（開發中）</option>
-                <option value="last14">最近 2 週（開發中）</option>
-                <option value="last30">最近 4 週（開發中）</option>
+                <option value="last7">最近 1 週</option>
+                <option value="last14">最近 2 週</option>
+                <option value="last30">最近 4 週</option>
               </select>
-              {selectedTimeRange !== 'season' && (
-                <div className="absolute top-full mt-2 left-0 bg-yellow-900/90 border border-yellow-600 rounded px-3 py-2 text-xs text-yellow-200 shadow-lg z-10 whitespace-nowrap">
-                  ⚠️ 週數據功能開發中，目前顯示賽季平均數據
-                </div>
-              )}
             </div>
             <div className="bg-purple-600/30 border border-purple-500 px-4 py-2 rounded-lg">
               <span className="text-purple-200 text-sm">第 {currentWeek} 週</span>

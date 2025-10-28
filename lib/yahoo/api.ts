@@ -596,6 +596,337 @@ export async function getLeagueFreeAgents(
 }
 
 /**
+ * Fetch all league players (both taken and available) for analysis
+ * Yahoo API limits to 25 players per request, so we paginate
+ */
+export async function getAllLeaguePlayers(
+  accessToken: string,
+  leagueKey: string,
+  maxAvailable: number = 100
+): Promise<YahooPlayer[]> {
+  const allPlayers: YahooPlayer[] = []
+
+  // Fetch all taken players (on rosters)
+  console.log('Fetching taken players (status=T)...')
+  const takenPlayers = await fetchPlayersByStatus(accessToken, leagueKey, 'T', 500)
+  allPlayers.push(...takenPlayers)
+  console.log(`Fetched ${takenPlayers.length} taken players`)
+
+  // Fetch top available players (free agents)
+  console.log(`Fetching top ${maxAvailable} available players (status=A)...`)
+  const availablePlayers = await fetchPlayersByStatus(accessToken, leagueKey, 'A', maxAvailable)
+  allPlayers.push(...availablePlayers)
+  console.log(`Fetched ${availablePlayers.length} available players`)
+
+  console.log(`Total players fetched: ${allPlayers.length}`)
+  return allPlayers
+}
+
+/**
+ * Helper function to fetch players by status with pagination
+ */
+async function fetchPlayersByStatus(
+  accessToken: string,
+  leagueKey: string,
+  status: string,
+  maxCount: number
+): Promise<YahooPlayer[]> {
+  const allPlayers: YahooPlayer[] = []
+  const batchSize = 25 // Yahoo API limit per request
+  const numBatches = Math.ceil(maxCount / batchSize)
+
+  for (let i = 0; i < numBatches; i++) {
+    const start = i * batchSize
+    const batchCount = Math.min(batchSize, maxCount - start)
+
+    try {
+      const url = `${YAHOO_FANTASY_API_BASE}/league/${leagueKey}/players;status=${status};start=${start};count=${batchCount}?format=json`
+
+      const response = await axios.get(url, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          Accept: 'application/json',
+        },
+      })
+
+      const league = response.data?.fantasy_content?.league
+      if (!league || !Array.isArray(league) || league.length < 2) {
+        break
+      }
+
+      const playersObj = league[1]?.players
+      if (!playersObj || typeof playersObj !== 'object') {
+        break
+      }
+
+      const batchPlayers: YahooPlayer[] = []
+      for (const key in playersObj) {
+        if (key === 'count') continue
+        const playerItem = playersObj[key]?.player
+        if (playerItem && Array.isArray(playerItem)) {
+          let playerInfo: Partial<YahooPlayer> & Record<string, unknown> = {}
+
+          if (Array.isArray(playerItem[0])) {
+            for (const prop of playerItem[0]) {
+              if (typeof prop === 'object' && prop !== null) {
+                playerInfo = { ...playerInfo, ...prop }
+              }
+            }
+          } else if (typeof playerItem[0] === 'object') {
+            playerInfo = playerItem[0] as Partial<YahooPlayer> & Record<string, unknown>
+          }
+
+          // Process eligible_positions
+          if (playerInfo.eligible_positions && Array.isArray(playerInfo.eligible_positions)) {
+            playerInfo.eligible_positions = playerInfo.eligible_positions.map((pos: unknown) => {
+              if (typeof pos === 'object' && pos !== null && 'position' in pos) {
+                return (pos as { position: string }).position
+              }
+              return typeof pos === 'string' ? pos : ''
+            }).filter(Boolean)
+          }
+
+          if (playerInfo.player_key) {
+            batchPlayers.push(playerInfo as YahooPlayer)
+          }
+        }
+      }
+
+      if (batchPlayers.length === 0) {
+        break
+      }
+
+      allPlayers.push(...batchPlayers)
+
+      if (batchPlayers.length < batchCount) {
+        break
+      }
+    } catch (error) {
+      console.error(`Error fetching ${status} players batch ${i + 1}:`, error)
+      break
+    }
+  }
+
+  return allPlayers
+}
+
+/**
+ * Aggregate player stats across multiple weeks
+ * Returns stats in format compatible with NBA API (PlayerAverages)
+ */
+export async function getPlayerMultiWeekStats(
+  accessToken: string,
+  playerKey: string,
+  playerName: string,
+  currentWeek: number,
+  numWeeks: number
+): Promise<{
+  name: string
+  team: string
+  position: string
+  gamesPlayed: number
+  ppg: number
+  rpg: number
+  apg: number
+  spg: number
+  bpg: number
+  tpg: number
+  fgPct: number
+  ftPct: number
+  threepm: number
+  fgm: number
+  fga: number
+  ftm: number
+  fta: number
+  oreb: number
+  dreb: number
+  atoratio: number
+} | null> {
+  const weeklyStatsArray: Record<string, number>[] = []
+
+  // Fetch stats for the last N weeks
+  for (let i = 0; i < numWeeks; i++) {
+    const weekNum = currentWeek - i
+    if (weekNum < 1) break
+
+    try {
+      const stats = await getPlayerWeeklyStats(accessToken, playerKey, weekNum)
+      if (stats && Object.keys(stats).length > 0) {
+        weeklyStatsArray.push(stats)
+      }
+    } catch (error) {
+      console.warn(`Failed to fetch week ${weekNum} stats for ${playerName}:`, error)
+    }
+  }
+
+  // If no stats found, return null
+  if (weeklyStatsArray.length === 0) {
+    return null
+  }
+
+  // Aggregate stats
+  const aggregated = {
+    name: playerName,
+    team: '',
+    position: '',
+    gamesPlayed: weeklyStatsArray.length,
+    ppg: 0,
+    rpg: 0,
+    apg: 0,
+    spg: 0,
+    bpg: 0,
+    tpg: 0,
+    fgPct: 0,
+    ftPct: 0,
+    threepm: 0,
+    fgm: 0,
+    fga: 0,
+    ftm: 0,
+    fta: 0,
+    oreb: 0,
+    dreb: 0,
+    atoratio: 0,
+  }
+
+  let totalFGM = 0
+  let totalFGA = 0
+  let totalFTM = 0
+  let totalFTA = 0
+
+  weeklyStatsArray.forEach(stats => {
+    aggregated.ppg += stats['PTS'] || 0
+    aggregated.rpg += stats['REB'] || 0
+    aggregated.apg += stats['AST'] || 0
+    aggregated.spg += stats['ST'] || 0
+    aggregated.bpg += stats['BLK'] || 0
+    aggregated.tpg += stats['TO'] || 0
+    aggregated.threepm += stats['3PTM'] || 0
+    totalFGM += stats['FGM'] || 0
+    totalFGA += stats['FGA'] || 0
+    totalFTM += stats['FTM'] || 0
+    totalFTA += stats['FTA'] || 0
+    aggregated.oreb += stats['OREB'] || 0
+  })
+
+  // Calculate averages
+  const weeks = weeklyStatsArray.length
+  aggregated.ppg /= weeks
+  aggregated.rpg /= weeks
+  aggregated.apg /= weeks
+  aggregated.spg /= weeks
+  aggregated.bpg /= weeks
+  aggregated.tpg /= weeks
+  aggregated.threepm /= weeks
+  aggregated.oreb /= weeks
+
+  // Calculate percentages from totals
+  aggregated.fgPct = totalFGA > 0 ? totalFGM / totalFGA : 0
+  aggregated.ftPct = totalFTA > 0 ? totalFTM / totalFTA : 0
+  aggregated.fgm = totalFGM / weeks
+  aggregated.fga = totalFGA / weeks
+  aggregated.ftm = totalFTM / weeks
+  aggregated.fta = totalFTA / weeks
+  aggregated.dreb = aggregated.rpg - aggregated.oreb
+  aggregated.atoratio = aggregated.tpg > 0 ? aggregated.apg / aggregated.tpg : aggregated.apg
+
+  return aggregated
+}
+
+/**
+ * Fetch all league players with their stats for a specific time range
+ * Returns stats in format compatible with NBA API for easy integration
+ */
+export async function getLeaguePlayersStats(
+  accessToken: string,
+  leagueKey: string,
+  currentWeek: number,
+  numWeeks: number = 1,
+  maxAvailablePlayers: number = 100
+): Promise<Record<string, {
+  name: string
+  team: string
+  position: string
+  gamesPlayed: number
+  ppg: number
+  rpg: number
+  apg: number
+  spg: number
+  bpg: number
+  tpg: number
+  fgPct: number
+  ftPct: number
+  threepm: number
+  fgm: number
+  fga: number
+  ftm: number
+  fta: number
+  oreb: number
+  dreb: number
+  atoratio: number
+}>> {
+  console.log(`Fetching league players stats: currentWeek=${currentWeek}, numWeeks=${numWeeks}`)
+
+  // Fetch all league players
+  const players = await getAllLeaguePlayers(accessToken, leagueKey, maxAvailablePlayers)
+  console.log(`Fetched ${players.length} total players from league`)
+
+  // Fetch stats for each player
+  const playerStatsMap: Record<string, {
+    name: string
+    team: string
+    position: string
+    gamesPlayed: number
+    ppg: number
+    rpg: number
+    apg: number
+    spg: number
+    bpg: number
+    tpg: number
+    fgPct: number
+    ftPct: number
+    threepm: number
+    fgm: number
+    fga: number
+    ftm: number
+    fta: number
+    oreb: number
+    dreb: number
+    atoratio: number
+  }> = {}
+
+  // Process players in batches to avoid overwhelming the API
+  const batchSize = 10
+  for (let i = 0; i < players.length; i += batchSize) {
+    const batch = players.slice(i, i + batchSize)
+
+    const batchPromises = batch.map(async (player) => {
+      try {
+        const stats = await getPlayerMultiWeekStats(
+          accessToken,
+          player.player_key,
+          player.name.full,
+          currentWeek,
+          numWeeks
+        )
+
+        if (stats) {
+          playerStatsMap[player.name.full] = stats
+        }
+      } catch (error) {
+        console.warn(`Failed to fetch stats for ${player.name.full}:`, error)
+      }
+    })
+
+    await Promise.all(batchPromises)
+
+    console.log(`Processed ${Math.min(i + batchSize, players.length)}/${players.length} players`)
+  }
+
+  console.log(`Successfully fetched stats for ${Object.keys(playerStatsMap).length} players`)
+  return playerStatsMap
+}
+
+/**
  * Game log entry for a player
  */
 export interface PlayerGameLog {
