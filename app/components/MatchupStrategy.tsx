@@ -196,16 +196,9 @@ export default function MatchupStrategy({
   const fetchAnalysis = async () => {
     setLoading(true)
     try {
-      // Fetch NBA stats first (use season averages for now as weekly stats API has issues)
-      const statsResponse = await fetch('/api/nba/stats?season=2025')
-      if (!statsResponse.ok) {
-        throw new Error('Failed to fetch NBA stats')
-      }
+      console.log(`Fetching matchup analysis for week ${currentWeek}`)
 
-      const statsData = await statsResponse.json()
-      const stats = statsData.stats || {}
-
-      // Fetch both rosters
+      // Fetch both rosters (includes injury status)
       const [myRosterRes, oppRosterRes] = await Promise.all([
         fetch(`/api/yahoo/roster?teamKey=${myTeamKey}`),
         fetch(`/api/yahoo/roster?teamKey=${opponentTeamKey}`),
@@ -223,9 +216,19 @@ export default function MatchupStrategy({
       const myRoster: Player[] = myRosterData.roster || []
       const oppRoster: Player[] = oppRosterData.roster || []
 
-      // Calculate team stats using season averages
-      const myTeamStats = calculateTeamStats(myRoster, stats)
-      const oppTeamStats = calculateTeamStats(oppRoster, stats)
+      console.log('My roster:', myRoster.length, 'players')
+      console.log('Opponent roster:', oppRoster.length, 'players')
+
+      // Fetch weekly stats for all players
+      const myWeeklyStats = await fetchRosterWeeklyStats(myRoster, currentWeek)
+      const oppWeeklyStats = await fetchRosterWeeklyStats(oppRoster, currentWeek)
+
+      // Calculate team stats from weekly data
+      const myTeamStats = calculateTeamStatsFromWeekly(myWeeklyStats)
+      const oppTeamStats = calculateTeamStatsFromWeekly(oppWeeklyStats)
+
+      console.log('My team weekly stats:', myTeamStats)
+      console.log('Opponent team weekly stats:', oppTeamStats)
 
       setMyStats(myTeamStats)
       setOppStats(oppTeamStats)
@@ -237,6 +240,98 @@ export default function MatchupStrategy({
       console.error('Error fetching matchup analysis:', error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  /**
+   * Fetch weekly stats for all players in a roster
+   */
+  const fetchRosterWeeklyStats = async (roster: Player[], week: number): Promise<Record<string, Record<string, number>>> => {
+    const statsPromises = roster.map(async (player) => {
+      try {
+        const response = await fetch(`/api/yahoo/player-gamelogs?playerKey=${player.player_key}&week=${week}`)
+        if (!response.ok) {
+          console.warn(`Failed to fetch weekly stats for ${player.name.full}`)
+          return { playerKey: player.player_key, stats: null }
+        }
+        const data = await response.json()
+        return { playerKey: player.player_key, stats: data.stats || {} }
+      } catch (error) {
+        console.error(`Error fetching stats for ${player.name.full}:`, error)
+        return { playerKey: player.player_key, stats: null }
+      }
+    })
+
+    const results = await Promise.all(statsPromises)
+
+    // Convert to map
+    const statsMap: Record<string, Record<string, number>> = {}
+    results.forEach((result) => {
+      if (result.stats) {
+        statsMap[result.playerKey] = result.stats
+      }
+    })
+
+    return statsMap
+  }
+
+  /**
+   * Calculate team stats from weekly player stats
+   */
+  const calculateTeamStatsFromWeekly = (weeklyStats: Record<string, Record<string, number>>): TeamStats => {
+    let totalPTS = 0
+    let totalREB = 0
+    let totalAST = 0
+    let totalST = 0
+    let totalBLK = 0
+    let total3PTM = 0
+    let totalTO = 0
+    let totalFGM = 0
+    let totalFGA = 0
+    let totalFTM = 0
+    let totalFTA = 0
+    let totalOREB = 0
+    let playerCount = 0
+
+    Object.values(weeklyStats).forEach((stats) => {
+      if (stats && Object.keys(stats).length > 0) {
+        totalPTS += stats['PTS'] || 0
+        totalREB += stats['REB'] || 0
+        totalAST += stats['AST'] || 0
+        totalST += stats['ST'] || 0
+        totalBLK += stats['BLK'] || 0
+        total3PTM += stats['3PTM'] || 0
+        totalTO += stats['TO'] || 0
+        totalFGM += stats['FGM'] || 0
+        totalFGA += stats['FGA'] || 0
+        totalFTM += stats['FTM'] || 0
+        totalFTA += stats['FTA'] || 0
+        totalOREB += stats['OREB'] || 0
+        playerCount++
+      }
+    })
+
+    const fgPct = totalFGA > 0 ? (totalFGM / totalFGA) * 100 : 0
+    const ftPct = totalFTA > 0 ? (totalFTM / totalFTA) * 100 : 0
+    const atoratio = totalTO > 0 ? totalAST / totalTO : totalAST
+
+    return {
+      ppg: totalPTS,
+      rpg: totalREB,
+      apg: totalAST,
+      spg: totalST,
+      bpg: totalBLK,
+      threepm: total3PTM,
+      tpg: totalTO,
+      fgPct,
+      ftPct,
+      fgm: totalFGM,
+      fga: totalFGA,
+      ftm: totalFTM,
+      fta: totalFTA,
+      oreb: totalOREB,
+      dreb: totalREB - totalOREB, // Calculate DREB from REB - OREB
+      atoratio,
     }
   }
 

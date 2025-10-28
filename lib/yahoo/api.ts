@@ -295,6 +295,21 @@ export async function getTeamRoster(accessToken: string, teamKey: string): Promi
           }
         }
 
+        // Ensure injury status fields are present (even if empty)
+        // Yahoo API includes 'status' and 'injury_note' in player[0]
+        if (!playerInfo.status) {
+          playerInfo.status = undefined
+        }
+        if (!playerInfo.injury_note) {
+          playerInfo.injury_note = undefined
+        }
+
+        // Log player with injury status for debugging
+        if (playerInfo.status && playerInfo.status !== 'Healthy') {
+          console.log(`Player ${playerInfo.name?.full} has injury status: ${playerInfo.status}`,
+            playerInfo.injury_note ? `- ${playerInfo.injury_note}` : '')
+        }
+
         if (playerInfo.player_key) {
           playerData.push(playerInfo as YahooPlayer)
         }
@@ -578,6 +593,124 @@ export async function getLeagueFreeAgents(
 
   console.log(`Total free agents fetched: ${allPlayers.length}`)
   return allPlayers
+}
+
+/**
+ * Game log entry for a player
+ */
+export interface PlayerGameLog {
+  date: string
+  opponent: string
+  stats: Record<string, number>
+}
+
+/**
+ * Fetch player's stats for a specific week
+ * Returns the player's accumulated stats for that week from Yahoo API
+ */
+export async function getPlayerWeeklyStats(
+  accessToken: string,
+  playerKey: string,
+  week: number
+): Promise<Record<string, number>> {
+  try {
+    const url = `${YAHOO_FANTASY_API_BASE}/player/${playerKey}/stats;type=week;week=${week}?format=json`
+
+    console.log('Fetching player weekly stats from:', url)
+
+    const response = await axios.get(url, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        Accept: 'application/json',
+      },
+    })
+
+    console.log('Player weekly stats response:', JSON.stringify(response.data, null, 2))
+
+    const player = response.data?.fantasy_content?.player
+    if (!player || !Array.isArray(player) || player.length < 2) {
+      console.log('Invalid player structure')
+      return {}
+    }
+
+    // player[1] contains player_stats
+    const playerStatsData = player[1]?.player_stats
+    if (!playerStatsData || typeof playerStatsData !== 'object') {
+      console.log('No player_stats found')
+      return {}
+    }
+
+    // Parse stats
+    const statsData = playerStatsData[1] || playerStatsData['1'] || playerStatsData
+    const statsObj = statsData?.stats
+
+    if (!statsObj || typeof statsObj !== 'object') {
+      console.log('No stats object found')
+      return {}
+    }
+
+    const stats: Record<string, number> = {}
+
+    // Map stat IDs to readable names
+    const statIdMap: Record<string, string> = {
+      '5': 'FGM',   // Field Goals Made
+      '8': 'FGA',   // Field Goals Attempted
+      '9': 'FG%',   // Field Goal Percentage
+      '6': 'FTM',   // Free Throws Made
+      '11': 'FTA',  // Free Throws Attempted
+      '10': 'FT%',  // Free Throw Percentage
+      '1': '3PTM',  // 3-pointers Made
+      '12': 'PTS',  // Points
+      '15': 'OREB', // Offensive Rebounds
+      '16': 'REB',  // Total Rebounds
+      '17': 'AST',  // Assists
+      '18': 'ST',   // Steals
+      '19': 'BLK',  // Blocks
+      '20': 'TO',   // Turnovers
+      '27': 'A/T',  // Assist/Turnover Ratio
+    }
+
+    // Parse stats array/object
+    for (const statKey in statsObj) {
+      if (statKey === 'count') continue
+
+      const statItem = statsObj[statKey]?.stat
+      if (!statItem) continue
+
+      let statInfo: Record<string, unknown> = {}
+      if (Array.isArray(statItem)) {
+        for (const prop of statItem) {
+          if (typeof prop === 'object' && prop !== null) {
+            Object.assign(statInfo, prop)
+          }
+        }
+      } else if (typeof statItem === 'object') {
+        statInfo = statItem as Record<string, unknown>
+      }
+
+      const statId = String(statInfo.stat_id || '')
+      const statName = statIdMap[statId]
+      const statValue = parseFloat(String(statInfo.value || '0'))
+
+      if (statName) {
+        stats[statName] = statValue
+      }
+    }
+
+    console.log('Parsed player weekly stats:', stats)
+    return stats
+  } catch (error) {
+    console.error('Error fetching player weekly stats:', error)
+    if (axios.isAxiosError(error)) {
+      console.error('Response data:', error.response?.data)
+      if (error.response?.status === 401) {
+        const authError = new Error('Authentication failed. Please reconnect your Yahoo account.')
+        ;(authError as Error & { status: number }).status = 401
+        throw authError
+      }
+    }
+    throw error
+  }
 }
 
 /**
