@@ -753,6 +753,8 @@ export async function getPlayerMultiWeekStats(
       const stats = await getPlayerWeeklyStats(accessToken, playerKey, weekNum)
       if (stats && Object.keys(stats).length > 0) {
         weeklyStatsArray.push(stats)
+      } else {
+        console.log(`    Week ${weekNum} for ${playerName}: No stats (empty or null)`)
       }
 
       // Add small delay between week requests for same player (50ms)
@@ -760,12 +762,13 @@ export async function getPlayerMultiWeekStats(
         await delay(50)
       }
     } catch (error) {
-      console.warn(`Failed to fetch week ${weekNum} stats for ${playerName}:`, error)
+      console.warn(`    Week ${weekNum} for ${playerName}: Error -`, error instanceof Error ? error.message : String(error))
     }
   }
 
   // If no stats found, return null
   if (weeklyStatsArray.length === 0) {
+    console.log(`    ${playerName}: No weekly stats found across ${numWeeks} weeks`)
     return null
   }
 
@@ -916,6 +919,13 @@ export async function getRosterPlayersStats(
 
       if (stats) {
         playerStatsMap[player.name.full] = stats
+        if (i < 3) {
+          console.log(`  ✓ ${player.name.full}: ${stats.ppg.toFixed(1)} PPG, ${stats.gamesPlayed} weeks`)
+        }
+      } else {
+        if (i < 3) {
+          console.log(`  ✗ ${player.name.full}: No stats returned`)
+        }
       }
 
       // Add delay between requests to avoid rate limiting (150ms per player)
@@ -924,7 +934,7 @@ export async function getRosterPlayersStats(
       }
 
       if ((i + 1) % 5 === 0) {
-        console.log(`Processed ${i + 1}/${players.length} players`)
+        console.log(`Processed ${i + 1}/${players.length} players, ${Object.keys(playerStatsMap).length} with stats`)
       }
     } catch (error) {
       console.warn(`Failed to fetch stats for ${player.name.full}:`, error)

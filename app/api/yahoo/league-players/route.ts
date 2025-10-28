@@ -88,9 +88,15 @@ export async function GET(request: NextRequest) {
       getTeamRoster(session.accessToken, oppTeamKey)
     ])
 
+    console.log(`My roster: ${myRoster.length} players`)
+    console.log(`Opponent roster: ${oppRoster.length} players`)
+
     // Combine both rosters
     const allPlayers = [...myRoster, ...oppRoster]
     console.log(`Total roster players: ${allPlayers.length}`)
+
+    // Log player names for debugging
+    console.log(`Player names: ${allPlayers.slice(0, 5).map(p => p.name.full).join(', ')}...`)
 
     // Fetch fresh data from Yahoo API (only for roster players)
     console.log(`Fetching roster players stats for ${cacheKey} (week ${currentWeek}, ${numWeeks} weeks)`)
@@ -100,6 +106,13 @@ export async function GET(request: NextRequest) {
       currentWeek,
       numWeeks
     )
+
+    console.log(`getRosterPlayersStats returned ${Object.keys(playerStatsMap).length} players with stats`)
+    console.log(`Sample player stats:`, Object.keys(playerStatsMap).slice(0, 3).map(name => ({
+      name,
+      ppg: playerStatsMap[name]?.ppg,
+      gamesPlayed: playerStatsMap[name]?.gamesPlayed
+    })))
 
     // Update cache
     statsCache.set(cacheKey, {
