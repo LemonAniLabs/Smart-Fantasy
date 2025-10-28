@@ -59,7 +59,11 @@ export async function GET(request: NextRequest) {
     for (const player of testPlayers) {
       console.log(`\n=== TESTING PLAYER: ${player.name.full} (${player.player_key}) ===`)
 
-      const playerResults: Record<string, unknown> = {
+      const playerResults: {
+        playerName: string
+        playerKey: string
+        weeks: Record<string, unknown>
+      } = {
         playerName: player.name.full,
         playerKey: player.player_key,
         weeks: {}
