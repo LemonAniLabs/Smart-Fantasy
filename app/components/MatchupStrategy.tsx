@@ -72,6 +72,8 @@ interface CategoryComparison {
   recommendation: string
 }
 
+type TimeRange = 'season' | 'week' | 'last7' | 'last14' | 'last30'
+
 export default function MatchupStrategy({
   myTeamKey,
   myTeamName,
@@ -85,6 +87,7 @@ export default function MatchupStrategy({
   const [oppStats, setOppStats] = useState<TeamStats | null>(null)
   const [comparison, setComparison] = useState<CategoryComparison[]>([])
   const [statCategories, setStatCategories] = useState<Array<{key: string, name: string, higherIsBetter: boolean}>>([])
+  const [selectedTimeRange, setSelectedTimeRange] = useState<TimeRange>('season')
 
   useEffect(() => {
     // Parse league stat categories from settings
@@ -191,12 +194,12 @@ export default function MatchupStrategy({
       fetchAnalysis()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [myTeamKey, opponentTeamKey, statCategories])
+  }, [myTeamKey, opponentTeamKey, statCategories, selectedTimeRange])
 
   const fetchAnalysis = async () => {
     setLoading(true)
     try {
-      console.log(`Fetching matchup analysis for week ${currentWeek}`)
+      console.log(`Fetching matchup analysis for ${selectedTimeRange} (week ${currentWeek})`)
 
       // Fetch both rosters (includes injury status)
       const [myRosterRes, oppRosterRes] = await Promise.all([
@@ -219,16 +222,49 @@ export default function MatchupStrategy({
       console.log('My roster:', myRoster.length, 'players')
       console.log('Opponent roster:', oppRoster.length, 'players')
 
-      // Fetch weekly stats for all players
-      const myWeeklyStats = await fetchRosterWeeklyStats(myRoster, currentWeek)
-      const oppWeeklyStats = await fetchRosterWeeklyStats(oppRoster, currentWeek)
+      let myTeamStats: TeamStats
+      let oppTeamStats: TeamStats
 
-      // Calculate team stats from weekly data
-      const myTeamStats = calculateTeamStatsFromWeekly(myWeeklyStats)
-      const oppTeamStats = calculateTeamStatsFromWeekly(oppWeeklyStats)
+      if (selectedTimeRange === 'week') {
+        // Try to use weekly stats
+        console.log('Fetching weekly stats...')
+        const myWeeklyStats = await fetchRosterWeeklyStats(myRoster, currentWeek)
+        const oppWeeklyStats = await fetchRosterWeeklyStats(oppRoster, currentWeek)
 
-      console.log('My team weekly stats:', myTeamStats)
-      console.log('Opponent team weekly stats:', oppTeamStats)
+        // Check if we got valid data
+        const myHasData = Object.keys(myWeeklyStats).length > 0
+        const oppHasData = Object.keys(oppWeeklyStats).length > 0
+
+        if (myHasData && oppHasData) {
+          myTeamStats = calculateTeamStatsFromWeekly(myWeeklyStats)
+          oppTeamStats = calculateTeamStatsFromWeekly(oppWeeklyStats)
+          console.log('Using weekly stats')
+        } else {
+          console.warn('Weekly stats returned empty, falling back to season averages')
+          // Fallback to season averages
+          const statsResponse = await fetch('/api/nba/stats?season=2025')
+          const statsData = await statsResponse.json()
+          const stats = statsData.stats || {}
+          myTeamStats = calculateTeamStats(myRoster, stats)
+          oppTeamStats = calculateTeamStats(oppRoster, stats)
+        }
+      } else {
+        // Use season averages (default)
+        console.log('Fetching season average stats...')
+        const statsResponse = await fetch('/api/nba/stats?season=2025')
+        if (!statsResponse.ok) {
+          throw new Error('Failed to fetch NBA stats')
+        }
+        const statsData = await statsResponse.json()
+        const stats = statsData.stats || {}
+
+        myTeamStats = calculateTeamStats(myRoster, stats)
+        oppTeamStats = calculateTeamStats(oppRoster, stats)
+        console.log('Using season averages')
+      }
+
+      console.log('My team stats:', myTeamStats)
+      console.log('Opponent team stats:', oppTeamStats)
 
       setMyStats(myTeamStats)
       setOppStats(oppTeamStats)
@@ -516,12 +552,26 @@ export default function MatchupStrategy({
     <div className="space-y-6">
       {/* Overview */}
       <div className="bg-gradient-to-r from-purple-900/30 to-blue-900/30 p-6 rounded-lg border border-purple-500/30">
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
           <h4 className="text-white font-bold text-xl flex items-center gap-2">
             🎯 戰略分析
           </h4>
-          <div className="bg-purple-600/30 border border-purple-500 px-4 py-2 rounded-lg">
-            <span className="text-purple-200 text-sm">第 {currentWeek} 週</span>
+          <div className="flex items-center gap-3">
+            {/* Time Range Selector */}
+            <select
+              value={selectedTimeRange}
+              onChange={(e) => setSelectedTimeRange(e.target.value as TimeRange)}
+              className="bg-slate-700 text-white px-3 py-2 rounded border border-slate-600 focus:border-purple-500 focus:outline-none text-sm"
+            >
+              <option value="season">賽季平均</option>
+              <option value="week">本週累計 (第 {currentWeek} 週)</option>
+              <option value="last7" disabled>近 7 天平均 (即將推出)</option>
+              <option value="last14" disabled>近 14 天平均 (即將推出)</option>
+              <option value="last30" disabled>近 30 天平均 (即將推出)</option>
+            </select>
+            <div className="bg-purple-600/30 border border-purple-500 px-4 py-2 rounded-lg">
+              <span className="text-purple-200 text-sm">第 {currentWeek} 週</span>
+            </div>
           </div>
         </div>
 
