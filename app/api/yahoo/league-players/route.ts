@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
-import { getRosterPlayersStats, getLeagueMetadata, getTeamRoster } from '@/lib/yahoo/api'
+import { getTeamRoster } from '@/lib/yahoo/api'
+import { fetchPlayerStats, normalizePlayerName, type PlayerAverages } from '@/lib/nba/api'
 
 // Cache player stats in memory (refreshes when server restarts)
 const statsCache: Map<string, { data: unknown; timestamp: number }> = new Map()
@@ -12,10 +13,14 @@ const CACHE_DURATION = 1000 * 60 * 30 // 30 minutes (shorter than NBA stats cach
  * GET /api/yahoo/league-players?myTeamKey=xxx&oppTeamKey=yyy&range=last7
  *
  * Range options:
- * - season: Full season stats (uses NBA API for better performance)
- * - last7: Last 1 week (7 days)
- * - last14: Last 2 weeks (14 days)
- * - last30: Last 4 weeks (30 days)
+ * - season: Full season stats
+ * - last7: Last 1 week (7 days) - Currently uses season stats (time range filtering pending)
+ * - last14: Last 2 weeks (14 days) - Currently uses season stats (time range filtering pending)
+ * - last30: Last 4 weeks (30 days) - Currently uses season stats (time range filtering pending)
+ *
+ * Note: Time range filtering currently uses season averages from NBA Stats API.
+ * Yahoo API's weekly stats endpoint (type=week;week=N) doesn't return player_stats data.
+ * Future enhancement: Implement date-based filtering using NBA game logs.
  */
 export async function GET(request: NextRequest) {
   try {
@@ -31,7 +36,7 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams
     const myTeamKey = searchParams.get('myTeamKey')
     const oppTeamKey = searchParams.get('oppTeamKey')
-    const range = searchParams.get('range') || 'last7'
+    const range = searchParams.get('range') || 'season'
 
     if (!myTeamKey || !oppTeamKey) {
       return NextResponse.json(
@@ -40,25 +45,15 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // Map time range to number of weeks
+    // Map time range to number of weeks (for logging/metadata only)
     let numWeeks = 1
     if (range === 'last14') {
       numWeeks = 2
     } else if (range === 'last30') {
       numWeeks = 4
     } else if (range === 'season') {
-      // For season stats, redirect to NBA API
-      return NextResponse.json(
-        {
-          error: 'For season stats, use /api/nba/stats endpoint instead',
-          redirect: '/api/nba/stats?season=2025'
-        },
-        { status: 400 }
-      )
+      numWeeks = 0 // Full season
     }
-
-    // Extract leagueKey from teamKey
-    const leagueKey = myTeamKey.substring(0, myTeamKey.lastIndexOf('.t.'))
 
     // Create cache key
     const cacheKey = `${myTeamKey}-${oppTeamKey}-${range}`
@@ -75,11 +70,7 @@ export async function GET(request: NextRequest) {
       })
     }
 
-    // Get current week from league metadata
-    console.log(`Fetching league metadata for ${leagueKey}`)
-    const metadata = await getLeagueMetadata(session.accessToken, leagueKey)
-    const currentWeek = parseInt(String(metadata?.current_week || '1'))
-    console.log(`Current week: ${currentWeek}`)
+    console.log(`Fetching roster players stats for ${cacheKey} (range: ${range})`)
 
     // Fetch both team rosters
     console.log(`Fetching rosters for ${myTeamKey} and ${oppTeamKey}`)
@@ -98,16 +89,46 @@ export async function GET(request: NextRequest) {
     // Log player names for debugging
     console.log(`Player names: ${allPlayers.slice(0, 5).map(p => p.name.full).join(', ')}...`)
 
-    // Fetch fresh data from Yahoo API (only for roster players)
-    console.log(`Fetching roster players stats for ${cacheKey} (week ${currentWeek}, ${numWeeks} weeks)`)
-    const playerStatsMap = await getRosterPlayersStats(
-      session.accessToken,
-      allPlayers,
-      currentWeek,
-      numWeeks
-    )
+    // Fetch stats from NBA API (season averages)
+    // Note: Time range filtering not yet implemented - all ranges use season averages
+    console.log(`Fetching NBA stats for season 2025 (${range})`)
+    const nbaStatsMap = await fetchPlayerStats('2025', range)
+    console.log(`NBA API returned ${nbaStatsMap.size} total players`)
 
-    console.log(`getRosterPlayersStats returned ${Object.keys(playerStatsMap).length} players with stats`)
+    // Filter to only include roster players and convert to the expected format
+    const playerStatsMap: Record<string, PlayerAverages> = {}
+    let matchedCount = 0
+    const unmatchedPlayers: string[] = []
+
+    allPlayers.forEach(player => {
+      const yahooName = player.name.full
+
+      // Try exact match first
+      let stats = nbaStatsMap.get(yahooName)
+
+      // Try normalized match if exact match fails
+      if (!stats) {
+        const normalizedYahoo = normalizePlayerName(yahooName)
+        for (const [nbaName, nbaStats] of nbaStatsMap.entries()) {
+          if (normalizePlayerName(nbaName) === normalizedYahoo) {
+            stats = nbaStats
+            break
+          }
+        }
+      }
+
+      if (stats) {
+        playerStatsMap[yahooName] = stats
+        matchedCount++
+      } else {
+        unmatchedPlayers.push(yahooName)
+      }
+    })
+
+    console.log(`Matched ${matchedCount}/${allPlayers.length} roster players with NBA stats`)
+    if (unmatchedPlayers.length > 0) {
+      console.log(`Unmatched players (${unmatchedPlayers.length}):`, unmatchedPlayers.slice(0, 10).join(', '))
+    }
     console.log(`Sample player stats:`, Object.keys(playerStatsMap).slice(0, 3).map(name => ({
       name,
       ppg: playerStatsMap[name]?.ppg,
@@ -126,7 +147,8 @@ export async function GET(request: NextRequest) {
       count: Object.keys(playerStatsMap).length,
       range,
       numWeeks,
-      currentWeek,
+      source: 'nba-api',
+      note: range !== 'season' ? 'Time range filtering not yet implemented - using season averages' : undefined,
     })
   } catch (error: unknown) {
     console.error('Error in /api/yahoo/league-players:', error)
