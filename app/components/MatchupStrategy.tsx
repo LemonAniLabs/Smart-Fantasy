@@ -93,6 +93,15 @@ export default function MatchupStrategy({
   const [myInjuredPlayers, setMyInjuredPlayers] = useState<Player[]>([])
   const [oppInjuredPlayers, setOppInjuredPlayers] = useState<Player[]>([])
 
+  // Injury exclusion controls
+  const [excludeAllInjured, setExcludeAllInjured] = useState(false)
+  const [excludedPlayerKeys, setExcludedPlayerKeys] = useState<Set<string>>(new Set())
+
+  // Cache rosters and stats for recalculation
+  const [myRoster, setMyRoster] = useState<Player[]>([])
+  const [oppRoster, setOppRoster] = useState<Player[]>([])
+  const [statsData, setStatsData] = useState<Record<string, PlayerStats>>({})
+
   useEffect(() => {
     // Parse league stat categories from settings
     if (leagueSettings) {
@@ -200,6 +209,49 @@ export default function MatchupStrategy({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [myTeamKey, opponentTeamKey, statCategories, selectedTimeRange])
 
+  // Recalculate stats when injury exclusion settings change
+  useEffect(() => {
+    if (myRoster.length > 0 && oppRoster.length > 0 && Object.keys(statsData).length > 0) {
+      recalculateStats()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [excludeAllInjured, excludedPlayerKeys])
+
+  const recalculateStats = () => {
+    console.log('Recalculating stats with injury exclusions...')
+    const myTeamStats = calculateTeamStats(myRoster, statsData, excludeAllInjured, excludedPlayerKeys)
+    const oppTeamStats = calculateTeamStats(oppRoster, statsData, excludeAllInjured, excludedPlayerKeys)
+
+    setMyStats(myTeamStats)
+    setOppStats(oppTeamStats)
+
+    // Regenerate comparison
+    const comparisonData = generateComparison(myTeamStats, oppTeamStats)
+    setComparison(comparisonData)
+  }
+
+  // Toggle individual player exclusion
+  const togglePlayerExclusion = (playerKey: string) => {
+    const newExcluded = new Set(excludedPlayerKeys)
+    if (newExcluded.has(playerKey)) {
+      newExcluded.delete(playerKey)
+    } else {
+      newExcluded.add(playerKey)
+    }
+    setExcludedPlayerKeys(newExcluded)
+  }
+
+  // Toggle exclude all injured
+  const toggleExcludeAllInjured = () => {
+    const newValue = !excludeAllInjured
+    setExcludeAllInjured(newValue)
+
+    // If turning on, also clear individual exclusions
+    if (newValue) {
+      setExcludedPlayerKeys(new Set())
+    }
+  }
+
   const fetchAnalysis = async () => {
     setLoading(true)
     try {
@@ -220,15 +272,19 @@ export default function MatchupStrategy({
         oppRosterRes.json(),
       ])
 
-      const myRoster: Player[] = myRosterData.roster || []
-      const oppRoster: Player[] = oppRosterData.roster || []
+      const myRosterPlayers: Player[] = myRosterData.roster || []
+      const oppRosterPlayers: Player[] = oppRosterData.roster || []
 
-      console.log('My roster:', myRoster.length, 'players')
-      console.log('Opponent roster:', oppRoster.length, 'players')
+      console.log('My roster:', myRosterPlayers.length, 'players')
+      console.log('Opponent roster:', oppRosterPlayers.length, 'players')
+
+      // Cache rosters for recalculation
+      setMyRoster(myRosterPlayers)
+      setOppRoster(oppRosterPlayers)
 
       // Analyze injury status
-      const myInjured = myRoster.filter(p => p.status && p.status !== 'Healthy')
-      const oppInjured = oppRoster.filter(p => p.status && p.status !== 'Healthy')
+      const myInjured = myRosterPlayers.filter(p => p.status && p.status !== 'Healthy')
+      const oppInjured = oppRosterPlayers.filter(p => p.status && p.status !== 'Healthy')
 
       setMyInjuredPlayers(myInjured)
       setOppInjuredPlayers(oppInjured)
@@ -255,11 +311,15 @@ export default function MatchupStrategy({
       if (!statsResponse.ok) {
         throw new Error('Failed to fetch NBA stats')
       }
-      const statsData = await statsResponse.json()
-      const stats = statsData.stats || {}
+      const statsDataResponse = await statsResponse.json()
+      const stats = statsDataResponse.stats || {}
 
-      const myTeamStats = calculateTeamStats(myRoster, stats)
-      const oppTeamStats = calculateTeamStats(oppRoster, stats)
+      // Cache stats data for recalculation
+      setStatsData(stats)
+
+      // Calculate team stats with current exclusion settings
+      const myTeamStats = calculateTeamStats(myRosterPlayers, stats, excludeAllInjured, excludedPlayerKeys)
+      const oppTeamStats = calculateTeamStats(oppRosterPlayers, stats, excludeAllInjured, excludedPlayerKeys)
 
       const rangeLabel = selectedTimeRange === 'season' ? 'season averages' :
                         selectedTimeRange === 'last7' ? 'last 7 days average' :
@@ -403,7 +463,12 @@ export default function MatchupStrategy({
     return converted
   }
 
-  const calculateTeamStats = (roster: Player[], statsMap: Record<string, PlayerStats>): TeamStats => {
+  const calculateTeamStats = (
+    roster: Player[],
+    statsMap: Record<string, PlayerStats>,
+    excludeAllInjured: boolean,
+    excludedPlayerKeys: Set<string>
+  ): TeamStats => {
     let totalPPG = 0
     let totalRPG = 0
     let totalAPG = 0
@@ -423,6 +488,16 @@ export default function MatchupStrategy({
     let playerCount = 0
 
     roster.forEach((player) => {
+      // Skip excluded players
+      if (excludedPlayerKeys.has(player.player_key)) {
+        console.log(`Excluding player: ${player.name.full} (individually excluded)`)
+        return
+      }
+      if (excludeAllInjured && player.status && player.status !== 'Healthy') {
+        console.log(`Excluding player: ${player.name.full} (injured, excludeAll is on)`)
+        return
+      }
+
       const stats = statsMap[player.name.full]
       if (stats && stats.gamesPlayed >= 5) {
         totalPPG += stats.ppg
@@ -575,9 +650,21 @@ export default function MatchupStrategy({
       {/* Injury Alert */}
       {(myInjuredPlayers.length > 0 || oppInjuredPlayers.length > 0) && (
         <div className="bg-yellow-900/20 border border-yellow-600 rounded-lg p-4">
-          <h4 className="text-yellow-400 font-semibold mb-3 flex items-center gap-2">
-            ⚠️ 傷病警報
-          </h4>
+          <div className="flex items-center justify-between mb-3">
+            <h4 className="text-yellow-400 font-semibold flex items-center gap-2">
+              ⚠️ 傷病警報
+            </h4>
+            <button
+              onClick={toggleExcludeAllInjured}
+              className={`px-4 py-2 rounded text-sm font-medium transition-colors ${
+                excludeAllInjured
+                  ? 'bg-red-600 text-white hover:bg-red-700'
+                  : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+              }`}
+            >
+              {excludeAllInjured ? '✓ 已排除所有傷兵' : '排除所有傷兵'}
+            </button>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* My injured players */}
             {myInjuredPlayers.length > 0 && (
@@ -586,13 +673,24 @@ export default function MatchupStrategy({
                 <div className="space-y-2">
                   {myInjuredPlayers.map((player) => {
                     const badge = getInjuryBadge(player.status || '')
+                    const isExcluded = excludeAllInjured || excludedPlayerKeys.has(player.player_key)
                     return (
-                      <div key={player.player_key} className="flex items-start gap-2 text-sm">
+                      <div key={player.player_key} className={`flex items-start gap-2 text-sm p-2 rounded ${isExcluded ? 'bg-red-900/20' : ''}`}>
+                        <input
+                          type="checkbox"
+                          checked={isExcluded}
+                          onChange={() => togglePlayerExclusion(player.player_key)}
+                          disabled={excludeAllInjured}
+                          className="mt-0.5 w-4 h-4 rounded border-slate-600 bg-slate-700 text-red-600 focus:ring-red-500 focus:ring-offset-slate-900 disabled:opacity-50"
+                          title={isExcluded ? '取消排除此球員' : '排除此球員'}
+                        />
                         <span className={`${badge.color} ${badge.textColor} px-2 py-0.5 rounded text-xs font-bold`}>
                           {badge.label}
                         </span>
                         <div className="flex-1">
-                          <div className="text-white font-medium">{player.name.full}</div>
+                          <div className={`font-medium ${isExcluded ? 'text-slate-500 line-through' : 'text-white'}`}>
+                            {player.name.full}
+                          </div>
                           {player.injury_note && (
                             <div className="text-slate-400 text-xs mt-0.5">{player.injury_note}</div>
                           )}
@@ -611,13 +709,24 @@ export default function MatchupStrategy({
                 <div className="space-y-2">
                   {oppInjuredPlayers.map((player) => {
                     const badge = getInjuryBadge(player.status || '')
+                    const isExcluded = excludeAllInjured || excludedPlayerKeys.has(player.player_key)
                     return (
-                      <div key={player.player_key} className="flex items-start gap-2 text-sm">
+                      <div key={player.player_key} className={`flex items-start gap-2 text-sm p-2 rounded ${isExcluded ? 'bg-red-900/20' : ''}`}>
+                        <input
+                          type="checkbox"
+                          checked={isExcluded}
+                          onChange={() => togglePlayerExclusion(player.player_key)}
+                          disabled={excludeAllInjured}
+                          className="mt-0.5 w-4 h-4 rounded border-slate-600 bg-slate-700 text-red-600 focus:ring-red-500 focus:ring-offset-slate-900 disabled:opacity-50"
+                          title={isExcluded ? '取消排除此球員' : '排除此球員'}
+                        />
                         <span className={`${badge.color} ${badge.textColor} px-2 py-0.5 rounded text-xs font-bold`}>
                           {badge.label}
                         </span>
                         <div className="flex-1">
-                          <div className="text-white font-medium">{player.name.full}</div>
+                          <div className={`font-medium ${isExcluded ? 'text-slate-500 line-through' : 'text-white'}`}>
+                            {player.name.full}
+                          </div>
                           {player.injury_note && (
                             <div className="text-slate-400 text-xs mt-0.5">{player.injury_note}</div>
                           )}
@@ -630,7 +739,7 @@ export default function MatchupStrategy({
             )}
           </div>
           <div className="mt-3 text-xs text-yellow-300">
-            💡 提示：傷病球員的數據仍計入分析中。根據傷病狀況調整你的陣容策略。
+            💡 提示：使用複選框可排除個別傷病球員，或使用「排除所有傷兵」按鈕一次排除全部。被排除的球員數據不會計入分析。
           </div>
         </div>
       )}
