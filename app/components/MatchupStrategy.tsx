@@ -194,36 +194,40 @@ export default function MatchupStrategy({
   const fetchAnalysis = async () => {
     setLoading(true)
     try {
-      // Fetch NBA stats first
-      const statsResponse = await fetch('/api/nba/stats?season=2025')
-      if (!statsResponse.ok) {
-        throw new Error('Failed to fetch NBA stats')
+      // Get current matchup data to determine current week
+      const matchupResponse = await fetch(`/api/yahoo/matchup?teamKey=${myTeamKey}`)
+      let currentWeek = 1
+
+      if (matchupResponse.ok) {
+        const matchupData = await matchupResponse.json()
+        currentWeek = matchupData.matchup?.['0']?.week || matchupData.matchup?.week || 1
+        console.log('Current week from matchup:', currentWeek)
       }
 
-      const statsData = await statsResponse.json()
-      const stats = statsData.stats || {}
-
-      // Fetch both rosters
-      const [myRosterRes, oppRosterRes] = await Promise.all([
-        fetch(`/api/yahoo/roster?teamKey=${myTeamKey}`),
-        fetch(`/api/yahoo/roster?teamKey=${opponentTeamKey}`),
+      // Fetch weekly stats for both teams
+      const [myWeeklyStatsRes, oppWeeklyStatsRes] = await Promise.all([
+        fetch(`/api/yahoo/weekly-stats?teamKey=${myTeamKey}&week=${currentWeek}`),
+        fetch(`/api/yahoo/weekly-stats?teamKey=${opponentTeamKey}&week=${currentWeek}`),
       ])
 
-      if (!myRosterRes.ok || !oppRosterRes.ok) {
-        throw new Error('Failed to fetch rosters')
+      if (!myWeeklyStatsRes.ok || !oppWeeklyStatsRes.ok) {
+        throw new Error('Failed to fetch weekly stats')
       }
 
-      const [myRosterData, oppRosterData] = await Promise.all([
-        myRosterRes.json(),
-        oppRosterRes.json(),
+      const [myWeeklyData, oppWeeklyData] = await Promise.all([
+        myWeeklyStatsRes.json(),
+        oppWeeklyStatsRes.json(),
       ])
 
-      const myRoster: Player[] = myRosterData.roster || []
-      const oppRoster: Player[] = oppRosterData.roster || []
+      console.log('My team weekly stats:', myWeeklyData)
+      console.log('Opponent weekly stats:', oppWeeklyData)
 
-      // Calculate team stats
-      const myTeamStats = calculateTeamStats(myRoster, stats)
-      const oppTeamStats = calculateTeamStats(oppRoster, stats)
+      const myWeeklyStats = myWeeklyData.stats || {}
+      const oppWeeklyStats = oppWeeklyData.stats || {}
+
+      // Convert weekly stats to TeamStats format
+      const myTeamStats = convertWeeklyStatsToTeamStats(myWeeklyStats)
+      const oppTeamStats = convertWeeklyStatsToTeamStats(oppWeeklyStats)
 
       setMyStats(myTeamStats)
       setOppStats(oppTeamStats)
@@ -235,6 +239,28 @@ export default function MatchupStrategy({
       console.error('Error fetching matchup analysis:', error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const convertWeeklyStatsToTeamStats = (weeklyStats: Record<string, number>): TeamStats => {
+    // Convert Yahoo weekly stats format to our TeamStats format
+    return {
+      ppg: weeklyStats['PTS'] || 0,
+      rpg: weeklyStats['REB'] || 0,
+      apg: weeklyStats['AST'] || 0,
+      spg: weeklyStats['ST'] || 0,
+      bpg: weeklyStats['BLK'] || 0,
+      threepm: weeklyStats['3PTM'] || 0,
+      tpg: weeklyStats['TO'] || 0,
+      fgPct: (weeklyStats['FG%'] || 0) * 100, // Convert to percentage
+      ftPct: (weeklyStats['FT%'] || 0) * 100, // Convert to percentage
+      fgm: weeklyStats['FGM'] || 0,
+      fga: weeklyStats['FGA'] || 0,
+      ftm: weeklyStats['FTM'] || 0,
+      fta: weeklyStats['FTA'] || 0,
+      oreb: weeklyStats['OREB'] || 0,
+      dreb: 0, // Yahoo doesn't provide DREB in weekly stats, calculate from REB - OREB if needed
+      atoratio: weeklyStats['A/T'] || 0,
     }
   }
 
