@@ -219,11 +219,16 @@ export default function MatchupStrategy({
         oppWeeklyStatsRes.json(),
       ])
 
-      console.log('My team weekly stats:', myWeeklyData)
-      console.log('Opponent weekly stats:', oppWeeklyData)
+      console.log('My team weekly stats FULL:', JSON.stringify(myWeeklyData, null, 2))
+      console.log('Opponent weekly stats FULL:', JSON.stringify(oppWeeklyData, null, 2))
 
       const myWeeklyStats = myWeeklyData.stats || {}
       const oppWeeklyStats = oppWeeklyData.stats || {}
+
+      console.log('My stats object:', myWeeklyStats)
+      console.log('Opponent stats object:', oppWeeklyStats)
+      console.log('My stats is empty?', Object.keys(myWeeklyStats).length === 0)
+      console.log('Opponent stats is empty?', Object.keys(oppWeeklyStats).length === 0)
 
       // Convert weekly stats to TeamStats format
       const myTeamStats = convertWeeklyStatsToTeamStats(myWeeklyStats)
