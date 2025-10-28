@@ -244,7 +244,10 @@ export default function MatchupStrategy({
 
   const convertWeeklyStatsToTeamStats = (weeklyStats: Record<string, number>): TeamStats => {
     // Convert Yahoo weekly stats format to our TeamStats format
-    return {
+    console.log('Converting weekly stats:', weeklyStats)
+    console.log('Weekly stats keys:', Object.keys(weeklyStats))
+
+    const converted = {
       ppg: weeklyStats['PTS'] || 0,
       rpg: weeklyStats['REB'] || 0,
       apg: weeklyStats['AST'] || 0,
@@ -262,6 +265,9 @@ export default function MatchupStrategy({
       dreb: 0, // Yahoo doesn't provide DREB in weekly stats, calculate from REB - OREB if needed
       atoratio: weeklyStats['A/T'] || 0,
     }
+
+    console.log('Converted TeamStats:', converted)
+    return converted
   }
 
   const calculateTeamStats = (roster: Player[], statsMap: Record<string, PlayerStats>): TeamStats => {
