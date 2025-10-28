@@ -8,6 +8,7 @@ interface MatchupStrategyProps {
   opponentTeamKey: string
   opponentTeamName: string
   leagueSettings?: unknown
+  currentWeek?: number
 }
 
 interface Player {
@@ -77,6 +78,7 @@ export default function MatchupStrategy({
   opponentTeamKey,
   opponentTeamName,
   leagueSettings,
+  currentWeek = 1,
 }: MatchupStrategyProps) {
   const [loading, setLoading] = useState(true)
   const [myStats, setMyStats] = useState<TeamStats | null>(null)
@@ -419,9 +421,14 @@ export default function MatchupStrategy({
     <div className="space-y-6">
       {/* Overview */}
       <div className="bg-gradient-to-r from-purple-900/30 to-blue-900/30 p-6 rounded-lg border border-purple-500/30">
-        <h4 className="text-white font-bold text-xl mb-4 flex items-center gap-2">
-          🎯 戰略分析
-        </h4>
+        <div className="flex items-center justify-between mb-4">
+          <h4 className="text-white font-bold text-xl flex items-center gap-2">
+            🎯 戰略分析
+          </h4>
+          <div className="bg-purple-600/30 border border-purple-500 px-4 py-2 rounded-lg">
+            <span className="text-purple-200 text-sm">第 {currentWeek} 週</span>
+          </div>
+        </div>
 
         <div className="grid grid-cols-3 gap-4 mb-4">
           <div className="bg-green-900/20 border border-green-600 rounded-lg p-3 text-center">

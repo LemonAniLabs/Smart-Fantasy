@@ -4,8 +4,8 @@ import { authOptions } from '@/lib/auth'
 import { getCurrentMatchup } from '@/lib/yahoo/api'
 
 /**
- * Get current week's matchup for a team
- * GET /api/yahoo/matchup?teamKey=xxx
+ * Get matchup for a team for a specific week or current week
+ * GET /api/yahoo/matchup?teamKey=xxx&week=1 (optional week parameter)
  */
 export async function GET(request: NextRequest) {
   try {
@@ -20,6 +20,8 @@ export async function GET(request: NextRequest) {
 
     const searchParams = request.nextUrl.searchParams
     const teamKey = searchParams.get('teamKey')
+    const weekParam = searchParams.get('week')
+    const week = weekParam ? parseInt(weekParam) : undefined
 
     if (!teamKey) {
       return NextResponse.json(
@@ -28,9 +30,12 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    const matchup = await getCurrentMatchup(session.accessToken, teamKey)
+    const result = await getCurrentMatchup(session.accessToken, teamKey, week)
 
-    return NextResponse.json({ matchup })
+    return NextResponse.json({
+      matchup: result?.matchup || null,
+      week: result?.week || 1
+    })
   } catch (error: unknown) {
     console.error('Error in /api/yahoo/matchup:', error)
     return NextResponse.json(

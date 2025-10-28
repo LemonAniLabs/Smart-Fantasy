@@ -89,6 +89,7 @@ export default function YahooConnect() {
   const [showRosterManager, setShowRosterManager] = useState(false)
   const [showWeeklyComparison, setShowWeeklyComparison] = useState(false)
   const [authError, setAuthError] = useState(false)
+  const [currentWeek, setCurrentWeek] = useState<number>(1)
 
   useEffect(() => {
     if (session?.accessToken) {
@@ -164,8 +165,8 @@ export default function YahooConnect() {
       // Fetch my team's roster
       await fetchTeamRoster(userTeam.team_key)
 
-      // Fetch current week's matchup
-      fetchMatchup(userTeam.team_key)
+      // Fetch league metadata to get current week
+      await fetchLeagueMetadata(league.league_key, userTeam.team_key)
 
       // Fetch league settings
       fetchLeagueSettings(league.league_key)
@@ -207,22 +208,62 @@ export default function YahooConnect() {
     }
   }
 
-  const fetchMatchup = async (teamKey: string) => {
+  const fetchLeagueMetadata = async (leagueKey: string, teamKey: string) => {
+    try {
+      const metadataResponse = await fetch(`/api/yahoo/league-metadata?leagueKey=${leagueKey}`)
+      if (!metadataResponse.ok) {
+        console.warn('Failed to fetch league metadata')
+        return
+      }
+      const metadataData = await metadataResponse.json()
+      console.log('League metadata:', metadataData)
+
+      // Extract current week from metadata
+      const metadata = metadataData.metadata
+      if (metadata && metadata.current_week) {
+        const week = parseInt(String(metadata.current_week))
+        console.log('Current week from metadata:', week)
+        setCurrentWeek(week)
+
+        // Fetch matchup for current week
+        await fetchMatchup(teamKey, week)
+      } else {
+        // Fallback to week 1 if current_week not available
+        console.warn('No current_week in metadata, using week 1')
+        setCurrentWeek(1)
+        await fetchMatchup(teamKey, 1)
+      }
+    } catch (err) {
+      console.error('Error fetching league metadata:', err)
+      // Fallback to week 1
+      setCurrentWeek(1)
+      await fetchMatchup(teamKey, 1)
+    }
+  }
+
+  const fetchMatchup = async (teamKey: string, week?: number) => {
     setLoadingMatchup(true)
     try {
-      const matchupResponse = await fetch(`/api/yahoo/matchup?teamKey=${teamKey}`)
+      const weekParam = week ? `&week=${week}` : ''
+      const matchupResponse = await fetch(`/api/yahoo/matchup?teamKey=${teamKey}${weekParam}`)
       if (!matchupResponse.ok) {
         console.warn('Failed to fetch matchup')
         return
       }
       const matchupData = await matchupResponse.json()
       console.log('Matchup data:', matchupData)
+      console.log('Matchup week:', matchupData.week)
+
+      // Update current week if returned from API
+      if (matchupData.week) {
+        setCurrentWeek(matchupData.week)
+      }
 
       // Find opponent team from matchup data
       // matchup structure: {"0": {"teams": {...}}}
       if (matchupData.matchup) {
         const matchupObj = matchupData.matchup
-        const teamsData = matchupObj['0']?.teams || matchupObj.teams
+        const teamsData = matchupObj[1]?.teams || matchupObj['0']?.teams || matchupObj.teams
         if (teamsData) {
           // Find opponent (the team that is not mine)
           for (const key in teamsData) {
@@ -745,6 +786,7 @@ export default function YahooConnect() {
                           opponentTeamKey={opponentTeam.team_key}
                           opponentTeamName={opponentTeam.name}
                           leagueSettings={leagueSettings}
+                          currentWeek={currentWeek}
                         />
                       </div>
                     </div>
@@ -1011,6 +1053,7 @@ export default function YahooConnect() {
           leagueKey={selectedLeague.league_key}
           allTeams={allTeams}
           myTeamKey={myTeam.team_key}
+          currentWeek={currentWeek}
           leagueSettings={leagueSettings}
           onClose={() => setShowWeeklyComparison(false)}
         />

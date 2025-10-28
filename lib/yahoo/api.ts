@@ -343,12 +343,49 @@ export async function getLeagueSettings(accessToken: string, leagueKey: string) 
 }
 
 /**
- * Fetch current week's matchup for a team
+ * Fetch league metadata including current week
  */
-export async function getCurrentMatchup(accessToken: string, teamKey: string) {
+export async function getLeagueMetadata(accessToken: string, leagueKey: string) {
   try {
-    // Get current week matchup
-    const url = `${YAHOO_FANTASY_API_BASE}/team/${teamKey}/matchups;current?format=json`
+    const url = `${YAHOO_FANTASY_API_BASE}/league/${leagueKey}/metadata?format=json`
+
+    console.log('Fetching league metadata from:', url)
+
+    const response = await axios.get(url, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        Accept: 'application/json',
+      },
+    })
+
+    console.log('League metadata response:', JSON.stringify(response.data, null, 2))
+
+    const league = response.data?.fantasy_content?.league
+    if (!league || !Array.isArray(league) || league.length < 1) {
+      console.log('Invalid league structure')
+      return null
+    }
+
+    // league[0] contains league info including current_week
+    const leagueInfo = league[0] as Record<string, unknown>
+    return leagueInfo
+  } catch (error) {
+    console.error('Error fetching league metadata:', error)
+    if (axios.isAxiosError(error)) {
+      console.error('Response data:', error.response?.data)
+    }
+    throw error
+  }
+}
+
+/**
+ * Fetch matchup for a team for a specific week (or current week if not specified)
+ */
+export async function getCurrentMatchup(accessToken: string, teamKey: string, week?: number) {
+  try {
+    // Get matchup for specific week or current week
+    const weekParam = week ? `;weeks=${week}` : ';current'
+    const url = `${YAHOO_FANTASY_API_BASE}/team/${teamKey}/matchups${weekParam}?format=json`
 
     console.log('Fetching matchup from:', url)
 
@@ -373,14 +410,20 @@ export async function getCurrentMatchup(accessToken: string, teamKey: string) {
       return null
     }
 
-    // Get first matchup (current week)
+    // Get first matchup
     const matchupData = matchupsObj['0']?.matchup || matchupsObj[0]?.matchup
     if (!matchupData) {
       console.log('No matchup data found')
       return null
     }
 
-    return matchupData
+    // Extract week number from matchup data
+    let weekNumber = week
+    if (!weekNumber && matchupData[0]) {
+      weekNumber = parseInt(String(matchupData[0].week || '1'))
+    }
+
+    return { matchup: matchupData, week: weekNumber }
   } catch (error) {
     console.error('Error fetching matchup:', error)
     if (axios.isAxiosError(error)) {
