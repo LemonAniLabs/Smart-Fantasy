@@ -24,9 +24,28 @@ interface PlayerStats {
   threepm: number
 }
 
+interface GameLog {
+  date: string
+  stats: Record<string, number>
+  hasGame: boolean
+}
+
+interface GameLogsData {
+  playerKey: string
+  gamesFound: number
+  requestsMade: number
+  gameLogs: GameLog[]
+}
+
+type TabType = 'season' | 'games'
+
 export default function PlayerCard({ playerName, yahooPlayerKey, onClose }: PlayerCardProps) {
   const [stats, setStats] = useState<PlayerStats | null>(null)
   const [loading, setLoading] = useState(true)
+  const [activeTab, setActiveTab] = useState<TabType>('season')
+  const [gameLogs, setGameLogs] = useState<GameLog[]>([])
+  const [gameLogsLoading, setGameLogsLoading] = useState(false)
+  const [gameLimit, setGameLimit] = useState<number>(10)
 
   useEffect(() => {
     fetchPlayerDetails()
@@ -49,6 +68,41 @@ export default function PlayerCard({ playerName, yahooPlayerKey, onClose }: Play
     }
   }
 
+  const fetchGameLogs = async () => {
+    if (!yahooPlayerKey || gameLogs.length > 0) return // Don't fetch if already loaded
+
+    setGameLogsLoading(true)
+    try {
+      console.log(`Fetching ${gameLimit} game logs for ${yahooPlayerKey}`)
+      const response = await fetch(`/api/yahoo/player-season-games?playerKey=${yahooPlayerKey}&limit=${gameLimit}`)
+      const data: GameLogsData = await response.json()
+
+      if (data.gameLogs) {
+        setGameLogs(data.gameLogs)
+        console.log(`Loaded ${data.gamesFound} games`)
+      }
+    } catch (error) {
+      console.error('Error fetching game logs:', error)
+    } finally {
+      setGameLogsLoading(false)
+    }
+  }
+
+  // Fetch game logs when switching to games tab
+  useEffect(() => {
+    if (activeTab === 'games' && gameLogs.length === 0) {
+      fetchGameLogs()
+    }
+  }, [activeTab])
+
+  // Re-fetch when game limit changes
+  useEffect(() => {
+    if (activeTab === 'games') {
+      setGameLogs([]) // Clear existing logs
+      fetchGameLogs()
+    }
+  }, [gameLimit])
+
   // Get player headshot URL (NBA uses player ID, we'll use a generic placeholder for now)
   const getPlayerImageUrl = (name: string) => {
     // For now, return a placeholder
@@ -56,20 +110,76 @@ export default function PlayerCard({ playerName, yahooPlayerKey, onClose }: Play
     return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&size=200&background=7c3aed&color=fff&bold=true`
   }
 
+  // Map Yahoo stat IDs to readable names
+  const statIdMap: Record<string, string> = {
+    '5': 'FGM',
+    '6': 'FGA',
+    '7': 'FG%',
+    '8': 'FTM',
+    '9': 'FTA',
+    '10': 'FT%',
+    '11': '3PM',
+    '12': 'PTS',
+    '13': 'REB',
+    '14': 'AST',
+    '15': 'STL',
+    '16': 'BLK',
+    '17': 'TO'
+  }
+
+  // Format stat value based on type
+  const formatStatValue = (statId: string, value: number): string => {
+    if (statId === '7' || statId === '10') { // Percentages
+      return (value * 100).toFixed(1) + '%'
+    }
+    return value.toFixed(1)
+  }
+
+  // Get readable stat name from ID
+  const getStatName = (statId: string): string => {
+    return statIdMap[statId] || `Stat ${statId}`
+  }
+
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <div className="bg-slate-900 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-purple-500/30 shadow-2xl">
         {/* Header */}
-        <div className="sticky top-0 bg-gradient-to-r from-purple-900 to-slate-900 p-4 flex justify-between items-center border-b border-purple-500/30">
-          <h3 className="text-xl font-bold text-white">Player Details</h3>
-          <button
-            onClick={onClose}
-            className="text-purple-200 hover:text-white transition-colors"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
+        <div className="sticky top-0 bg-gradient-to-r from-purple-900 to-slate-900 border-b border-purple-500/30 z-10">
+          <div className="p-4 flex justify-between items-center">
+            <h3 className="text-xl font-bold text-white">球員詳情</h3>
+            <button
+              onClick={onClose}
+              className="text-purple-200 hover:text-white transition-colors"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          {/* Tabs */}
+          <div className="flex border-t border-purple-500/30">
+            <button
+              onClick={() => setActiveTab('season')}
+              className={`flex-1 py-3 text-sm font-medium transition-colors ${
+                activeTab === 'season'
+                  ? 'bg-slate-800 text-purple-300 border-b-2 border-purple-500'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              賽季統計
+            </button>
+            <button
+              onClick={() => setActiveTab('games')}
+              className={`flex-1 py-3 text-sm font-medium transition-colors ${
+                activeTab === 'games'
+                  ? 'bg-slate-800 text-purple-300 border-b-2 border-purple-500'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              比賽紀錄
+            </button>
+          </div>
         </div>
 
         {loading ? (
@@ -79,6 +189,9 @@ export default function PlayerCard({ playerName, yahooPlayerKey, onClose }: Play
           </div>
         ) : stats ? (
           <div className="p-6 space-y-6">
+            {/* Season Stats Tab */}
+            {activeTab === 'season' && (
+          <>
             {/* Player Header */}
             <div className="flex items-start gap-6">
               <img
@@ -245,6 +358,72 @@ export default function PlayerCard({ playerName, yahooPlayerKey, onClose }: Play
                 </div>
               </div>
             </div>
+            </>
+            )}
+
+            {/* Game Logs Tab */}
+            {activeTab === 'games' && (
+              <>
+                {/* Player Header (simplified for game logs) */}
+                <div className="flex items-start justify-between">
+                  <div>
+                    <h2 className="text-2xl font-bold text-white">{stats.name}</h2>
+                    <p className="text-slate-400 text-sm mt-1">本賽季比賽紀錄</p>
+                  </div>
+                  <select
+                    value={gameLimit}
+                    onChange={(e) => setGameLimit(Number(e.target.value))}
+                    className="bg-slate-800 text-white px-3 py-2 rounded border border-slate-600 text-sm"
+                  >
+                    <option value={5}>最近 5 場</option>
+                    <option value={10}>最近 10 場</option>
+                    <option value={15}>最近 15 場</option>
+                    <option value={20}>最近 20 場</option>
+                  </select>
+                </div>
+
+                {/* Game Logs List */}
+                {gameLogsLoading ? (
+                  <div className="text-center py-12">
+                    <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500"></div>
+                    <p className="text-purple-200 mt-4">載入比賽紀錄中...</p>
+                    <p className="text-slate-400 text-sm mt-2">這可能需要幾秒鐘</p>
+                  </div>
+                ) : gameLogs.length > 0 ? (
+                  <div className="space-y-3">
+                    {gameLogs.map((game, index) => (
+                      <div key={game.date} className="bg-slate-800/50 rounded-lg border border-slate-700 hover:border-purple-500/50 transition-colors">
+                        <div className="p-4">
+                          <div className="flex justify-between items-center mb-3 pb-2 border-b border-slate-700">
+                            <div>
+                              <span className="text-purple-400 font-semibold">第 {index + 1} 場</span>
+                              <span className="text-slate-400 text-sm ml-3">{game.date}</span>
+                            </div>
+                            <span className="text-xs text-slate-500">{Object.keys(game.stats).length} 項數據</span>
+                          </div>
+
+                          <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 gap-3">
+                            {Object.entries(game.stats)
+                              .filter(([statId]) => statIdMap[statId])
+                              .map(([statId, value]) => (
+                                <div key={statId} className="text-center">
+                                  <div className="text-xs text-slate-400 mb-1">{getStatName(statId)}</div>
+                                  <div className="text-white font-semibold">{formatStatValue(statId, value)}</div>
+                                </div>
+                              ))}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-12">
+                    <p className="text-slate-400">尚無比賽紀錄</p>
+                    <p className="text-slate-500 text-sm mt-2">球員可能還沒有出賽記錄</p>
+                  </div>
+                )}
+              </>
+            )}
           </div>
         ) : (
           <div className="p-8 text-center">
