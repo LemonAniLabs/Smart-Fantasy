@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import axios from 'axios'
+import { supabase } from '@/lib/supabase/client'
 
 const YAHOO_FANTASY_API_BASE = 'https://fantasysports.yahooapis.com/fantasy/v2'
 
@@ -12,6 +13,73 @@ interface GameLog {
   date: string
   stats: Record<string, number>
   hasGame: boolean
+}
+
+/**
+ * Fetch game logs from Supabase cache
+ */
+async function getGameLogsFromCache(playerKey: string, dates: string[]): Promise<Map<string, GameLog>> {
+  // If Supabase is not configured, return empty cache
+  if (!supabase) {
+    console.log('Supabase not configured, skipping cache check')
+    return new Map()
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from('player_game_logs')
+      .select('game_date, stats')
+      .eq('player_key', playerKey)
+      .in('game_date', dates)
+
+    if (error) {
+      console.error('Error fetching from Supabase:', error)
+      return new Map()
+    }
+
+    const cacheMap = new Map<string, GameLog>()
+    data?.forEach(row => {
+      cacheMap.set(row.game_date, {
+        date: row.game_date,
+        stats: row.stats as Record<string, number>,
+        hasGame: true
+      })
+    })
+
+    return cacheMap
+  } catch (error) {
+    console.error('Error in getGameLogsFromCache:', error)
+    return new Map()
+  }
+}
+
+/**
+ * Save game log to Supabase cache
+ */
+async function saveGameLogToCache(playerKey: string, playerName: string, gameLog: GameLog): Promise<void> {
+  // If Supabase is not configured, skip saving
+  if (!supabase) {
+    return
+  }
+
+  try {
+    const { error } = await supabase
+      .from('player_game_logs')
+      .upsert({
+        player_key: playerKey,
+        player_name: playerName,
+        game_date: gameLog.date,
+        stats: gameLog.stats
+      }, {
+        onConflict: 'player_key,game_date'
+      })
+
+    if (error) {
+      console.error('Error saving to Supabase:', error)
+    }
+  } catch (error) {
+    console.error('Error in saveGameLogToCache:', error)
+  }
 }
 
 /**
@@ -76,14 +144,31 @@ export async function GET(request: NextRequest) {
 
     console.log(`Checking ${datesToCheck.length} dates from ${datesToCheck[datesToCheck.length - 1]} to ${datesToCheck[0]}`)
 
+    // Check cache first
+    console.log(`Checking Supabase cache for ${playerKey}...`)
+    const cacheMap = await getGameLogsFromCache(playerKey, datesToCheck)
+    console.log(`Found ${cacheMap.size} cached games`)
+
     // Fetch stats for each date
     const gameLogs: GameLog[] = []
     let requestCount = 0
+    let cacheHits = 0
+    let playerName = '' // Will be populated from first API response
 
     for (const date of datesToCheck) {
       // Stop if we've found enough games
       if (gameLogs.length >= limit) break
 
+      // Check cache first
+      const cachedGame = cacheMap.get(date)
+      if (cachedGame) {
+        gameLogs.push(cachedGame)
+        cacheHits++
+        console.log(`Cache hit for ${date}`)
+        continue
+      }
+
+      // Not in cache, fetch from Yahoo API
       try {
         const url = `${YAHOO_FANTASY_API_BASE}/player/${playerKey}/stats;type=date;date=${date}?format=json`
 
@@ -99,6 +184,11 @@ export async function GET(request: NextRequest) {
         const playerData = response.data?.fantasy_content?.player
         if (!playerData || !Array.isArray(playerData) || playerData.length < 2) {
           continue
+        }
+
+        // Get player name if not already set
+        if (!playerName && playerData[0]?.name?.full) {
+          playerName = playerData[0].name.full
         }
 
         const playerStats = playerData[1]?.player_stats
@@ -133,13 +223,21 @@ export async function GET(request: NextRequest) {
           }
         })
 
-        gameLogs.push({
+        const gameLog: GameLog = {
           date,
           stats: statsObject,
           hasGame: true,
-        })
+        }
 
+        gameLogs.push(gameLog)
         console.log(`Found game on ${date} - ${Object.keys(statsObject).length} stats`)
+
+        // Save to cache (don't await, let it run in background)
+        if (playerName) {
+          saveGameLogToCache(playerKey, playerName, gameLog).catch(err => {
+            console.error('Failed to save to cache:', err)
+          })
+        }
 
       } catch (error) {
         console.error(`Error fetching stats for ${date}:`, error)
@@ -150,12 +248,14 @@ export async function GET(request: NextRequest) {
       await new Promise(resolve => setTimeout(resolve, 200))
     }
 
-    console.log(`Found ${gameLogs.length} games in ${requestCount} API requests`)
+    console.log(`Found ${gameLogs.length} games in ${requestCount} API requests (${cacheHits} from cache)`)
 
     return NextResponse.json({
       playerKey,
       gamesFound: gameLogs.length,
       requestsMade: requestCount,
+      cacheHits,
+      fromCache: cacheHits > 0,
       gameLogs,
     })
 

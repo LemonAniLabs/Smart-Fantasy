@@ -127,8 +127,14 @@ export default function PlayerCard({ playerName, yahooPlayerKey, onClose }: Play
     '17': 'TO'
   }
 
+  // Define all stat columns to display (in order)
+  const allStatColumns = ['5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17']
+
   // Format stat value based on type
-  const formatStatValue = (statId: string, value: number): string => {
+  const formatStatValue = (statId: string, value: number | undefined): string => {
+    if (value === undefined || value === null) {
+      return '-'
+    }
     if (statId === '7' || statId === '10') { // Percentages
       return (value * 100).toFixed(1) + '%'
     }
@@ -382,7 +388,7 @@ export default function PlayerCard({ playerName, yahooPlayerKey, onClose }: Play
                   </select>
                 </div>
 
-                {/* Game Logs List */}
+                {/* Game Logs Table */}
                 {gameLogsLoading ? (
                   <div className="text-center py-12">
                     <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500"></div>
@@ -390,31 +396,38 @@ export default function PlayerCard({ playerName, yahooPlayerKey, onClose }: Play
                     <p className="text-slate-400 text-sm mt-2">這可能需要幾秒鐘</p>
                   </div>
                 ) : gameLogs.length > 0 ? (
-                  <div className="space-y-3">
-                    {gameLogs.map((game, index) => (
-                      <div key={game.date} className="bg-slate-800/50 rounded-lg border border-slate-700 hover:border-purple-500/50 transition-colors">
-                        <div className="p-4">
-                          <div className="flex justify-between items-center mb-3 pb-2 border-b border-slate-700">
-                            <div>
-                              <span className="text-purple-400 font-semibold">第 {index + 1} 場</span>
-                              <span className="text-slate-400 text-sm ml-3">{game.date}</span>
-                            </div>
-                            <span className="text-xs text-slate-500">{Object.keys(game.stats).length} 項數據</span>
-                          </div>
-
-                          <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 gap-3">
-                            {Object.entries(game.stats)
-                              .filter(([statId]) => statIdMap[statId])
-                              .map(([statId, value]) => (
-                                <div key={statId} className="text-center">
-                                  <div className="text-xs text-slate-400 mb-1">{getStatName(statId)}</div>
-                                  <div className="text-white font-semibold">{formatStatValue(statId, value)}</div>
-                                </div>
-                              ))}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
+                  <div className="overflow-x-auto -mx-6 px-6">
+                    <table className="w-full border-collapse text-sm">
+                      <thead>
+                        <tr className="bg-slate-800 sticky top-0 z-10">
+                          <th className="text-left px-3 py-2 text-purple-300 font-semibold border-b-2 border-purple-500 whitespace-nowrap sticky left-0 bg-slate-800">
+                            日期
+                          </th>
+                          {allStatColumns.map(statId => (
+                            <th key={statId} className="text-center px-3 py-2 text-slate-300 font-semibold border-b-2 border-purple-500 whitespace-nowrap">
+                              {getStatName(statId)}
+                            </th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {gameLogs.map((game, index) => (
+                          <tr key={game.date} className="border-b border-slate-700 hover:bg-slate-800/50 transition-colors">
+                            <td className="px-3 py-3 text-slate-300 font-medium whitespace-nowrap sticky left-0 bg-slate-900/95 backdrop-blur">
+                              <div className="flex items-center gap-2">
+                                <span className="text-purple-400 text-xs">#{index + 1}</span>
+                                <span>{game.date}</span>
+                              </div>
+                            </td>
+                            {allStatColumns.map(statId => (
+                              <td key={statId} className="text-center px-3 py-3 text-white whitespace-nowrap">
+                                {formatStatValue(statId, game.stats[statId])}
+                              </td>
+                            ))}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
                   </div>
                 ) : (
                   <div className="text-center py-12">
