@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>測試球員比賽紀錄</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+        }
+        .test-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        input, select {
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        button {
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #5568d3;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .status {
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+        .status.loading {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            color: #856404;
+        }
+        .status.success {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            color: #155724;
+        }
+        .status.error {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+            color: #721c24;
+        }
+        .results {
+            margin-top: 20px;
+        }
+        .game-card {
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .game-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #dee2e6;
+        }
+        .game-date {
+            font-size: 18px;
+            font-weight: 700;
+            color: #667eea;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 10px;
+        }
+        .stat-item {
+            text-align: center;
+            padding: 8px;
+            background: white;
+            border-radius: 4px;
+        }
+        .stat-label {
+            font-size: 11px;
+            color: #666;
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+        .stat-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #333;
+        }
+        .summary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+        .summary-item {
+            text-align: center;
+        }
+        .summary-label {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+        .summary-value {
+            font-size: 28px;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏀 球員比賽紀錄測試</h1>
+        <p class="subtitle">測試 Yahoo Fantasy API 能否正確獲取球員的完整賽季出賽表現</p>
+
+        <div class="test-controls">
+            <input type="text" id="leagueKey" placeholder="League Key (例如: 428.l.95226)" value="428.l.95226" style="flex: 1; min-width: 200px;">
+            <select id="gameLimit">
+                <option value="5">最近 5 場</option>
+                <option value="10" selected>最近 10 場</option>
+                <option value="15">最近 15 場</option>
+                <option value="20">最近 20 場</option>
+            </select>
+            <button id="testBtn" onclick="runTest()">開始測試</button>
+        </div>
+
+        <div id="status"></div>
+        <div id="results"></div>
+    </div>
+
+    <script>
+        const statIdMap = {
+            '5': 'FGM',
+            '6': 'FGA',
+            '7': 'FG%',
+            '8': 'FTM',
+            '9': 'FTA',
+            '10': 'FT%',
+            '11': '3PM',
+            '12': 'PTS',
+            '13': 'REB',
+            '14': 'AST',
+            '15': 'STL',
+            '16': 'BLK',
+            '17': 'TO'
+        };
+
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.className = `status ${type}`;
+            statusDiv.innerHTML = message;
+            statusDiv.style.display = 'block';
+        }
+
+        function formatStatValue(statId, value) {
+            if (statId === '7' || statId === '10') { // Percentages
+                return (value * 100).toFixed(1) + '%';
+            }
+            return value.toFixed(1);
+        }
+
+        async function runTest() {
+            const testBtn = document.getElementById('testBtn');
+            const resultsDiv = document.getElementById('results');
+            const leagueKey = document.getElementById('leagueKey').value;
+            const gameLimit = document.getElementById('gameLimit').value;
+
+            testBtn.disabled = true;
+            resultsDiv.innerHTML = '';
+
+            try {
+                // Step 1: Get teams
+                showStatus('📋 步驟 1/3: 獲取球隊資訊...', 'loading');
+                const teamsRes = await fetch(`/api/yahoo/teams?leagueKey=${leagueKey}`);
+                if (!teamsRes.ok) throw new Error('無法獲取球隊資訊');
+                const teamsData = await teamsRes.json();
+
+                if (!teamsData.teams || teamsData.teams.length === 0) {
+                    throw new Error('找不到球隊');
+                }
+
+                const myTeam = teamsData.teams[0];
+
+                // Step 2: Get roster
+                showStatus(`📋 步驟 2/3: 獲取 ${myTeam.name} 的球員名單...`, 'loading');
+                const rosterRes = await fetch(`/api/yahoo/roster?teamKey=${myTeam.team_key}`);
+                if (!rosterRes.ok) throw new Error('無法獲取球員名單');
+                const rosterData = await rosterRes.json();
+
+                if (!rosterData.roster || rosterData.roster.length === 0) {
+                    throw new Error('找不到球員');
+                }
+
+                const player = rosterData.roster[0];
+
+                // Step 3: Get game logs
+                showStatus(`🏀 步驟 3/3: 獲取 ${player.name.full} 的比賽紀錄... (這可能需要幾秒鐘)`, 'loading');
+                const startTime = Date.now();
+                const logsRes = await fetch(`/api/yahoo/player-season-games?playerKey=${player.player_key}&limit=${gameLimit}`);
+                if (!logsRes.ok) throw new Error('無法獲取比賽紀錄');
+                const logsData = await logsRes.json();
+                const duration = ((Date.now() - startTime) / 1000).toFixed(1);
+
+                // Show success
+                showStatus(`✅ 測試完成！耗時 ${duration} 秒`, 'success');
+
+                // Display results
+                displayResults(player, logsData, duration);
+
+            } catch (error) {
+                showStatus(`❌ 錯誤: ${error.message}`, 'error');
+                console.error(error);
+            } finally {
+                testBtn.disabled = false;
+            }
+        }
+
+        function displayResults(player, data, duration) {
+            const resultsDiv = document.getElementById('results');
+
+            // Summary
+            const summaryHTML = `
+                <div class="summary">
+                    <h3 style="margin: 0 0 15px 0;">測試摘要</h3>
+                    <div class="summary-grid">
+                        <div class="summary-item">
+                            <div class="summary-label">球員</div>
+                            <div class="summary-value">${player.name.full}</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-label">找到比賽數</div>
+                            <div class="summary-value">${data.gamesFound}</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-label">API 請求數</div>
+                            <div class="summary-value">${data.requestsMade}</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-label">總耗時</div>
+                            <div class="summary-value">${duration}s</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Game logs
+            let gamesHTML = '<h3>比賽紀錄</h3>';
+
+            if (data.gameLogs && data.gameLogs.length > 0) {
+                data.gameLogs.forEach((game, index) => {
+                    const statsHTML = Object.entries(game.stats)
+                        .filter(([statId]) => statIdMap[statId])
+                        .map(([statId, value]) => `
+                            <div class="stat-item">
+                                <div class="stat-label">${statIdMap[statId]}</div>
+                                <div class="stat-value">${formatStatValue(statId, value)}</div>
+                            </div>
+                        `).join('');
+
+                    gamesHTML += `
+                        <div class="game-card">
+                            <div class="game-header">
+                                <span class="game-date">第 ${index + 1} 場 - ${game.date}</span>
+                                <span style="color: #666; font-size: 14px;">${Object.keys(game.stats).length} 項數據</span>
+                            </div>
+                            <div class="stats-grid">
+                                ${statsHTML}
+                            </div>
+                        </div>
+                    `;
+                });
+            } else {
+                gamesHTML += '<p style="color: #999;">沒有找到比賽紀錄</p>';
+            }
+
+            resultsDiv.innerHTML = summaryHTML + gamesHTML;
+        }
+    </script>
+</body>
+</html>
