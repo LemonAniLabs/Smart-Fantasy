@@ -164,6 +164,22 @@
         <h1>🏀 球員比賽紀錄測試</h1>
         <p class="subtitle">測試 Yahoo Fantasy API 能否正確獲取球員的完整賽季出賽表現</p>
 
+        <div id="loginWarning" style="display: none; background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin-bottom: 20px; border-radius: 6px;">
+            <strong>⚠️ 需要登入</strong>
+            <p style="margin: 10px 0 0 0; color: #856404;">
+                此測試頁面需要你先登入 Yahoo Fantasy 帳號。
+                <br><br>
+                <strong>請按照以下步驟操作：</strong><br>
+                1. 點擊下方按鈕前往主頁<br>
+                2. 用 Yahoo 帳號登入<br>
+                3. 返回此測試頁面<br>
+                4. 重新點擊「開始測試」
+            </p>
+            <button onclick="window.location.href='/'" style="margin-top: 15px; background: #ffc107; color: #000;">
+                前往主頁登入
+            </button>
+        </div>
+
         <div class="test-controls">
             <input type="text" id="leagueKey" placeholder="League Key (例如: 428.l.95226)" value="428.l.95226" style="flex: 1; min-width: 200px;">
             <select id="gameLimit">
@@ -261,6 +277,11 @@
             } catch (error) {
                 showStatus(`❌ 錯誤: ${error.message}`, 'error');
                 console.error(error);
+
+                // Show login warning if unauthorized
+                if (error.message.includes('無法獲取球隊資訊') || error.message.includes('無法獲取球員名單')) {
+                    document.getElementById('loginWarning').style.display = 'block';
+                }
             } finally {
                 testBtn.disabled = false;
             }
