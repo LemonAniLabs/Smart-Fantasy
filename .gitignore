@@ -41,3 +41,12 @@ yarn-error.log*
 next-env.d.ts
 
 /app/generated/prisma
+
+# Python
+scripts/venv/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+scripts/.yfpy/
