@@ -8,9 +8,9 @@ const YAHOO_FANTASY_API_BASE = 'https://fantasysports.yahooapis.com/fantasy/v2'
 
 // NBA season date ranges
 const SEASONS: Record<string, { start: string; end: string }> = {
-  '2024-25': { start: '2024-10-22', end: '2025-06-30' },
-  '2023-24': { start: '2023-10-24', end: '2024-06-17' },
-  '2022-23': { start: '2022-10-18', end: '2023-06-12' }
+  '2025-26': { start: '2025-10-21', end: '2026-06-30' },
+  '2024-25': { start: '2024-10-22', end: '2025-06-17' },
+  '2023-24': { start: '2023-10-24', end: '2024-06-17' }
 }
 
 interface GameLog {
@@ -195,7 +195,7 @@ export async function GET(request: NextRequest) {
 
     const searchParams = request.nextUrl.searchParams
     const playerKey = searchParams.get('playerKey')
-    const season = searchParams.get('season') || '2024-25'
+    const season = searchParams.get('season') || '2025-26'
     const batchSize = parseInt(searchParams.get('batchSize') || '50')
 
     if (!playerKey) {

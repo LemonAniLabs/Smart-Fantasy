@@ -6,8 +6,8 @@ import { supabase } from '@/lib/supabase/client'
 
 const YAHOO_FANTASY_API_BASE = 'https://fantasysports.yahooapis.com/fantasy/v2'
 
-// 2024-25 NBA season started on October 22, 2024
-const NBA_SEASON_START = new Date('2024-10-22')
+// 2025-26 NBA season started on October 21, 2025
+const NBA_SEASON_START = new Date('2025-10-21')
 
 interface GameLog {
   date: string

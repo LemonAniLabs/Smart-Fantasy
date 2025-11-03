@@ -5,7 +5,7 @@ import axios from 'axios'
 import { supabase } from '@/lib/supabase/client'
 
 const YAHOO_FANTASY_API_BASE = 'https://fantasysports.yahooapis.com/fantasy/v2'
-const NBA_SEASON_START = new Date('2024-10-22')
+const NBA_SEASON_START = new Date('2025-10-21')
 
 interface GameLog {
   date: string
