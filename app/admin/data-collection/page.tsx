@@ -46,7 +46,7 @@ export default function DataCollectionPage() {
       addLog('', 'info')
 
       // Stats
-      let totalStats = {
+      const totalStats = {
         processed: 0,
         newGames: 0,
         existingGames: 0,
