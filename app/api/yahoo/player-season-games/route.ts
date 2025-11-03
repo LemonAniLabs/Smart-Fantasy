@@ -13,6 +13,10 @@ interface GameLog {
   date: string
   stats: Record<string, number>
   hasGame: boolean
+  opponent?: string
+  home_away?: 'home' | 'away'
+  minutes_played?: number
+  game_result?: 'W' | 'L' | 'T'
 }
 
 /**
@@ -28,7 +32,7 @@ async function getGameLogsFromCache(playerKey: string, dates: string[]): Promise
   try {
     const { data, error } = await supabase
       .from('player_game_logs')
-      .select('game_date, stats')
+      .select('game_date, stats, opponent, home_away, minutes_played, game_result')
       .eq('player_key', playerKey)
       .in('game_date', dates)
 
@@ -42,7 +46,11 @@ async function getGameLogsFromCache(playerKey: string, dates: string[]): Promise
       cacheMap.set(row.game_date, {
         date: row.game_date,
         stats: row.stats as Record<string, number>,
-        hasGame: true
+        hasGame: true,
+        opponent: row.opponent || undefined,
+        home_away: row.home_away as 'home' | 'away' | undefined,
+        minutes_played: row.minutes_played || undefined,
+        game_result: row.game_result as 'W' | 'L' | 'T' | undefined
       })
     })
 
@@ -69,7 +77,11 @@ async function saveGameLogToCache(playerKey: string, playerName: string, gameLog
         player_key: playerKey,
         player_name: playerName,
         game_date: gameLog.date,
-        stats: gameLog.stats
+        stats: gameLog.stats,
+        opponent: gameLog.opponent || null,
+        home_away: gameLog.home_away || null,
+        minutes_played: gameLog.minutes_played || null,
+        game_result: gameLog.game_result || null
       }, {
         onConflict: 'player_key,game_date'
       })
@@ -212,6 +224,8 @@ export async function GET(request: NextRequest) {
 
         // Convert stats array to object
         const statsObject: Record<string, number> = {}
+        let minutesPlayed: number | undefined
+
         stats.forEach((statItem: { stat: { stat_id: string; value: string } }) => {
           const statId = statItem.stat.stat_id
           const value = statItem.stat.value
@@ -220,6 +234,11 @@ export async function GET(request: NextRequest) {
           const numValue = parseFloat(value)
           if (!isNaN(numValue)) {
             statsObject[statId] = numValue
+
+            // Stat ID 3 is typically minutes played (MIN)
+            if (statId === '3') {
+              minutesPlayed = numValue
+            }
           }
         })
 
@@ -227,10 +246,13 @@ export async function GET(request: NextRequest) {
           date,
           stats: statsObject,
           hasGame: true,
+          minutes_played: minutesPlayed,
+          // opponent, home_away, and game_result will be added in Phase 2.2
+          // when we integrate with NBA Stats API or Yahoo scoreboard endpoint
         }
 
         gameLogs.push(gameLog)
-        console.log(`Found game on ${date} - ${Object.keys(statsObject).length} stats`)
+        console.log(`Found game on ${date} - ${Object.keys(statsObject).length} stats${minutesPlayed ? `, ${minutesPlayed} min` : ''}`)
 
         // Save to cache (don't await, let it run in background)
         if (playerName) {
